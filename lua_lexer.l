@@ -1,5 +1,7 @@
 %option never-interactive
 
+%x LCOMM // состояние многострочного комментария
+
 /* Макросы */
 ID_START                [A-Za-z_]
 ID_CONT                 [A-Za-z0-9_]*
@@ -25,6 +27,19 @@ HEX_FLOAT               {HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}* | "."{HEX_DIGIT
 #include <iostream>
 
 using std::cout;
+
+static char comment_buf[8192];
+static size_t comment_pos = 0;
+
+static inline void append_to_comments(const char* s, size_t n) {
+    if (comment_pos + n >= sizeof(comment_buf)) n = sizeof(comment_buf) - 1 - comment_pos;
+    if (n > 0) {
+        std::memcpy(comment_buf + comment_pos, s, n);
+        comment_pos += n;
+        comment_buf[comment_pos] = '\0';
+    }
+}
+
 %}
 
 
@@ -78,6 +93,9 @@ using std::cout;
 "__index"               { cout << "Metamethod: " << yytext << " (table[key])\n"; }
 "__newindex"            { cout << "Metamethod: " << yytext << " (table[key] = value)\n"; }
 "__call"                { cout << "Metamethod: " << yytext << " (func(args))\n"; }
+
+/* Комментарии */
+
 
 /* Операторы (многосимвольные) */
 "..."                   { cout << "Varargs: " << yytext << '\n'; }
