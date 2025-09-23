@@ -107,7 +107,7 @@ static inline void comm_reset(){
 <SLCOMM>"[["           { comm_reset(); comm_start_line = yylineno; BEGIN(LCOMM); }
 
 /* Однострочные комментарии */
-<SLCOMM>[^\n]*         { cout << "Single comment: " << yytext << '\n'; }          
+<SLCOMM>[^\n]*         { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }          
 
 /* Многострочные комментарии */
 <LCOMM>"]]"            { cout << "Multi comment: " << comm_buf << '\n'; BEGIN(INITIAL); } // конец многострочного комментария
