@@ -1,4 +1,5 @@
 %option never-interactive
+%option yylineno
 
 %x LCOMM // состояние многострочного комментария
 %x SLCOMM // ловим -- и проверяем, многострочный или однострочный комментарий
@@ -111,7 +112,7 @@ static inline void comm_reset(){
 
 /* Многострочные комментарии */
 <LCOMM>"]]"            { cout << "Multi comment: " << comm_buf << '\n'; BEGIN(INITIAL); } // конец многострочного комментария
-<LCOMM>\n              { yylineno++; comm_append("\n", 1); }
+<LCOMM>\n              { comm_append("\n", 1); }
 <LCOMM>.               { comm_append(yytext, yyleng); }
 
 // Ошибка: не закрытый многострочный комментарий
