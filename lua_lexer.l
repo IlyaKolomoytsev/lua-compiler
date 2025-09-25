@@ -193,8 +193,8 @@ static inline void str_reset() {
 <DSTRING,SSTRING>\\r    { str_putc('\r'); }
 <DSTRING,SSTRING>\\t    { str_putc('\t'); }
 <DSTRING,SSTRING>\\v    { str_putc('\v'); }
-<DSTRING>       \\\"    { str_putc('\"'); }
-<SSTRING>       \\\'    { str_putc('\''); }
+<DSTRING>"\\\""         { str_putc('"');  }
+<SSTRING>"\\'"          { str_putc('\''); }
 <DSTRING,SSTRING>\\\\   { str_putc('\\'); }
 
 /* \xHH две hex-цифры */
