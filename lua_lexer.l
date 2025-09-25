@@ -239,11 +239,9 @@ static inline void str_reset() {
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
 /* Ошибка: неизвестная escape-последовательность */
-<DSTRING,SSTRING>\\([^abfnrtv"'\\x0-9u\z\n])
+<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n])
 {
-    std::cout << "ERROR: invalid escape " << "'" << yytext << "'"
-              << " at line " << yylineno << "\n";
-    str_append(yytext + 1, yyleng - 1);
+    cout << "ERROR: invalid escape " << "'" << yytext << "'" << " at line " << yylineno << '\n'; str_append(yytext + 1, yyleng - 1);
 }
 
 /* Числовые литералы */
