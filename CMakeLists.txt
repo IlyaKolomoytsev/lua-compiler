@@ -23,7 +23,6 @@ add_custom_command(
 add_executable(lua_compiler
         main.cpp
         ${GENERATED_LEXER_FILE}
-        yyFlexLexer.cpp
 )
 
 set_source_files_properties(${GENERATED_LEXER_FILE} PROPERTIES LANGUAGE CXX)
