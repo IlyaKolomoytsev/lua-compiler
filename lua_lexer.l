@@ -1,5 +1,6 @@
 %option never-interactive
 %option yylineno
+%option noyywrap
 
 %x LCOMM /* состояние многострочного комментария */
 %x SLCOMM /* ловим -- и проверяем, многострочный или однострочный комментарий */
@@ -239,10 +240,10 @@ static inline void str_reset() {
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
 /* Ошибка: неизвестная escape-последовательность */
-<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n])
+/* <DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n])
 {
     cout << "ERROR: invalid escape " << "'" << yytext << "'" << " at line " << yylineno << '\n'; str_append(yytext + 1, yyleng - 1);
-}
+} */
 
 /* Числовые литералы */
 {HEX_FLOAT}             { cout << "Float(hex): " << strtod(yytext, nullptr) << '\n'; }
