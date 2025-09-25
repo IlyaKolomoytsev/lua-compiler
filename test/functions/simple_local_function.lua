@@ -1,0 +1,3 @@
+local function greet()
+    return "Hello, World!"
+end
