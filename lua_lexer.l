@@ -80,9 +80,9 @@ static inline void str_append(const char* s, size_t n) {
 }
 
 static inline int hexval(int c) {
-    if (c >= '0' && c <= '9') return c - '0';
-    if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
-    if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
+    if ('0' <= c && c <= '9') return c - '0';
+    if ('a' <= c && c <= 'f') return 10 + (c - 'a');
+    if ('A' <= c && c <= 'F') return 10 + (c - 'A');
     return -1;
 }
 
