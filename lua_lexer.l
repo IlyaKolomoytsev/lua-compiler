@@ -1,10 +1,10 @@
 %option never-interactive
 %option yylineno
 
-%x LCOMM // состояние многострочного комментария
-%x SLCOMM // ловим -- и проверяем, многострочный или однострочный комментарий
-%x DSTRING // строки в двойных кавычках
-%x SSTRING // строки в одинарных кавычках
+%x LCOMM /* состояние многострочного комментария */
+%x SLCOMM /* ловим -- и проверяем, многострочный или однострочный комментарий */
+%x DSTRING /* строки в двойных кавычках */
+%x SSTRING /* строки в одинарных кавычках */
 
 /* Макросы */
 ID_START                [A-Za-z_]
@@ -169,7 +169,7 @@ static inline void str_reset() {
 <SLCOMM>[^\n]*          { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }          
 
 /* Многострочные комментарии */
-<LCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } // конец многострочного комментария
+<LCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
 <LCOMM>\n               { comm_append("\n", 1); }
 <LCOMM>.                { comm_append(yytext, yyleng); }
 
@@ -177,14 +177,14 @@ static inline void str_reset() {
 <LCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
 
 /* Строки */
-\"                      { str_reset(); BEGIN(DSTRING); } // Старт строки с "
-\'                      { str_reset(); BEGIN(SSTRING); } // Старт строки с '
+\"                      { str_reset(); BEGIN(DSTRING); } /* Старт строки с " */
+\'                      { str_reset(); BEGIN(SSTRING); } /* Старт строки с ' */
 
-// Добавление обычного текста
+/* Добавление обычного текста */
 <DSTRING>[^"\\\n]+      { str_append(yytext, yyleng); }              
 <SSTRING>[^'\\\n]+      { str_append(yytext, yyleng); }
 
-// Стандартные escape-последовательности
+/* Стандартные escape-последовательности */
 <DSTRING,SSTRING>\\a    { str_putc('\a'); }
 <DSTRING,SSTRING>\\b    { str_putc('\b'); }
 <DSTRING,SSTRING>\\f    { str_putc('\f'); }
@@ -196,14 +196,14 @@ static inline void str_reset() {
 <SSTRING>       \\\'    { str_putc('\''); }
 <DSTRING,SSTRING>\\\\   { str_putc('\\'); }
 
-// \xHH две hex-цифры
+/* \xHH две hex-цифры */
 <DSTRING,SSTRING>\\x[0-9A-Fa-f]{2} {
     int hi = hexval(yytext[2]);
     int lo = hexval(yytext[3]);
     str_putc((char)((hi << 4) | lo));
 }
 
-// \ddd от одной до трех десятичных цифр
+/* \ddd от одной до трех десятичных цифр */
 <DSTRING,SSTRING>\\[0-9]{1,3} {
     int v = std::strtol(yytext + 1, nullptr, 10);
     if (v < 0) v = 0;
@@ -211,7 +211,7 @@ static inline void str_reset() {
     str_putc((char)v);
 }
 
-// \u{...} unicode в hex
+/* \u{...} unicode в hex */
 <DSTRING,SSTRING>\\u\{[0-9A-Fa-f]+\} {
     unsigned cp = 0;
     for (int i = 3; yytext[i] != '}'; ++i) {
@@ -223,22 +223,22 @@ static inline void str_reset() {
     utf8_from_codepoint(cp);
 }
 
-// Обратный слэш + перевод строки
+/* Обратный слэш + перевод строки */
 <DSTRING,SSTRING>\\\n  { str_putc('\n'); }
 
-// Конец строки
+/* Конец строки */
 <DSTRING>\"             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
 <SSTRING>\'             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
 
-// Ошибка: перевод строки до закрытия
+/* Ошибка: перевод строки до закрытия */
 <DSTRING>\n             { cout << "ERROR: unterminated string (\") at line " << yylineno << '\n'; BEGIN(INITIAL); }
 <SSTRING>\n             { cout << "ERROR: unterminated string (') at line " << yylineno << '\n'; BEGIN(INITIAL); }
 
-// Ошибка: конец файла внутри строки
+/* Ошибка: конец файла внутри строки */
 <DSTRING><<EOF>>        { cout << "ERROR: unterminated string (\") before EOF\n"; BEGIN(INITIAL); }
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
-// Ошибка: неизвестная escape-последовательность
+/* Ошибка: неизвестная escape-последовательность */
 <DSTRING,SSTRING>\\([^abfnrtv"'\\x0-9u\z\n])
 {
     std::cout << "ERROR: invalid escape " << "'" << yytext << "'"
