@@ -171,10 +171,11 @@ static inline void str_reset() {
 "--[["                  { comm_reset(); comment_start_line = yylineno; BEGIN(MCOMM); }
 
 
-<SCOMM>[^\n]*           { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }
+<SCOMM>[^\r\n]*           { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }
 
 <MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
-<MCOMM>\n               { comm_append("\n", 1); }
+<MCOMM>\r\n             { comm_append("\n", 1); }
+<MCOMM>\r               { /* игнорируем одиночный CR */ }
 <MCOMM>.                { comm_append(yytext, yyleng); }
 
 
