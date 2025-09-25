@@ -243,7 +243,8 @@ static inline void str_reset() {
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
 <DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
-    cout << "ERROR: invalid escape " << "'" << yytext << "'" << " at line " << yylineno << '\n'; str_append(yytext + 1, yyleng - 1);
+    cout << "ERROR: invalid escape '" << yytext << "' at line " << yylineno << '\n';
+    str_append(yytext + 1, yyleng - 1); // добавим символ после '\' буквально
 }
 
 
