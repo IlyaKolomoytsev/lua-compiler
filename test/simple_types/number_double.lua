@@ -1,0 +1,12 @@
+local var = 2.01
+maxValue = 9223372036854775807.0
+local hex0x = 0x3b.3
+local Exp_Value = 4e-1
+local BIG_EXP_VALUE = 4E-1
+binExp = 0x8p-2
+binExpWithBigP = 0x8P-2
+_negativeVal = -10000.32
+local _1HexN = -0xAf.d
+expNegVal = -893e-5
+NegBinExp = -0x10p-4
+NegBinExpWithBigP = -0x10P-4
