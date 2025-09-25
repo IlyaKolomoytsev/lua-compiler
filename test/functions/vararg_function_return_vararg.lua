@@ -1,0 +1,3 @@
+function printAll(...)
+    return ...
+end
