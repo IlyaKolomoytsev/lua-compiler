@@ -2,10 +2,14 @@
 %option yylineno
 %option noyywrap
 
-%x LCOMM /* состояние многострочного комментария */
-%x SLCOMM /* ловим -- и проверяем, многострочный или однострочный комментарий */
-%x DSTRING /* строки в двойных кавычках */
-%x SSTRING /* строки в одинарных кавычках */
+/* состояние многострочного комментария */
+%x LCOMM
+/* ловим -- и проверяем, многострочный или однострочный комментарий */
+%x SLCOMM
+/* строки в двойных кавычках */
+%x DSTRING
+/* строки в одинарных кавычках */
+%x SSTRING
 
 /* Макросы */
 ID_START                [A-Za-z_]
@@ -113,7 +117,7 @@ static inline void str_reset() {
 
 %%
 
-/* Ключевые слова */
+
 "and"                   { cout << "Keyword: " << yytext << '\n'; }
 "break"                 { cout << "Keyword: " << yytext << '\n'; }
 "do"                    { cout << "Keyword: " << yytext << '\n'; }
@@ -138,7 +142,7 @@ static inline void str_reset() {
 "true"                  { cout << "Boolean: " << yytext << '\n'; }
 "false"                 { cout << "Boolean: " << yytext << '\n'; }
 
-/* Метаметоды */
+
 "__add"                 { cout << "Metamethod: " << yytext << " (operator +)\n"; }
 "__sub"                 { cout << "Metamethod: " << yytext << " (operator -)\n"; }
 "__mul"                 { cout << "Metamethod: " << yytext << " (operator *)\n"; }
@@ -162,30 +166,29 @@ static inline void str_reset() {
 "__newindex"            { cout << "Metamethod: " << yytext << " (table[key] = value)\n"; }
 "__call"                { cout << "Metamethod: " << yytext << " (func(args))\n"; }
 
-/* Комментарии */
+
 "--"                    { BEGIN(SLCOMM); }
 <SLCOMM>"[["            { comm_reset(); comment_start_line = yylineno; BEGIN(LCOMM); }
 
-/* Однострочные комментарии */
+
 <SLCOMM>[^\n]*          { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }          
 
-/* Многострочные комментарии */
 <LCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
 <LCOMM>\n               { comm_append("\n", 1); }
 <LCOMM>.                { comm_append(yytext, yyleng); }
 
-/* Ошибка: не закрытый многострочный комментарий */
+
 <LCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
 
-/* Строки */
+
 \"                      { str_reset(); BEGIN(DSTRING); } /* Старт строки с " */
 \'                      { str_reset(); BEGIN(SSTRING); } /* Старт строки с ' */
 
-/* Добавление обычного текста */
+
 <DSTRING>[^"\\\n]+      { str_append(yytext, yyleng); }              
 <SSTRING>[^'\\\n]+      { str_append(yytext, yyleng); }
 
-/* Стандартные escape-последовательности */
+
 <DSTRING,SSTRING>\\a    { str_putc('\a'); }
 <DSTRING,SSTRING>\\b    { str_putc('\b'); }
 <DSTRING,SSTRING>\\f    { str_putc('\f'); }
@@ -197,14 +200,14 @@ static inline void str_reset() {
 <SSTRING>"\\'"          { str_putc('\''); }
 <DSTRING,SSTRING>\\\\   { str_putc('\\'); }
 
-/* \xHH две hex-цифры */
+
 <DSTRING,SSTRING>\\x[0-9A-Fa-f]{2} {
     int hi = hexval(yytext[2]);
     int lo = hexval(yytext[3]);
     str_putc((char)((hi << 4) | lo));
 }
 
-/* \ddd от одной до трех десятичных цифр */
+
 <DSTRING,SSTRING>\\[0-9]{1,3} {
     int v = std::strtol(yytext + 1, nullptr, 10);
     if (v < 0) v = 0;
@@ -212,7 +215,7 @@ static inline void str_reset() {
     str_putc((char)v);
 }
 
-/* \u{...} unicode в hex */
+
 <DSTRING,SSTRING>\\u\{[0-9A-Fa-f]+\} {
     unsigned cp = 0;
     for (int i = 3; yytext[i] != '}'; ++i) {
@@ -224,34 +227,32 @@ static inline void str_reset() {
     utf8_from_codepoint(cp);
 }
 
-/* Обратный слэш + перевод строки */
+
 <DSTRING,SSTRING>\\\n  { str_putc('\n'); }
 
-/* Конец строки */
+
 <DSTRING>\"             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
 <SSTRING>\'             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
 
-/* Ошибка: перевод строки до закрытия */
+
 <DSTRING>\n             { cout << "ERROR: unterminated string (\") at line " << yylineno << '\n'; BEGIN(INITIAL); }
 <SSTRING>\n             { cout << "ERROR: unterminated string (') at line " << yylineno << '\n'; BEGIN(INITIAL); }
 
-/* Ошибка: конец файла внутри строки */
+
 <DSTRING><<EOF>>        { cout << "ERROR: unterminated string (\") before EOF\n"; BEGIN(INITIAL); }
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
-/* Ошибка: неизвестная escape-последовательность */
-/* <DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n])
-{
+<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
     cout << "ERROR: invalid escape " << "'" << yytext << "'" << " at line " << yylineno << '\n'; str_append(yytext + 1, yyleng - 1);
-} */
+}
 
-/* Числовые литералы */
+
 {HEX_FLOAT}             { cout << "Float(hex): " << strtod(yytext, nullptr) << '\n'; }
 {HEX_INT}               { cout << "Int(hex): " << strtoll(yytext, nullptr, 0) << '\n'; }
 {DEC_FLOAT}             { cout << "Float: " << strtod(yytext, nullptr) << '\n'; }
 {DEC_INT}               { cout << "Int: " << strtoll(yytext, nullptr, 10) << '\n'; }
 
-/* Операторы (многосимвольные) */
+
 "..."                   { cout << "Varargs: " << yytext << '\n'; }
 "::"                    { cout << "LabelSep: " << yytext << '\n'; }
 "//"                    { cout << "Operator: " << yytext << " (int div)\n"; }
@@ -263,7 +264,7 @@ static inline void str_reset() {
 "<<"                    { cout << "Operator: " << yytext << " (shl)\n"; }
 ">>"                    { cout << "Operator: " << yytext << " (shr)\n"; }
 
-/* Операторы (односимвольные) */
+
 "+"                     { cout << "Operator: " << yytext << '\n'; }
 "-"                     { cout << "Operator: " << yytext << '\n'; }
 "*"                     { cout << "Operator: " << yytext << '\n'; }
@@ -282,7 +283,7 @@ static inline void str_reset() {
 ","                     { cout << "Operator: "   << yytext << '\n'; }
 ";"                     { cout << "Operator: " << yytext << '\n'; }
 
-/* Скобки */
+
 "("                     { cout << "LParen: "  << yytext << '\n'; }
 ")"                     { cout << "RParen: "  << yytext << '\n'; }
 "["                     { cout << "LBracket: "<< yytext << '\n'; }
@@ -290,13 +291,13 @@ static inline void str_reset() {
 "{"                     { cout << "LBrace: "  << yytext << '\n'; }
 "}"                     { cout << "RBrace: "  << yytext << '\n'; }
 
-/* Идентификаторы */
+
 {ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; }
 
 
 
 
-/* Пробельные символы */
+
 {WS}            ;
 
 %%
