@@ -2,10 +2,10 @@
 %option yylineno
 %option noyywrap
 
+/* состояние однострочного комментария */
+%x SCOMM
 /* состояние многострочного комментария */
-%x LCOMM
-/* ловим -- и проверяем, многострочный или однострочный комментарий */
-%x SLCOMM
+%x MCOMM
 /* строки в двойных кавычках */
 %x DSTRING
 /* строки в одинарных кавычках */
@@ -167,18 +167,18 @@ static inline void str_reset() {
 "__call"                { cout << "Metamethod: " << yytext << " (func(args))\n"; }
 
 
-"--"                    { BEGIN(SLCOMM); }
-<SLCOMM>"[["            { comm_reset(); comment_start_line = yylineno; BEGIN(LCOMM); }
+"--"                    { comm_reset(); comment_start_line = yylineno; BEGIN(SCOMM); }
+"--[["                  { comm_reset(); comment_start_line = yylineno; BEGIN(MCOMM); }
 
 
-<SLCOMM>[^\n]*          { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }          
+<SCOMM>[^\n]*           { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }
 
-<LCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
-<LCOMM>\n               { comm_append("\n", 1); }
-<LCOMM>.                { comm_append(yytext, yyleng); }
+<MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
+<MCOMM>\n               { comm_append("\n", 1); }
+<MCOMM>.                { comm_append(yytext, yyleng); }
 
 
-<LCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
+<MCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
 
 
 \"                      { str_reset(); BEGIN(DSTRING); } /* Старт строки с " */
