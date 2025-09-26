@@ -26,7 +26,7 @@ HEX_DIGIT               [0-9A-Fa-f]
 HEX_PREFIX              0[xX]
 HEX_EXP                 [pP][+-]?{DIGIT}+
 HEX_INT                 {HEX_PREFIX}{HEX_DIGIT}+
-HEX_FLOAT               {HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}+){HEX_EXP}|{HEX_INT}{HEX_EXP}
+HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}+){HEX_EXP}?|({HEX_INT}{HEX_EXP}))
 
 
 %{
