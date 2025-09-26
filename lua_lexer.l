@@ -267,10 +267,6 @@ static inline void str_reset() {
 
 {ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; }
 
-
-
-
-
 {WS}            ;
 
 %%
