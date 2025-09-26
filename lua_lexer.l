@@ -143,30 +143,6 @@ static inline void str_reset() {
 "false"                 { cout << "Boolean: " << yytext << '\n'; }
 
 
-"__add"                 { cout << "Metamethod: " << yytext << " (operator +)\n"; }
-"__sub"                 { cout << "Metamethod: " << yytext << " (operator -)\n"; }
-"__mul"                 { cout << "Metamethod: " << yytext << " (operator *)\n"; }
-"__div"                 { cout << "Metamethod: " << yytext << " (operator /)\n"; }
-"__mod"                 { cout << "Metamethod: " << yytext << " (operator %)\n"; }
-"__pow"                 { cout << "Metamethod: " << yytext << " (operator ^)\n"; }
-"__unm"                 { cout << "Metamethod: " << yytext << " (operator -)\n"; }
-"__idiv"                { cout << "Metamethod: " << yytext << " (operator //)\n"; }
-"__band"                { cout << "Metamethod: " << yytext << " (operator &)\n"; }
-"__bor"                 { cout << "Metamethod: " << yytext << " (operator |)\n"; }
-"__bxor"                { cout << "Metamethod: " << yytext << " (operator ~)\n"; }
-"__bnot"                { cout << "Metamethod: " << yytext << " (operator ~)\n"; }
-"__shl"                 { cout << "Metamethod: " << yytext << " (operator <<)\n"; }
-"__shr"                 { cout << "Metamethod: " << yytext << " (operator >>)\n"; }
-"__concat"              { cout << "Metamethod: " << yytext << " (operator ..)\n"; }
-"__len"                 { cout << "Metamethod: " << yytext << " (operator #)\n"; }
-"__eq"                  { cout << "Metamethod: " << yytext << " (operator ==)\n"; }
-"__lt"                  { cout << "Metamethod: " << yytext << " (operator <)\n"; }
-"__le"                  { cout << "Metamethod: " << yytext << " (operator <=)\n"; }
-"__index"               { cout << "Metamethod: " << yytext << " (table[key])\n"; }
-"__newindex"            { cout << "Metamethod: " << yytext << " (table[key] = value)\n"; }
-"__call"                { cout << "Metamethod: " << yytext << " (func(args))\n"; }
-
-
 "--"                    { comm_reset(); comment_start_line = yylineno; BEGIN(SCOMM); }
 "--[["                  { comm_reset(); comment_start_line = yylineno; BEGIN(MCOMM); }
 
