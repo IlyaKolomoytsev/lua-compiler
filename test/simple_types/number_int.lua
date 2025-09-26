@@ -1,12 +1,5 @@
 local var = 2
 maxValue = 9223372036854775807
 local hex0x = 0x2A
-local Exp_Value = 4e1
-local BIG_EXP_VALUE = 4E1
-binExpWithSmallP = 0x1p+2
-binExpWithBigP = 0x1P+2
 _negativeVal = -10000
 local _1HexN = -0xAf
-expNegVal = -893e5
-NegBinExpWithSmallP = -0x1p+2
-NegBinExpWithBigP = -0x1P+2
