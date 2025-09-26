@@ -239,8 +239,6 @@ static inline void str_reset() {
 "~="                    { cout << "Operator: " << yytext << '\n'; }
 "<="                    { cout << "Operator: " << yytext << '\n'; }
 ">="                    { cout << "Operator: " << yytext << '\n'; }
-"<<"                    { cout << "Operator: " << yytext << " (shl)\n"; }
-">>"                    { cout << "Operator: " << yytext << " (shr)\n"; }
 
 
 "+"                     { cout << "Operator: " << yytext << '\n'; }
@@ -250,9 +248,6 @@ static inline void str_reset() {
 "%"                     { cout << "Operator: " << yytext << '\n'; }
 "^"                     { cout << "Operator: " << yytext << '\n'; }
 "#"                     { cout << "Operator: " << yytext << " (len)\n"; }
-"&"                     { cout << "Operator: " << yytext << " (band)\n"; }
-"|"                     { cout << "Operator: " << yytext << " (bor)\n"; }
-"~"                     { cout << "Operator: " << yytext << " (bxor / bnot)\n"; }
 "="                     { cout << "Operator: "  << yytext << '\n'; }
 "<"                     { cout << "Operator: " << yytext << '\n'; }
 ">"                     { cout << "Operator: " << yytext << '\n'; }
