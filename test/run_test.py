@@ -105,7 +105,7 @@ if __name__ == "__main__":
         for file in files:
             new_path = Path(TEST_RESULT_DIRECTORY) / Path(file).with_name(Path(file).name).with_suffix('.txt')
             new_path.parent.mkdir(parents=True, exist_ok=True)
-            command = [EXECUTABLE_TARGET, file]
+            command = [EXECUTABLE_TARGET, Path(file).as_posix()]
             run_command_inside_container(command, container_name, new_path)
     finally:
         kill_docker_container(container_name)
