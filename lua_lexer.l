@@ -116,7 +116,10 @@ static inline void str_reset() {
 
 
 %%
-
+%{
+    // ToDo: объявления я так понял должны быть тут.
+    // комментарий создан спустя неделю после консультации
+%}
 
 "and"                   { cout << "Keyword: " << yytext << '\n'; }
 "break"                 { cout << "Keyword: " << yytext << '\n'; }
@@ -152,7 +155,7 @@ static inline void str_reset() {
 <MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
 <MCOMM>\r\n             { comm_append("\n", 1); }
 <MCOMM>\r               { /* игнорируем одиночный CR */ }
-<MCOMM>.                { comm_append(yytext, yyleng); }
+<MCOMM>.                { comm_append(yytext, yyleng); } // ToDo добработать оптимизацию
 
 
 <MCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
@@ -219,7 +222,7 @@ static inline void str_reset() {
 <DSTRING><<EOF>>        { cout << "ERROR: unterminated string (\") before EOF\n"; BEGIN(INITIAL); }
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
-<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
+<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) { // ToDo можно ограничется //.
     cout << "ERROR: invalid escape '" << yytext << "' at line " << yylineno << '\n';
     str_append(yytext + 1, yyleng - 1); // добавим символ после '\' буквально
 }
@@ -268,6 +271,8 @@ static inline void str_reset() {
 {ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; }
 
 {WS}            ;
+
+<*>. {} // ToDo: встречен неизвестный символ
 
 %%
 
