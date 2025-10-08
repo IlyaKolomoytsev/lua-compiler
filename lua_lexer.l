@@ -218,7 +218,7 @@ static char string_buf[8192];
 
 {WS}            ;
 
-<*>. {} // ToDo: встречен неизвестный символ
+<*>. { cout << "Error: unexpected symbol: " << yytext << " at line " << yylineno << '\n'; }
 
 %%
 
