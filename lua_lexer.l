@@ -37,85 +37,31 @@ HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}
 
 using std::cout;
 
+/* Прототипы функций */
+static inline void comm_append(const char* s, size_t n);
+static inline void comm_reset();
+static inline void str_putc(char c);
+static inline void str_append(const char* s, size_t n);
+static inline int hexval(int c);
+static inline void utf8_from_codepoint(unsigned cp);
+static inline void str_reset();
+
 /* Переменные для работы с комментариями */
 static char comment_buf[8192];
 static size_t comment_pos = 0;
 static int comment_start_line = 0;
 
+
 /* Переменные для работы со строками */
 static size_t string_pos = 0;
-static char string_buf[8192]; 
+static char string_buf[8192];
 
-/* Функции для работы с комментариями */
-static inline void comm_append(const char* s, size_t n) {
-    if (comment_pos + n >= sizeof(comment_buf)) n = sizeof(comment_buf) - 1 - comment_pos;
-    if (n > 0) {
-        std::memcpy(comment_buf + comment_pos, s, n);
-        comment_pos += n;
-        comment_buf[comment_pos] = '\0';
-    }
-}
 
-static inline void comm_reset(){
-    comment_pos = 0;
-    comment_buf[0] = '\0';
-    comment_start_line = 0;
-}
-
-/* Функции для работы со строками */
-static inline void str_putc(char c) {
-    if (string_pos + 1 < sizeof(string_buf)) {
-        string_buf[string_pos++] = c;
-        string_buf[string_pos] = '\0';
-    }
-}
-
-static inline void str_append(const char* s, size_t n) {
-    if (string_pos + n >= sizeof(string_buf)) n = sizeof(string_buf) - 1 - string_pos;
-    if (n > 0) {
-        std::memcpy(string_buf + string_pos, s, n);
-        string_pos += n;
-        string_buf[string_pos] = '\0';
-    }
-}
-
-static inline int hexval(int c) {
-    if ('0' <= c && c <= '9') return c - '0';
-    if ('a' <= c && c <= 'f') return 10 + (c - 'a');
-    if ('A' <= c && c <= 'F') return 10 + (c - 'A');
-    return -1;
-}
-
-/* кодпоинт (U+XXXXX) → UTF-8 */
-static inline void utf8_from_codepoint(unsigned cp) {
-    if (cp <= 0x7F) {
-        str_putc((char)cp);
-    } else if (cp <= 0x7FF) {
-        str_putc((char)(0xC0 | ((cp >> 6) & 0x1F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else if (cp <= 0xFFFF) {
-        str_putc((char)(0xE0 | ((cp >> 12) & 0x0F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else if (cp <= 0x10FFFF) {
-        str_putc((char)(0xF0 | ((cp >> 18) & 0x07)));
-        str_putc((char)(0x80 | ((cp >> 12) & 0x3F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else {
-        utf8_from_codepoint(0xFFFD);
-    }
-}
-
-static inline void str_reset() {
-    string_pos = 0;
-    string_buf[0] = '\0';
-}
 
 %}
 
-
 %%
+
 %{
     // ToDo: объявления я так понял должны быть тут.
     // комментарий создан спустя неделю после консультации
@@ -251,12 +197,12 @@ static inline void str_reset() {
 "%"                     { cout << "Operator: " << yytext << '\n'; }
 "^"                     { cout << "Operator: " << yytext << '\n'; }
 "#"                     { cout << "Operator: " << yytext << " (len)\n"; }
-"="                     { cout << "Operator: "  << yytext << '\n'; }
+"="                     { cout << "Operator: " << yytext << '\n'; }
 "<"                     { cout << "Operator: " << yytext << '\n'; }
 ">"                     { cout << "Operator: " << yytext << '\n'; }
-"."                     { cout << "Operator: "     << yytext << '\n'; }
-":"                     { cout << "Operator: "   << yytext << '\n'; }
-","                     { cout << "Operator: "   << yytext << '\n'; }
+"."                     { cout << "Operator: " << yytext << '\n'; }
+":"                     { cout << "Operator: " << yytext << '\n'; }
+","                     { cout << "Operator: " << yytext << '\n'; }
 ";"                     { cout << "Operator: " << yytext << '\n'; }
 
 
@@ -275,5 +221,71 @@ static inline void str_reset() {
 <*>. {} // ToDo: встречен неизвестный символ
 
 %%
+
+/* Функции для работы с комментариями */
+static inline void comm_append(const char* s, size_t n) {
+    if (comment_pos + n >= sizeof(comment_buf)) n = sizeof(comment_buf) - 1 - comment_pos;
+    if (n > 0) {
+        std::memcpy(comment_buf + comment_pos, s, n);
+        comment_pos += n;
+        comment_buf[comment_pos] = '\0';
+    }
+}
+
+static inline void comm_reset(){
+    comment_pos = 0;
+    comment_buf[0] = '\0';
+    comment_start_line = 0;
+}
+
+/* Функции для работы со строками */
+static inline void str_putc(char c) {
+    if (string_pos + 1 < sizeof(string_buf)) {
+        string_buf[string_pos++] = c;
+        string_buf[string_pos] = '\0';
+    }
+}
+
+static inline void str_append(const char* s, size_t n) {
+    if (string_pos + n >= sizeof(string_buf)) n = sizeof(string_buf) - 1 - string_pos;
+    if (n > 0) {
+        std::memcpy(string_buf + string_pos, s, n);
+        string_pos += n;
+        string_buf[string_pos] = '\0';
+    }
+}
+
+static inline int hexval(int c) {
+    if ('0' <= c && c <= '9') return c - '0';
+    if ('a' <= c && c <= 'f') return 10 + (c - 'a');
+    if ('A' <= c && c <= 'F') return 10 + (c - 'A');
+    return -1;
+}
+
+/* кодпоинт (U+XXXXX) → UTF-8 */
+static inline void utf8_from_codepoint(unsigned cp) {
+    if (cp <= 0x7F) {
+        str_putc((char)cp);
+    } else if (cp <= 0x7FF) {
+        str_putc((char)(0xC0 | ((cp >> 6) & 0x1F)));
+        str_putc((char)(0x80 | (cp & 0x3F)));
+    } else if (cp <= 0xFFFF) {
+        str_putc((char)(0xE0 | ((cp >> 12) & 0x0F)));
+        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
+        str_putc((char)(0x80 | (cp & 0x3F)));
+    } else if (cp <= 0x10FFFF) {
+        str_putc((char)(0xF0 | ((cp >> 18) & 0x07)));
+        str_putc((char)(0x80 | ((cp >> 12) & 0x3F)));
+        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
+        str_putc((char)(0x80 | (cp & 0x3F)));
+    } else {
+        utf8_from_codepoint(0xFFFD);
+    }
+}
+
+static inline void str_reset() {
+    string_pos = 0;
+    string_buf[0] = '\0';
+}
 
 
