@@ -35,6 +35,7 @@ void yyerror(const char *s) {
 %token <Double> FLOAT
 %token <Int> INT
 %token <ID> ID
+%token <String> STRING
 
 %right '='
 %left OR
@@ -50,14 +51,57 @@ void yyerror(const char *s) {
 
 %%
 
-program:
-    | program statement
+program: stmt_list_em
+       ;
+
+stmt: expr
+    | stmt ';'
     ;
 
-statement:
-      NUM '+' NUM  { cout << $1 + $3 << endl; }
-    | NUM '-' NUM  { cout << $1 - $3 << endl; }
+stmt_list_em: /* empty*/
+            | stmt_list
+            ;
+
+stmt_list: stmt
+         | stmt_list stmt
+         ;
+
+expr: INT
+    | FLOAT
+    | ID
+    | STRING
+    | TRUE
+    | FALSE
+    | NIL
+    | '(' expr ')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '%' expr
+    | expr '^' expr
+    | expr '=' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr INT_DIV expr
+    | expr OR expr
+    | expr AND expr
+    | expr LESS_EQUAL expr
+    | expr GREATER_EQUAL expr
+    | expr EQUALITY expr
+    | expr INEQUALITY expr
+    | expr CONC expr
+    | '#' expr
+    | NOT expr
+    | '-' expr %prec UMINUS
     ;
 
+expr_list_em: /* empty*/
+            | expr_list
+            ;
+
+expr_list: expr
+         | expr_list ',' expr
+         ;
 %%
 
