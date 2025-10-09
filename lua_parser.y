@@ -42,7 +42,11 @@ void yyerror(const char *s) {
 %left '<' '>' LESS_EQUAL GREATER_EQUAL EQUALITY INEQUALITY
 %right CONC
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' INT_DIV '%'
+%left NOT '#' UMINUS
+%left '^'
+
+%start program
 
 %%
 
