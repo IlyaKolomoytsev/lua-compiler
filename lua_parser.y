@@ -61,6 +61,7 @@ stmt: stmt ';'
     | if_stmt
     | for_stmt
     | while_stmt
+    | repeat_until_stmt
     ;
 
 stmt_list_em: /* empty*/
