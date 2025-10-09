@@ -57,6 +57,7 @@ program: stmt_list_em
 
 stmt: expr
     | stmt ';'
+    | expr '=' expr
     | global_var_declarator_list
     | local_var_declaration_list
     | if_stmt
@@ -139,7 +140,6 @@ expr: INT
     | expr '/' expr
     | expr '%' expr
     | expr '^' expr
-    | expr '=' expr
     | expr '<' expr
     | expr '>' expr
     | expr '[' expr ']'
