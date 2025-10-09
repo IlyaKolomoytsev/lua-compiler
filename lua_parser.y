@@ -19,7 +19,28 @@ void yyerror(const char *s) {
 
 %}
 
-%token NUM
+%union {
+    int Int;
+    char *ID;
+    double Double;
+    char *String;
+}
+
+%token TRUE FALSE NIL
+%token IF ELSE ELSEIF
+%token FOR WHILE UNTIL REPEAT BREAK
+%token FUNCTION THEN DO END RETURN
+%token IN LOCAL GOTO
+
+%token <Double> FLOAT
+%token <Int> INT
+%token <ID> ID
+
+%right '='
+%token OR
+%token AND
+%left '<' '>' LESS_EQUAL GREATER_EQUAL EQUALITY INEQUALITY
+%right CONC
 %left '+' '-'
 %left '*' '/'
 
