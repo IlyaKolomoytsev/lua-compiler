@@ -107,6 +107,10 @@ while_stmt: WHILE expr THEN stmt_list_em END
 repeat_until_stmt: REPEAT stmt_list_em UNTIL expr
                  ;
 
+return_stmt: RETURN
+           | RETURN expr
+           ;
+
 expr: INT
     | FLOAT
     | ID
