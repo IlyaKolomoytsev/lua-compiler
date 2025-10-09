@@ -34,6 +34,7 @@ HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include "lua_parser.tab.h"
 
 using std::cout;
 

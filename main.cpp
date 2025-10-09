@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <FlexLexer.h>
+#include "lua_parser.tab.h"
+
+yyFlexLexer *lexer;
 
 int main(int argc, char* argv[]) {
     // Проверка на наличие аргумента командной строки (пути к файлу)
@@ -16,9 +19,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    yyFlexLexer lexer;       // создаём объект лексера
-    lexer.switch_streams(&file, &std::cout);  // Передаем файл для анализа
-    lexer.yylex();           // вызываем метод yylex() класса
+    lexer = new yyFlexLexer();      // создаём объект лексера
+    lexer->switch_streams(&file, &std::cout);  // Передаем файл для анализа
+    yyparse();
 
     return 0;
 }
