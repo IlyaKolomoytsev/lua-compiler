@@ -60,6 +60,7 @@ stmt: stmt ';'
     | var_declarator_list
     | if_stmt
     | for_stmt
+    | while_stmt
     ;
 
 stmt_list_em: /* empty*/
