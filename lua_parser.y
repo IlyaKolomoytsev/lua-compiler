@@ -31,6 +31,7 @@ void yyerror(const char *s) {
 %token FOR WHILE UNTIL REPEAT BREAK
 %token FUNCTION THEN DO END RETURN
 %token IN LOCAL GOTO
+%token VARARG
 
 %token <Double> FLOAT
 %token <Int> INT
