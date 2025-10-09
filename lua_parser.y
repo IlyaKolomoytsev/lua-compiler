@@ -147,7 +147,7 @@ field_list_em: /* empty */
              ;
 
 field_list: field
-          | field_list  field
+          | field_list ',' field
           | field_list ';' field
           ;
 
