@@ -96,6 +96,9 @@ for_stmt: FOR variable '=' expr ',' expr DO stmt_list_em END
         | FOR variable_list IN expr DO stmt_list_em END
         ;
 
+while_stmt: WHILE expr THEN stmt_list_em END
+          ;
+
 variable: ID
         | variable '.' ID
         | variable '[' expr ']'
