@@ -59,6 +59,7 @@ stmt: expr
     | global_var_declarator_list
     | local_var_declaration_list
     | if_stmt
+    | for_stmt
     | while_stmt
     | repeat_until_stmt
     ;
@@ -94,6 +95,11 @@ elseif_stmts: elseif_stmt
 
 elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
+
+for_stmt: FOR ID '=' expr ',' expr DO stmt_list_em END
+        | FOR ID '=' expr ',' expr ',' expr DO stmt_list_em END
+        | FOR id_list IN expr DO stmt_list_em END
+        ;
 
 while_stmt: WHILE expr THEN stmt_list_em END
           ;
