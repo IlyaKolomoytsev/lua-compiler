@@ -101,7 +101,7 @@ static char string_buf[8192];
 <MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
 <MCOMM>\r\n             { comm_append("\n", 1); }
 <MCOMM>\r               { /* игнорируем одиночный CR */ }
-<MCOMM>.                { comm_append(yytext, yyleng); } // ToDo добработать оптимизацию
+<MCOMM>.                { comm_append(yytext, yyleng); }
 
 
 <MCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
@@ -168,7 +168,7 @@ static char string_buf[8192];
 <DSTRING><<EOF>>        { cout << "ERROR: unterminated string (\") before EOF\n"; BEGIN(INITIAL); }
 <SSTRING><<EOF>>        { cout << "ERROR: unterminated string (') before EOF\n"; BEGIN(INITIAL); }
 
-<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) { // ToDo можно ограничется //.
+<DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
     cout << "ERROR: invalid escape '" << yytext << "' at line " << yylineno << '\n';
     str_append(yytext + 1, yyleng - 1); // добавим символ после '\' буквально
 }
@@ -178,6 +178,8 @@ static char string_buf[8192];
 {HEX_INT}               { cout << "Int(hex): " << strtoll(yytext, nullptr, 0) << '\n'; }
 {DEC_FLOAT}             { cout << "Float: " << strtod(yytext, nullptr) << '\n'; }
 {DEC_INT}               { cout << "Int: " << strtoll(yytext, nullptr, 10) << '\n'; }
+
+[0-9]+{ID_START}+ { cout << "Error: invalid identifier (starts with digit): " << yytext << " at line " << yylineno << '\n'; }
 
 
 "..."                   { cout << "Varargs: " << yytext << '\n'; }
@@ -215,6 +217,7 @@ static char string_buf[8192];
 
 
 {ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; }
+
 
 {WS}            ;
 
