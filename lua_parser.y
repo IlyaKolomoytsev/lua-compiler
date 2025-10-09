@@ -59,6 +59,7 @@ stmt: stmt ';'
     | func_call
     | var_declarator_list
     | if_stmt
+    | for_stmt
     ;
 
 stmt_list_em: /* empty*/
@@ -89,6 +90,11 @@ elseif_stmts: elseif_stmt
 
 elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
+
+for_stmt: FOR variable '=' expr ',' expr DO stmt_list_em END
+        | FOR variable '=' expr ',' expr ',' expr DO stmt_list_em END
+        | FOR variable_list IN expr DO stmt_list_em END
+        ;
 
 variable: ID
         | variable '.' ID
