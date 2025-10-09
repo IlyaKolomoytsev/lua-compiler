@@ -81,6 +81,10 @@ local_var_declaration_list: LOCAL id_list
 global_var_declarator_list: id_list '=' expr_list
                    ;
 
+id_list_em: /* empty */
+          | id_list
+          ;
+
 id_list: ID
        | id_list ',' ID
        ;
