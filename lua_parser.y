@@ -37,14 +37,14 @@ void yyerror(const char *s) {
 %token <ID> ID
 
 %right '='
-%token OR
-%token AND
+%left OR
+%left AND
 %left '<' '>' LESS_EQUAL GREATER_EQUAL EQUALITY INEQUALITY
 %right CONC
 %left '+' '-'
 %left '*' '/' INT_DIV '%'
 %left NOT '#' UMINUS
-%left '^'
+%right '^'
 
 %start program
 
