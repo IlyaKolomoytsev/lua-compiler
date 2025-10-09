@@ -108,8 +108,11 @@ while_stmt: WHILE expr THEN stmt_list_em END
 repeat_until_stmt: REPEAT stmt_list_em UNTIL expr
                  ;
 
-return_stmt: RETURN
-           | RETURN expr
+return_stmt: RETURN expr_list_em
+           | RETURN expr_list ',' VARARG
+           | RETURN VARARG ',' expr_list
+           | RETURN expr_list ',' VARARG ',' expr_list
+           | RETURN VARARG
            ;
 
 expr: INT
