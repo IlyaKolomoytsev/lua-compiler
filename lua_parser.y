@@ -56,6 +56,7 @@ program: stmt_list_em
 
 stmt: expr
     | stmt ';'
+    | if_stmt
     ;
 
 stmt_list_em: /* empty*/
