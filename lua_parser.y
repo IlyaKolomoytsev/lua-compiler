@@ -71,6 +71,14 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
+var_declarator_list: LOCAL id_list '=' expr_list
+                   | id_list '=' expr_list
+                   ;
+
+id_list: ID
+       | id_list ID
+       ;
+
 if_stmt: IF expr THEN stmt_list_em END
        | IF expr THEN stmt_list_em ELSE stmt_list_em END
        | IF expr THEN stmt_list_em elseif_stmts END
