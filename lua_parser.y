@@ -93,6 +93,9 @@ elseif_stmts: elseif_stmt
 elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
 
+while_stmt: WHILE expr THEN stmt_list_em END
+          ;
+
 expr: INT
     | FLOAT
     | ID
