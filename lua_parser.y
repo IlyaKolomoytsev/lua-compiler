@@ -64,6 +64,7 @@ stmt: expr
     | for_stmt
     | while_stmt
     | repeat_until_stmt
+    | func_stmt
     ;
 
 stmt_list_em: /* empty*/
