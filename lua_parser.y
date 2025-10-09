@@ -56,7 +56,8 @@ program: stmt_list_em
 
 stmt: expr
     | stmt ';'
-    | var_declarator_list
+    | global_var_declarator_list
+    | local_var_declaration_list
     | if_stmt
     ;
 
@@ -68,8 +69,11 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
-var_declarator_list: LOCAL id_list '=' expr_list
-                   | id_list '=' expr_list
+local_var_declaration_list: LOCAL id_list
+                          | LOCAL id_list '=' expr_list
+                          ;
+
+global_var_declarator_list: id_list '=' expr_list
                    ;
 
 id_list: ID
