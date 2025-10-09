@@ -60,6 +60,7 @@ stmt: expr
     | local_var_declaration_list
     | if_stmt
     | while_stmt
+    | repeat_until_stmt
     ;
 
 stmt_list_em: /* empty*/
