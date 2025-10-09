@@ -56,6 +56,7 @@ program: stmt_list_em
 
 stmt: expr
     | stmt ';'
+    | var_declarator_list
     | if_stmt
     ;
 
