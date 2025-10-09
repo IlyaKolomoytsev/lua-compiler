@@ -97,6 +97,9 @@ elseif_stmt: ELSEIF expr THEN stmt_list_em
 while_stmt: WHILE expr THEN stmt_list_em END
           ;
 
+repeat_until_stmt: REPEAT stmt_list_em UNTIL expr
+                 ;
+
 expr: INT
     | FLOAT
     | ID
