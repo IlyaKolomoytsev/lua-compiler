@@ -70,6 +70,19 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
+if_stmt: IF expr THEN stmt END
+       | IF expr THEN stmt ELSE stmt END
+       | IF expr THEN stmt elseif_stmts END
+       | IF expr THEN stmt elseif_stmts ELSE stmt END
+       ;
+
+elseif_stmts: elseif_stmt
+            | elseif_stmts elseif_stmt
+            ;
+
+elseif_stmt: ELSEIF expr THEN stmt
+           ;
+
 func_call: expr ':' ID '(' function_arguments_call_em ')'
          | expr '(' function_arguments_call_em ')'
          ;
