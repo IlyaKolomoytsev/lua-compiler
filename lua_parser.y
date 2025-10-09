@@ -96,6 +96,7 @@ expr: INT
     | TRUE
     | FALSE
     | NIL
+    | tableconstructor
     | '(' expr ')'
     | expr '+' expr
     | expr '-' expr
@@ -106,6 +107,7 @@ expr: INT
     | expr '=' expr
     | expr '<' expr
     | expr '>' expr
+    | expr '[' expr ']'
     | expr INT_DIV expr
     | expr OR expr
     | expr AND expr
@@ -118,6 +120,24 @@ expr: INT
     | NOT expr
     | '-' expr %prec UMINUS
     ;
+
+tableconstructor: '{' field_list_em '}'
+                ;
+
+field_list_em: /* empty */
+             | field_list
+             ;
+
+field_list: field
+          | field_list  field
+          | field_list ';' field
+          ;
+
+field: ID '=' expr
+     | '[' expr ']' '=' expr
+     | expr
+     ;
+
 
 expr_list_em: /* empty*/
             | expr_list
