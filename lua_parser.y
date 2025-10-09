@@ -80,7 +80,7 @@ global_var_declarator_list: id_list '=' expr_list
                    ;
 
 id_list: ID
-       | id_list ID
+       | id_list ',' ID
        ;
 
 if_stmt: IF expr THEN stmt_list_em END
