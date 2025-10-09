@@ -67,17 +67,17 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
-if_stmt: IF expr THEN stmt END
-       | IF expr THEN stmt ELSE stmt END
-       | IF expr THEN stmt elseif_stmts END
-       | IF expr THEN stmt elseif_stmts ELSE stmt END
+if_stmt: IF expr THEN stmt_list_em END
+       | IF expr THEN stmt_list_em ELSE stmt_list_em END
+       | IF expr THEN stmt_list_em elseif_stmts END
+       | IF expr THEN stmt_list_em elseif_stmts ELSE stmt_list_em END
        ;
 
 elseif_stmts: elseif_stmt
             | elseif_stmts elseif_stmt
             ;
 
-elseif_stmt: ELSEIF expr THEN stmt
+elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
 
 expr: INT
