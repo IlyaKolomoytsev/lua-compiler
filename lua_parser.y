@@ -108,6 +108,15 @@ while_stmt: WHILE expr THEN stmt_list_em END
 repeat_until_stmt: REPEAT stmt_list_em UNTIL expr
                  ;
 
+func_stmt: FUNCTION ID '(' arg_list ')' stmt_list_em END
+         | ID '=' FUNCTION '(' arg_list ')' stmt_list_em END
+         ;
+
+arg_list: id_list_em
+        | id_list ',' VARARG
+        | VARARG
+        ;
+
 return_stmt: RETURN expr_list_em
            | RETURN expr_list ',' VARARG
            | RETURN VARARG ',' expr_list
