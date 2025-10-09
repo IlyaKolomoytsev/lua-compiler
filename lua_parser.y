@@ -137,6 +137,7 @@ expr: INT
     | FALSE
     | NIL
     | tableconstructor
+    | ID '(' expr_list_em ')'
     | '(' expr ')'
     | expr '+' expr
     | expr '-' expr
