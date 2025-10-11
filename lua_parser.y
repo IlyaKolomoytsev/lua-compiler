@@ -54,7 +54,8 @@ void yyerror(const char *s) {
 program: stmt_list_em
        ;
 
-stmt: stmt ';'
+stmt: expr '=' expr
+    | stmt ';'
     ;
 
 stmt_list_em: /* empty*/
@@ -79,7 +80,6 @@ expr: INT
     | expr '/' expr
     | expr '%' expr
     | expr '^' expr
-    | expr '=' expr
     | expr '<' expr
     | expr '>' expr
     | expr INT_DIV expr
