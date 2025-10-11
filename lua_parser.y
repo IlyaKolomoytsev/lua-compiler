@@ -47,6 +47,8 @@ void yyerror(const char *s) {
 %left '*' '/' INT_DIV '%'
 %left NOT '#' UMINUS
 %right '^'
+%nonassoc '.' ':' '[' ']'
+%nonassoc '(' ')'
 
 %start program
 
