@@ -59,6 +59,7 @@ program: stmt_list_em
 
 stmt: expr '=' expr
     | stmt ';'
+    | func_call // generate reduce/reduce conflist with symbols '-' and ')' that reduced to expr and I this it's ok
     ;
 
 stmt_list_em: /* empty*/
