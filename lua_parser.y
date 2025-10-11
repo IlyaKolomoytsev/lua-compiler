@@ -72,6 +72,8 @@ stmt_list: stmt
 expr: INT
     | FLOAT
     | ID
+    | expr '.' ID
+    | expr '[' expr ']'
     | STRING
     | TRUE
     | FALSE
