@@ -69,6 +69,10 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
+func_call: expr ':' ID '(' function_arguments_call_em ')'
+         | expr '(' function_arguments_call_em ')'
+         ;
+
 expr: INT
     | FLOAT
     | ID
@@ -78,6 +82,7 @@ expr: INT
     | TRUE
     | FALSE
     | NIL
+    | func_call
     | '(' expr ')'
     | expr '+' expr
     | expr '-' expr
@@ -107,5 +112,15 @@ expr_list_em: /* empty*/
 expr_list: expr
          | expr_list ',' expr
          ;
+
+function_arguments_call_em: /* empty */
+                          | function_arguments_call
+                          ;
+
+function_arguments_call: expr
+                       | VARARG
+                       | function_arguments_call ',' expr
+                       | function_arguments_call ',' VARARG
+                       ;
 %%
 
