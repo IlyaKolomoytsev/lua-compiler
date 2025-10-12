@@ -58,7 +58,7 @@ void yyerror(const char *s) {
 program: stmt_list_em
        ;
 
-stmt: expr '=' expr
+stmt: variable '=' expr
     | stmt ';'
     | func_call // generate reduce/reduce conflist with symbols '-' and ')' that reduced to expr and I this it's ok
     | var_declarator_list
@@ -94,15 +94,20 @@ elseif_stmts: elseif_stmt
 elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
 
-func_call: expr ':' ID '(' function_arguments_call_em ')'
-         | expr '(' function_arguments_call_em ')'
+variable: ID
+        | variable '.' ID
+        | variable '[' expr ']'
+        ;
+
+func_call: variable ':' ID '(' function_arguments_call_em ')'
+         | variable '(' function_arguments_call_em ')'
+         | func_call ':' ID '(' function_arguments_call_em ')'
+         | func_call '(' function_arguments_call_em ')'
          ;
 
 expr: INT
     | FLOAT
-    | ID
-    | expr '.' ID
-    | expr '[' expr ']'
+    | variable
     | STRING
     | TRUE
     | FALSE
