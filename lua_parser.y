@@ -38,7 +38,6 @@ void yyerror(const char *s) {
 %token <ID> ID
 %token <String> STRING
 
-%right EXPR_LIST
 %right '='
 %left OR
 %left AND
@@ -138,8 +137,8 @@ expr_list_em: /* empty*/
             | expr_list
             ;
 
-expr_list: expr %prec EXPR_LIST
-         | expr_list ',' expr %prec EXPR_LIST
+expr_list: expr
+         | expr_list ',' expr
          ;
 
 function_arguments_call_em: /* empty */
