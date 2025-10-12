@@ -23,7 +23,7 @@ set(GENERATED_BISON_HEADER "${CMAKE_CURRENT_BINARY_DIR}/lua_parser.tab.h")
 # Generation bison source file
 add_custom_command(
         OUTPUT ${GENERATED_BISON_FILE} ${GENERATED_BISON_HEADER}
-        COMMAND ${BISON_EXECUTABLE} -d -o ${GENERATED_BISON_FILE} lua_parser.y
+        COMMAND ${BISON_EXECUTABLE} --verbose -d -o ${GENERATED_BISON_FILE} lua_parser.y
         DEPENDS lua_parser.y
         COMMENT "Generating C++ parser with Bison"
 )
