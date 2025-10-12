@@ -58,8 +58,7 @@ void yyerror(const char *s) {
 program: stmt_list_em
        ;
 
-stmt: variable '=' expr
-    | stmt ';'
+stmt: stmt ';'
     | func_call // generate reduce/reduce conflist with symbols '-' and ')' that reduced to expr and I this it's ok
     | var_declarator_list
     | if_stmt
@@ -73,12 +72,12 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
-var_declarator_list: LOCAL id_list '=' expr_list
-                   | id_list '=' expr_list
+var_declarator_list: LOCAL variable_list '=' expr_list
+                   | variable_list '=' expr_list
                    ;
 
-id_list: ID
-       | id_list ID
+variable_list: variable
+       | variable_list ',' variable
        ;
 
 if_stmt: IF expr THEN stmt_list_em END
