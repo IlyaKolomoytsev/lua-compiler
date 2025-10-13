@@ -63,8 +63,15 @@ static char string_buf[8192];
 %%
 
 %{
-    // ToDo: объявления я так понял должны быть тут.
-    // комментарий создан спустя неделю после консультации
+    /* Переменные для работы с комментариями */
+    char comment_buf[8192];
+    size_t comment_pos = 0;
+    int comment_start_line = 0;
+
+
+    /* Переменные для работы со строками */
+    size_t string_pos = 0;
+    char string_buf[8192];
 %}
 
 "and"                   { cout << "Keyword: " << yytext << '\n'; }
