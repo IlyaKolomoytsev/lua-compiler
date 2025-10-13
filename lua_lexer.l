@@ -38,25 +38,13 @@ HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}
 using std::cout;
 
 /* Прототипы функций */
-static inline void comm_append(const char* s, size_t n);
-static inline void comm_reset();
-static inline void str_putc(char c);
-static inline void str_append(const char* s, size_t n);
+static inline void comm_append(char* comment_buf, size_t* comment_pos,size_t buf_cap, const char* s, size_t n);
+static inline void comm_reset(char* comment_buf, size_t* comment_pos, int* comment_start_line);
+static inline void str_putc(char c, char* string_buf, size_t* string_pos, size_t str_cap);
+static inline void str_append(char* string_buf, size_t* string_pos, size_t buf_cap, const char* s, size_t n);
+static inline void str_reset(char* string_buf, size_t* string_pos);
 static inline int hexval(int c);
-static inline void utf8_from_codepoint(unsigned cp);
-static inline void str_reset();
-
-/* Переменные для работы с комментариями */
-static char comment_buf[8192];
-static size_t comment_pos = 0;
-static int comment_start_line = 0;
-
-
-/* Переменные для работы со строками */
-static size_t string_pos = 0;
-static char string_buf[8192];
-
-
+static inline void utf8_from_codepoint(unsigned cp, char* string_buf, size_t* string_pos);
 
 %}
 
@@ -99,45 +87,45 @@ static char string_buf[8192];
 "false"                 { cout << "Boolean: " << yytext << '\n'; }
 
 
-"--"                    { comm_reset(); comment_start_line = yylineno; BEGIN(SCOMM); }
-"--[["                  { comm_reset(); comment_start_line = yylineno; BEGIN(MCOMM); }
+"--"                    { comm_reset(comment_buf, &comment_pos, &comment_start_line); comment_start_line = yylineno; BEGIN(SCOMM); }
+"--[["                  { comm_reset(comment_buf, &comment_pos, &comment_start_line); comment_start_line = yylineno; BEGIN(MCOMM); }
 
 
 <SCOMM>[^\r\n]*           { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }
 
 <MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
-<MCOMM>\r\n             { comm_append("\n", 1); }
+<MCOMM>\r\n             { comm_append(comment_buf, &comment_pos, sizeof comment_buf, "\n", 1); }
 <MCOMM>\r               { /* игнорируем одиночный CR */ }
-<MCOMM>.                { comm_append(yytext, yyleng); }
+<MCOMM>.                { comm_append(comment_buf, &comment_pos, sizeof comment_buf, yytext, yyleng); }
 
 
 <MCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
 
 
-\"                      { str_reset(); BEGIN(DSTRING); } /* Старт строки с " */
-\'                      { str_reset(); BEGIN(SSTRING); } /* Старт строки с ' */
+\"                      { str_reset(string_buf, &string_pos); BEGIN(DSTRING); } /* Старт строки с " */
+\'                      { str_reset(string_buf, &string_pos); BEGIN(SSTRING); } /* Старт строки с ' */
 
 
-<DSTRING>[^"\\\n]+      { str_append(yytext, yyleng); }              
-<SSTRING>[^'\\\n]+      { str_append(yytext, yyleng); }
+<DSTRING>[^"\\\n]+      { str_append(string_buf, &string_pos, sizeof string_buf, yytext, yyleng); }
+<SSTRING>[^'\\\n]+      { str_append(string_buf, &string_pos, sizeof string_buf, yytext, yyleng); }
 
 
-<DSTRING,SSTRING>\\a    { str_putc('\a'); }
-<DSTRING,SSTRING>\\b    { str_putc('\b'); }
-<DSTRING,SSTRING>\\f    { str_putc('\f'); }
-<DSTRING,SSTRING>\\n    { str_putc('\n'); }
-<DSTRING,SSTRING>\\r    { str_putc('\r'); }
-<DSTRING,SSTRING>\\t    { str_putc('\t'); }
-<DSTRING,SSTRING>\\v    { str_putc('\v'); }
-<SSTRING,DSTRING>"\\\"" { str_putc('"');  }
-<SSTRING,DSTRING>"\\\'" { str_putc('\''); }
-<DSTRING,SSTRING>\\\\   { str_putc('\\'); }
+<DSTRING,SSTRING>\\a    { str_putc('\a', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\b    { str_putc('\b', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\f    { str_putc('\f', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\n    { str_putc('\n', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\r    { str_putc('\r', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\t    { str_putc('\t', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\v    { str_putc('\v', string_buf, &string_pos, sizeof string_buf); }
+<SSTRING,DSTRING>"\\\"" { str_putc('"', string_buf, &string_pos, sizeof string_buf);  }
+<SSTRING,DSTRING>"\\\'" { str_putc('\'', string_buf, &string_pos, sizeof string_buf); }
+<DSTRING,SSTRING>\\\\   { str_putc('\\', string_buf, &string_pos, sizeof string_buf); }
 
 
 <DSTRING,SSTRING>\\x[0-9A-Fa-f]{2} {
     int hi = hexval(yytext[2]);
     int lo = hexval(yytext[3]);
-    str_putc((char)((hi << 4) | lo));
+    str_putc((char)((hi << 4) | lo), string_buf, &string_pos, sizeof string_buf);
 }
 
 
@@ -145,7 +133,7 @@ static char string_buf[8192];
     int v = std::strtol(yytext + 1, nullptr, 10);
     if (v < 0) v = 0;
     if (v > 255) v = 255;
-    str_putc((char)v);
+    str_putc((char)v, string_buf, &string_pos, sizeof string_buf);
 }
 
 
@@ -157,11 +145,11 @@ static char string_buf[8192];
         cp = (cp << 4) | (unsigned)v;
         if (cp > 0x10FFFF) { cp = 0xFFFD; break; }
     }
-    utf8_from_codepoint(cp);
+    utf8_from_codepoint(cp, string_buf, &string_pos);
 }
 
 
-<DSTRING,SSTRING>\\\n  { str_putc('\n'); }
+<DSTRING,SSTRING>\\\n  { str_putc('\n', string_buf, &string_pos, sizeof string_buf); }
 
 
 <DSTRING>\"             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
@@ -177,7 +165,7 @@ static char string_buf[8192];
 
 <DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
     cout << "ERROR: invalid escape '" << yytext << "' at line " << yylineno << '\n';
-    str_append(yytext + 1, yyleng - 1); // добавим символ после '\' буквально
+    str_append(string_buf, &string_pos, sizeof string_buf, yytext + 1, yyleng - 1); // добавим символ после '\' буквально
 }
 
 
@@ -233,35 +221,43 @@ static char string_buf[8192];
 %%
 
 /* Функции для работы с комментариями */
-static inline void comm_append(const char* s, size_t n) {
-    if (comment_pos + n >= sizeof(comment_buf)) n = sizeof(comment_buf) - 1 - comment_pos;
+static inline void comm_append(char* comment_buf, size_t* comment_pos, size_t buf_cap, const char* s, size_t n) {
+    if (!comment_buf || !comment_pos || !s) return;
+
+    if (*comment_pos >= buf_cap) return;
+    size_t free_space = buf_cap - 1 - *comment_pos;
+    if (n > free_space) n = free_space;
     if (n > 0) {
-        std::memcpy(comment_buf + comment_pos, s, n);
-        comment_pos += n;
-        comment_buf[comment_pos] = '\0';
+        std::memcpy(comment_buf + *comment_pos, s, n);
+        *comment_pos += n;
+        comment_buf[*comment_pos] = '\0';
     }
 }
 
-static inline void comm_reset(){
-    comment_pos = 0;
+static inline void comm_reset(char* comment_buf, size_t* comment_pos, int* comment_start_line){
+    *comment_pos = 0;
     comment_buf[0] = '\0';
-    comment_start_line = 0;
+    *comment_start_line = 0;
 }
 
 /* Функции для работы со строками */
-static inline void str_putc(char c) {
-    if (string_pos + 1 < sizeof(string_buf)) {
-        string_buf[string_pos++] = c;
-        string_buf[string_pos] = '\0';
+static inline void str_putc(char c, char* string_buf, size_t* string_pos, size_t str_cap) {
+    if (!string_buf || !string_pos) return;
+
+    if (*string_pos + 1 < str_cap) {
+        string_buf[*string_pos] = c;
+        (*string_pos)++;
+        string_buf[*string_pos] = '\0';
     }
 }
 
-static inline void str_append(const char* s, size_t n) {
-    if (string_pos + n >= sizeof(string_buf)) n = sizeof(string_buf) - 1 - string_pos;
+static inline void str_append(char* string_buf, size_t* string_pos, size_t buf_cap, const char* s, size_t n) {
+    if (!string_buf || !string_pos || !s) return;
+    if (*string_pos + n >= buf_cap) n = buf_cap - 1 - *string_pos;
     if (n > 0) {
-        std::memcpy(string_buf + string_pos, s, n);
-        string_pos += n;
-        string_buf[string_pos] = '\0';
+        std::memcpy(string_buf + *string_pos, s, n);
+        *string_pos += n;
+        string_buf[*string_pos] = '\0';
     }
 }
 
@@ -273,28 +269,28 @@ static inline int hexval(int c) {
 }
 
 /* кодпоинт (U+XXXXX) → UTF-8 */
-static inline void utf8_from_codepoint(unsigned cp) {
+static inline void utf8_from_codepoint(unsigned cp, char* string_buf, size_t* string_pos) {
     if (cp <= 0x7F) {
-        str_putc((char)cp);
+        str_putc((char)cp, string_buf, string_pos, sizeof string_buf);
     } else if (cp <= 0x7FF) {
-        str_putc((char)(0xC0 | ((cp >> 6) & 0x1F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
+        str_putc((char)(0xC0 | ((cp >> 6) & 0x1F)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | (cp & 0x3F)), string_buf, string_pos, sizeof string_buf);
     } else if (cp <= 0xFFFF) {
-        str_putc((char)(0xE0 | ((cp >> 12) & 0x0F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
+        str_putc((char)(0xE0 | ((cp >> 12) & 0x0F)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | (cp & 0x3F)), string_buf, string_pos, sizeof string_buf);
     } else if (cp <= 0x10FFFF) {
-        str_putc((char)(0xF0 | ((cp >> 18) & 0x07)));
-        str_putc((char)(0x80 | ((cp >> 12) & 0x3F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
+        str_putc((char)(0xF0 | ((cp >> 18) & 0x07)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | ((cp >> 12) & 0x3F)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)), string_buf, string_pos, sizeof string_buf);
+        str_putc((char)(0x80 | (cp & 0x3F)), string_buf, string_pos, sizeof string_buf);
     } else {
-        utf8_from_codepoint(0xFFFD);
+        utf8_from_codepoint(0xFFFD, string_buf, string_pos);
     }
 }
 
-static inline void str_reset() {
-    string_pos = 0;
+static inline void str_reset(char* string_buf, size_t* string_pos) {
+    *string_pos = 0;
     string_buf[0] = '\0';
 }
 
