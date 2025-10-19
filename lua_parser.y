@@ -53,7 +53,8 @@ void yyerror(const char *s) {
 %%
 
 chunk: stmt_list_em
-       ;
+     | stmt_list_em return_stmt
+     ;
 
 stmt: stmt ';'
     | func_call
@@ -116,6 +117,10 @@ do_stmt: DO stmt_list_em END;
 
 goto_stmt: GOTO ID
          ;
+
+return_stmt: RETURN expr_list
+           | return_stmt ';'
+           ;
 
 variable: ID
         | variable '.' ID
