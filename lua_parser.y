@@ -103,6 +103,8 @@ while_stmt: WHILE expr THEN stmt_list_em END
 variable: ID
         | variable '.' ID
         | variable '[' expr ']'
+        | func_call '.' ID
+        | func_call '[' expr ']'
         ;
 
 func_call: variable ':' ID '(' function_arguments_call_em ')'
