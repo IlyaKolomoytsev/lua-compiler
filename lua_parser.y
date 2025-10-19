@@ -61,7 +61,7 @@ stmt: stmt ';'
     | if_stmt
     | for_stmt
     | while_stmt
-    | repeat_until_stmt
+    | repeat_stmt
     ;
 
 stmt_list_em: /* empty*/
@@ -85,25 +85,20 @@ if_stmt: IF expr THEN stmt_list_em END
        | IF expr THEN stmt_list_em ELSE stmt_list_em END
        | IF expr THEN stmt_list_em elseif_stmts END
        | IF expr THEN stmt_list_em elseif_stmts ELSE stmt_list_em END
+       | IF expr THEN stmt_list_em elseif_stmt_list END
+       | IF expr THEN stmt_list_em elseif_stmt_list ELSE stmt_list_em END
        ;
 
 elseif_stmts: elseif_stmt
             | elseif_stmts elseif_stmt
             ;
+elseif_stmt_list: elseif_stmt
+                | elseif_stmt_list elseif_stmt
+                ;
+
 
 elseif_stmt: ELSEIF expr THEN stmt_list_em
            ;
-
-for_stmt: FOR variable '=' expr ',' expr DO stmt_list_em END
-        | FOR variable '=' expr ',' expr ',' expr DO stmt_list_em END
-        | FOR variable_list IN expr DO stmt_list_em END
-        ;
-
-while_stmt: WHILE expr THEN stmt_list_em END
-          ;
-
-repeat_until_stmt: REPEAT stmt_list_em UNTIL expr
-                 ;
 
 variable: ID
         | variable '.' ID
