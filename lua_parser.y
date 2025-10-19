@@ -91,13 +91,13 @@ name_list: ID
          | name_list ',' ID
          ;
 
-if_stmt: IF expr THEN stmt_list_em END
-       | IF expr THEN stmt_list_em ELSE stmt_list_em END
-       | IF expr THEN stmt_list_em elseif_stmt_list END
-       | IF expr THEN stmt_list_em elseif_stmt_list ELSE stmt_list_em END
+if_stmt: IF expr THEN block END
+       | IF expr THEN block ELSE block END
+       | IF expr THEN block elseif_stmt_list END
+       | IF expr THEN block elseif_stmt_list ELSE block END
        ;
 
-elseif_stmt: ELSEIF expr THEN stmt_list_em
+elseif_stmt: ELSEIF expr THEN block
            ;
 
 elseif_stmt_list: elseif_stmt
@@ -112,10 +112,10 @@ for_stmt: FOR ID '=' expr ',' expr do_stmt
 while_stmt: WHILE expr do_stmt
           ;
 
-repeat_stmt: REPEAT stmt_list_em UNTIL expr
+repeat_stmt: REPEAT block UNTIL expr
            ;
 
-do_stmt: DO stmt_list_em END;
+do_stmt: DO block END;
 
 goto_stmt: GOTO ID
          ;
