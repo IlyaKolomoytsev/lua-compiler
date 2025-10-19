@@ -52,7 +52,10 @@ void yyerror(const char *s) {
 
 %%
 
-chunk: stmt_list_em
+chunk: block
+     ;
+
+block: stmt_list_em return_stmt_em
      ;
 
 stmt: stmt ';'
@@ -73,7 +76,6 @@ stmt_list: stmt
 
 stmt_list_em: /* empty*/
             | stmt_list
-            | stmt_list_em return_stmt
             ;
 
 var_declarator_list: LOCAL name_list
@@ -119,7 +121,7 @@ goto_stmt: GOTO ID
          ;
 
 return_stmt: RETURN expr_list_em
-           | return_stmt ';'
+           | RETURN expr_list_em ';'
            ;
 
 return_stmt_em: /* empty */
