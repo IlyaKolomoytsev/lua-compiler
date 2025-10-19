@@ -63,6 +63,8 @@ stmt: stmt ';'
     | while_stmt
     | repeat_stmt
     | do_stmt
+    | goto_stmt
+    | BREAK
     ;
 
 stmt_list_em: /* empty*/
@@ -111,6 +113,9 @@ repeat_stmt: REPEAT stmt_list_em UNTIL expr
            ;
 
 do_stmt: DO stmt_list_em END;
+
+goto_stmt: GOTO ID
+         ;
 
 variable: ID
         | variable '.' ID
