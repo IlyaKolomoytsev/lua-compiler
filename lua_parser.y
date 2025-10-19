@@ -81,6 +81,10 @@ variable_list: variable
        | variable_list ',' variable
        ;
 
+name_list: ID
+         | name_list ',' ID
+         ;
+
 if_stmt: IF expr THEN stmt_list_em END
        | IF expr THEN stmt_list_em ELSE stmt_list_em END
        | IF expr THEN stmt_list_em elseif_stmt_list END
