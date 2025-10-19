@@ -72,7 +72,8 @@ stmt_list: stmt
          | stmt_list stmt
          ;
 
-var_declarator_list: LOCAL variable_list '=' expr_list
+var_declarator_list: LOCAL variable_list
+                   | LOCAL variable_list '=' expr_list
                    | variable_list '=' expr_list
                    ;
 
