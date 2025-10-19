@@ -138,6 +138,7 @@ expr: INT
     | FALSE
     | NIL
     | func_call
+    | tableconstructor
     | '(' expr ')'
     | expr '+' expr
     | expr '-' expr
@@ -160,7 +161,7 @@ expr: INT
     | '-' expr %prec UMINUS
     ;
 
-expr_list_em: /* empty*/
+expr_list_em: /* empty */
             | expr_list
             ;
 
@@ -177,5 +178,26 @@ function_arguments_call: expr
                        | function_arguments_call ',' expr
                        | function_arguments_call ',' VARARG
                        ;
+
+tableconstructor: '{' field_list_em '}'
+                ;
+
+field_list_em: /* empty */
+             | field_list
+             ;
+
+field_list: field
+          | field_list field_sep field
+          | field_list field_sep
+          ;
+
+field: '[' expr ']' '=' expr
+     | ID '=' expr
+     | expr
+     ;
+
+field_sep: ','
+         | ';'
+         ;
 %%
 
