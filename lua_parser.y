@@ -48,11 +48,11 @@ void yyerror(const char *s) {
 %left NOT '#' UMINUS
 %right '^'
 
-%start program
+%start chunk
 
 %%
 
-program: stmt_list_em
+chunk: stmt_list_em
        ;
 
 stmt: stmt ';'
