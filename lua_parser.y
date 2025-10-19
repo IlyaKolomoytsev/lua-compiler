@@ -56,7 +56,7 @@ program: stmt_list_em
        ;
 
 stmt: stmt ';'
-    | func_call // generate reduce/reduce conflist with symbols '-' and ')' that reduced to expr and I this it's ok
+    | func_call
     | var_declarator_list
     | if_stmt
     ;
