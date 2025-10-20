@@ -39,9 +39,11 @@ add_custom_command(
 # Paths for nodes classes
 set(SOURCE_FILES
         main.cpp
+        nodes/Node.cpp
 )
 
 set(HEADER_FILES
+        nodes/Node.h
 )
 
 # Add files to executable target
