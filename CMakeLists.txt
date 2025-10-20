@@ -40,10 +40,12 @@ add_custom_command(
 set(SOURCE_FILES
         main.cpp
         nodes/Node.cpp
+        nodes/ExpressionNode.cpp
 )
 
 set(HEADER_FILES
         nodes/Node.h
+        nodes/ExpressionNode.h
 )
 
 # Add files to executable target
