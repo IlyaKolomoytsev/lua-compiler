@@ -4,13 +4,15 @@
 #include <string>
 #include <sys/types.h>
 
+#include "Node.h"
+
 class ExpressionNode;
 
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using ExpressionNodeList = std::list<ExpressionNode*>;
 
-class ExpressionNode
+class ExpressionNode : public Node
 {
     using token_id_t = uint;
     using integer_t = int64_t;
