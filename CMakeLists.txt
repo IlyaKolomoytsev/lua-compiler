@@ -36,9 +36,18 @@ add_custom_command(
         COMMENT "Generating C++ lexer with Flex"
 )
 
+# Paths for nodes classes
+set(SOURCE_FILES
+        main.cpp
+)
+
+set(HEADER_FILES
+)
+
 # Add files to executable target
 add_executable(lua_compiler
-        main.cpp
+        ${HEADER_FILES}
+        ${SOURCE_FILES}
         ${GENERATED_LEXER_FILE}
         ${GENERATED_BISON_FILE}
         ${GENERATED_BISON_HEADER}
