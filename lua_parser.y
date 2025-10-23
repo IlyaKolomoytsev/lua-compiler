@@ -125,12 +125,17 @@ variable: ID
         | func_call '.' ID
         | func_call '[' expr ']'
         ;
+        | prefix_expr '[' expr ']'
+        | prefix_expr '.' ID
+        ;
 
-func_call: variable ':' ID '(' function_arguments_call_em ')'
-         | variable '(' function_arguments_call_em ')'
-         | func_call ':' ID '(' function_arguments_call_em ')'
-         | func_call '(' function_arguments_call_em ')'
-         ;
+variable_list: variable
+       | variable_list ',' variable
+       ;
+
+variable_list_em: /* empty */
+                | variable_list
+                ;
 
 expr: INT
     | FLOAT
