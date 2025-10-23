@@ -168,7 +168,6 @@ expr: INT
     ;
 
 prefix_expr: variable
-          | function_call
           | '(' expr ')'
           ;
 
@@ -185,8 +184,8 @@ args: '(' expr_list_em ')'
     | STRING
     ;
 
-function_call: prefix_expr args
-             | prefix_expr ':' ID args
+function_call: variable args
+             | variable ':' ID args
              ;
 
 par_list: name_list
