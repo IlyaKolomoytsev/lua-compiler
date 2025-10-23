@@ -167,6 +167,15 @@ expr: INT
     | '-' expr %prec UMINUS
     ;
 
+prefix_expr: variable
+          | function_call
+          | '(' expr ')'
+          ;
+
+expr_list: expr
+         | expr_list ',' expr
+         ;
+
 expr_list_em: /* empty */
             | expr_list
             ;
