@@ -78,15 +78,6 @@ stmt_list_em: /* empty*/
             | stmt_list
             ;
 
-var_declarator_list: LOCAL name_list
-                   | LOCAL name_list '=' expr_list
-                   | variable_list '=' expr_list
-                   ;
-
-variable_list: variable
-       | variable_list ',' variable
-       ;
-
 name_list: ID
          | name_list ',' ID
          ;
