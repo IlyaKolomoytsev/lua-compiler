@@ -58,7 +58,7 @@ chunk: block
 block: stmt_list_em return_stmt_em
      ;
 
-stmt: stmt ';'
+stmt: ';'
     | func_call
     | var_declarator_list
     | if_stmt
@@ -148,7 +148,6 @@ expr: INT
     | TRUE
     | FALSE
     | NIL
-    | func_call
     | tableconstructor
     | '(' expr ')'
     | expr '+' expr
