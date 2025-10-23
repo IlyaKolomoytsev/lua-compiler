@@ -175,19 +175,37 @@ expr_list_em: /* empty */
             | expr_list
             ;
 
-expr_list: expr
-         | expr_list ',' expr
+args: '(' expr_list_em ')'
+    | tableconstructor
+    | STRING
+    ;
+
+function_call: prefix_expr args
+             | prefix_expr ':' ID args
+             ;
+
+par_list: name_list
+        | name_list ',' VARARG
+        | VARARG
+        ;
+
+par_list_em: /* empty */
+           | par_list
+           ;
+
+funcbody: '(' par_list_em ')' block END
+        ;
+
+function_def: FUNCTION funcbody
+            ;
+
+dotted_name: ID
+           | dotted_name '.' ID
+           ;
+
+func_name: dotted_name
+         | dotted_name ':' ID
          ;
-
-function_arguments_call_em: /* empty */
-                          | function_arguments_call
-                          ;
-
-function_arguments_call: expr
-                       | VARARG
-                       | function_arguments_call ',' expr
-                       | function_arguments_call ',' VARARG
-                       ;
 
 tableconstructor: '{' field_list_em '}'
                 ;
