@@ -134,13 +134,14 @@ variable_list_em: /* empty */
 
 expr: INT
     | FLOAT
-    | variable
     | STRING
     | TRUE
     | FALSE
     | NIL
+    | VARARG
+    | function_def
     | tableconstructor
-    | '(' expr ')'
+    | prefix_expr
     | expr '+' expr
     | expr '-' expr
     | expr '*' expr
@@ -228,4 +229,3 @@ field_sep: ','
          | ';'
          ;
 %%
-
