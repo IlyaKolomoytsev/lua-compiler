@@ -59,8 +59,12 @@ block: stmt_list_em return_stmt_em
      ;
 
 stmt: ';'
-    | func_call
-    | var_declarator_list
+    | variable_list '=' expr_list
+    | function_call
+    | FUNCTION func_name funcbody
+    | LOCAL FUNCTION ID funcbody
+    | LOCAL name_list
+    | LOCAL name_list '=' expr_list
     | if_stmt
     | for_stmt
     | while_stmt
