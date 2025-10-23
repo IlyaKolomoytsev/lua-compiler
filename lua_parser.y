@@ -120,11 +120,6 @@ return_stmt_em: /* empty */
               ;
 
 variable: ID
-        | variable '.' ID
-        | variable '[' expr ']'
-        | func_call '.' ID
-        | func_call '[' expr ']'
-        ;
         | prefix_expr '[' expr ']'
         | prefix_expr '.' ID
         ;
