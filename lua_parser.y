@@ -82,10 +82,6 @@ stmt_list_em: /* empty*/
             | stmt_list
             ;
 
-name_list: ID
-         | name_list ',' ID
-         ;
-
 if_stmt: IF expr THEN block END
        | IF expr THEN block ELSE block END
        | IF expr THEN block elseif_stmt_list END
@@ -123,6 +119,10 @@ return_stmt_em: /* empty */
               | return_stmt
               ;
 
+name_list: ID
+         | name_list ',' ID
+         ;
+
 variable: ID
         | prefix_expr '[' expr ']'
         | prefix_expr '.' ID
@@ -135,6 +135,61 @@ variable_list: variable
 variable_list_em: /* empty */
                 | variable_list
                 ;
+
+par_list: name_list
+        | name_list ',' VARARG
+        | VARARG
+        ;
+
+par_list_em: /* empty */
+           | par_list
+           ;
+
+dotted_name: ID
+           | dotted_name '.' ID
+           ;
+
+func_name: dotted_name
+         | dotted_name ':' ID
+         ;
+
+args: '(' expr_list_em ')'
+    | tableconstructor
+    | STRING
+    ;
+
+function_call: variable args
+             | variable ':' ID args
+             ;
+
+funcbody: '(' par_list_em ')' block END
+        ;
+
+function_def: FUNCTION funcbody
+            ;
+
+
+
+tableconstructor: '{' field_list_em '}'
+                ;
+
+field_list_em: /* empty */
+             | field_list
+             ;
+
+field_list: field
+          | field_list field_sep field
+          | field_list field_sep
+          ;
+
+field: '[' expr ']' '=' expr
+     | ID '=' expr
+     | expr
+     ;
+
+field_sep: ','
+         | ';'
+         ;
 
 expr: INT
     | FLOAT
@@ -179,56 +234,5 @@ expr_list_em: /* empty */
             | expr_list
             ;
 
-args: '(' expr_list_em ')'
-    | tableconstructor
-    | STRING
-    ;
 
-function_call: variable args
-             | variable ':' ID args
-             ;
-
-par_list: name_list
-        | name_list ',' VARARG
-        | VARARG
-        ;
-
-par_list_em: /* empty */
-           | par_list
-           ;
-
-funcbody: '(' par_list_em ')' block END
-        ;
-
-function_def: FUNCTION funcbody
-            ;
-
-dotted_name: ID
-           | dotted_name '.' ID
-           ;
-
-func_name: dotted_name
-         | dotted_name ':' ID
-         ;
-
-tableconstructor: '{' field_list_em '}'
-                ;
-
-field_list_em: /* empty */
-             | field_list
-             ;
-
-field_list: field
-          | field_list field_sep field
-          | field_list field_sep
-          ;
-
-field: '[' expr ']' '=' expr
-     | ID '=' expr
-     | expr
-     ;
-
-field_sep: ','
-         | ';'
-         ;
 %%
