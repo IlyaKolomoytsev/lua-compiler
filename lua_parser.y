@@ -153,7 +153,7 @@ func_name: dotted_name
          ;
 
 args: '(' expr_list_em ')'
-    | tableconstructor
+    | '{' field_list_em '}'
     | STRING
     ;
 
@@ -162,9 +162,6 @@ function_call: variable args
              | function_call args
              | function_call ':' ID args
              ;
-
-tableconstructor: '{' field_list_em '}'
-                ;
 
 field_list_em: /* empty */
              | field_list
@@ -191,7 +188,7 @@ expr: INT
     | NIL
     | VARARG
     | FUNCTION '(' par_list_em ')' block END
-    | tableconstructor
+    | '{' field_list_em '}'
     | variable
     | function_call
     | '(' expr ')'
