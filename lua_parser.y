@@ -55,7 +55,7 @@ void yyerror(const char *s) {
 chunk: block
      ;
 
-block: stmt_list_em return_stmt_em
+block: stmt_list_em finish_stmt
      ;
 
 stmt: ';'
@@ -72,7 +72,6 @@ stmt: ';'
     | do_stmt
     | goto_stmt
     | LABEL
-    | BREAK
     ;
 
 stmt_list: stmt
@@ -112,13 +111,11 @@ do_stmt: DO block END;
 goto_stmt: GOTO ID
          ;
 
-return_stmt: RETURN expr_list_em
+finish_stmt: /* empty */
+           | BREAK
+           | RETURN expr_list_em
            | RETURN expr_list_em ';'
            ;
-
-return_stmt_em: /* empty */
-              | return_stmt
-              ;
 
 name_list: ID
          | name_list ',' ID
