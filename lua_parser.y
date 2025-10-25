@@ -175,7 +175,6 @@ field_list_em: /* empty */
 
 field_list: field
           | field_list field_sep field
-          | field_list field_sep
           ;
 
 field: '[' expr ']' '=' expr
