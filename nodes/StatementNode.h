@@ -1,0 +1,10 @@
+#ifndef LUA_COMPILER_STATEMENT_NODE_H
+#define LUA_COMPILER_STATEMENT_NODE_H
+
+
+class StatementNode
+{
+};
+
+
+#endif //LUA_COMPILER_STATEMENT_NODE_H

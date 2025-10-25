@@ -41,11 +41,13 @@ set(SOURCE_FILES
         main.cpp
         nodes/Node.cpp
         nodes/ExpressionNode.cpp
+        nodes/StatementNode.cpp
 )
 
 set(HEADER_FILES
         nodes/Node.h
         nodes/ExpressionNode.h
+        nodes/StatementNode.h
 )
 
 # Add files to executable target
