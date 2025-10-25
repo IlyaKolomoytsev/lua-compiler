@@ -21,7 +21,7 @@ using TableFieldList = std::list<TableField>;
 
 class ExpressionNode : public Node
 {
-    using token_id_t = uint;
+    using token_id_t = std::string*;
     using integer_t = int64_t;
     using float_t = double;
     using string_t = std::string;
