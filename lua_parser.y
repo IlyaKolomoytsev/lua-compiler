@@ -71,7 +71,7 @@ stmt: ';'
     | while_stmt
     | repeat_stmt
     | DO block END
-    | goto_stmt
+    | GOTO ID
     | LABEL
     ;
 
@@ -106,9 +106,6 @@ while_stmt: WHILE expr DO block END
 
 repeat_stmt: REPEAT block UNTIL expr
            ;
-
-goto_stmt: GOTO ID
-         ;
 
 finish_stmt: /* empty */
            | BREAK
