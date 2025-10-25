@@ -47,6 +47,13 @@ ExpressionNode* ExpressionNode::TableField(ExpressionNode* table, token_id_t key
     return node;
 }
 
+ExpressionNode* ExpressionNode::TableConstructor(TableFieldList* fields)
+{
+    ExpressionNode* node = new ExpressionNode(Type::TableConstructor);
+    node->value_.tableConstructor_v = fields;
+    return node;
+}
+
 ExpressionNode* ExpressionNode::FunctionCall(ExpressionNode* functionId, arguments_list_t* arguments)
 {
     ExpressionNode* node = new ExpressionNode(Type::FunctionCall);

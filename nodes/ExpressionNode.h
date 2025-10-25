@@ -11,6 +11,12 @@ class ExpressionNode;
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using ExpressionNodeList = std::list<ExpressionNode*>;
+struct TableField
+{
+    ExpressionNode* name;
+    ExpressionNode* value;
+};
+using TableFieldList = std::list<TableField>;
 
 class ExpressionNode : public Node
 {
@@ -40,6 +46,8 @@ class ExpressionNode : public Node
 
     using expression_one_operand_t = ExpressionNode*;
 
+    using table_constructor_t = TableFieldList*;
+
     union Value
     {
         token_id_t id_v;
@@ -51,6 +59,7 @@ class ExpressionNode : public Node
         function_call_t functionCall_v;
         expression_two_operands_t twoOperands_v;
         expression_one_operand_t oneOperand_v;
+        table_constructor_t tableConstructor_v;
     };
 
 public:
@@ -64,6 +73,7 @@ public:
         Vararg,
         Id,
         TableField,
+        TableConstructor,
         FunctionCall,
         ExpressionList,
         Summation,
@@ -100,6 +110,8 @@ public:
     static ExpressionNode* Id(token_id_t value);
 
     static ExpressionNode* TableField(ExpressionNode* table, token_id_t key);
+
+    static ExpressionNode* TableConstructor(TableFieldList* fields);
 
     static ExpressionNode* FunctionCall(ExpressionNode* functionId, arguments_list_t* arguments);
 
