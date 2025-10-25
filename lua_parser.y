@@ -30,7 +30,7 @@ void yyerror(const char *s) {
 %token IF ELSE ELSEIF
 %token FOR WHILE UNTIL REPEAT BREAK
 %token FUNCTION THEN DO END RETURN
-%token IN LOCAL GOTO
+%token IN LOCAL GOTO LABEL
 %token VARARG
 
 %token <Double> FLOAT
@@ -71,6 +71,7 @@ stmt: ';'
     | repeat_stmt
     | do_stmt
     | goto_stmt
+    | LABEL
     | BREAK
     ;
 
