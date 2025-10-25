@@ -192,7 +192,7 @@ public:
     ExpressionNode* getOperand();
 
 private:
-    ExpressionNode(Type type);
+    explicit ExpressionNode(Type type);
 
     Type type_;
     Value value_;
