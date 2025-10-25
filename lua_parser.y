@@ -110,7 +110,6 @@ repeat_stmt: REPEAT block UNTIL expr
 finish_stmt: /* empty */
            | BREAK
            | RETURN expr_list_em
-           | RETURN expr_list_em ';'
            ;
 
 name_list: ID
