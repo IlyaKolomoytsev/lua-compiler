@@ -62,8 +62,8 @@ block: stmt_list_em finish_stmt
 stmt: ';'
     | variable_list '=' expr_list
     | function_call
-    | FUNCTION func_name funcbody
-    | LOCAL FUNCTION ID funcbody
+    | FUNCTION func_name '(' par_list_em ')' block END
+    | LOCAL FUNCTION ID '(' par_list_em ')' block END
     | LOCAL name_list
     | LOCAL name_list '=' expr_list
     | if_stmt
@@ -163,10 +163,7 @@ function_call: variable args
              | function_call ':' ID args
              ;
 
-funcbody: '(' par_list_em ')' block END
-        ;
-
-function_def: FUNCTION funcbody
+function_def: FUNCTION '(' par_list_em ')' block END
             ;
 
 tableconstructor: '{' field_list_em '}'
