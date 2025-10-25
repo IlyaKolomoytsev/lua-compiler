@@ -9,6 +9,7 @@
 class ExpressionNode;
 
 
+using NameList = std::list<ExpressionNode*>;
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using ExpressionNodeList = std::list<ExpressionNode*>;
 struct TableField
