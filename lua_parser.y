@@ -163,9 +163,6 @@ function_call: variable args
              | function_call ':' ID args
              ;
 
-function_def: FUNCTION '(' par_list_em ')' block END
-            ;
-
 tableconstructor: '{' field_list_em '}'
                 ;
 
@@ -193,7 +190,7 @@ expr: INT
     | FALSE
     | NIL
     | VARARG
-    | function_def
+    | FUNCTION '(' par_list_em ')' block END
     | tableconstructor
     | variable
     | function_call
