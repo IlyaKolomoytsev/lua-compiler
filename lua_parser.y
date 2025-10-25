@@ -124,8 +124,10 @@ name_list: ID
          ;
 
 variable: ID
-        | prefix_expr '[' expr ']'
-        | prefix_expr '.' ID
+        | variable '.' ID
+        | variable '[' expr ']'
+        | function_call '.' ID
+        | function_call '[' expr ']'
         ;
 
 variable_list: variable
@@ -160,6 +162,8 @@ args: '(' expr_list_em ')'
 
 function_call: variable args
              | variable ':' ID args
+             | function_call args
+             | function_call ':' ID args
              ;
 
 funcbody: '(' par_list_em ')' block END
@@ -167,8 +171,6 @@ funcbody: '(' par_list_em ')' block END
 
 function_def: FUNCTION funcbody
             ;
-
-
 
 tableconstructor: '{' field_list_em '}'
                 ;
@@ -200,7 +202,9 @@ expr: INT
     | VARARG
     | function_def
     | tableconstructor
-    | prefix_expr
+    | variable
+    | function_call
+    | '(' expr ')'
     | expr '+' expr
     | expr '-' expr
     | expr '*' expr
@@ -221,10 +225,6 @@ expr: INT
     | NOT expr
     | '-' expr %prec UMINUS
     ;
-
-prefix_expr: variable
-          | '(' expr ')'
-          ;
 
 expr_list: expr
          | expr_list ',' expr
