@@ -70,7 +70,7 @@ stmt: ';'
     | for_stmt
     | while_stmt
     | repeat_stmt
-    | do_stmt
+    | DO block END
     | goto_stmt
     | LABEL
     ;
@@ -96,18 +96,16 @@ elseif_stmt_list: elseif_stmt
                 | elseif_stmt_list elseif_stmt
                 ;
 
-for_stmt: FOR ID '=' expr ',' expr do_stmt
-        | FOR ID '=' expr ',' expr ',' expr do_stmt
-        | FOR name_list IN expr_list do_stmt
+for_stmt: FOR ID '=' expr ',' expr DO block END
+        | FOR ID '=' expr ',' expr ',' expr DO block END
+        | FOR name_list IN expr_list DO block END
         ;
 
-while_stmt: WHILE expr do_stmt
+while_stmt: WHILE expr DO block END
           ;
 
 repeat_stmt: REPEAT block UNTIL expr
            ;
-
-do_stmt: DO block END;
 
 goto_stmt: GOTO ID
          ;
