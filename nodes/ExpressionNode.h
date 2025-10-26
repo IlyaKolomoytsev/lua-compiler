@@ -109,6 +109,8 @@ public:
 
     static ExpressionNode* Bool(bool value);
 
+    static ExpressionNode* Nil();
+
     static ExpressionNode* Id(token_id_t value);
 
     static ExpressionNode* TableField(ExpressionNode* table, token_id_t key);

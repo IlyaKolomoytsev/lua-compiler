@@ -31,6 +31,12 @@ ExpressionNode* ExpressionNode::Bool(bool value)
     return node;
 }
 
+ExpressionNode* ExpressionNode::Nil()
+{
+    ExpressionNode* node = new ExpressionNode(Type::Nil);
+    return node;
+}
+
 ExpressionNode* ExpressionNode::Id(token_id_t value)
 {
     ExpressionNode* node = new ExpressionNode(Type::Id);
