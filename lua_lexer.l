@@ -34,30 +34,18 @@ HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include "lexer/LexerStringBuilder.h"
 #include "lua_parser.tab.h"
 
 using std::cout;
 
+static LexerStringBuilder lexerStringMaster = LexerStringBuilder();
+
 /* Прототипы функций */
-static inline void comm_append(const char* s, size_t n);
-static inline void comm_reset();
-static inline void str_putc(char c);
-static inline void str_append(const char* s, size_t n);
 static inline int hexval(int c);
-static inline void utf8_from_codepoint(unsigned cp);
-static inline void str_reset();
 
 /* Переменные для работы с комментариями */
-static char comment_buf[8192];
-static size_t comment_pos = 0;
 static int comment_start_line = 0;
-
-
-/* Переменные для работы со строками */
-static size_t string_pos = 0;
-static char string_buf[8192];
-
-
 
 %}
 
@@ -93,45 +81,45 @@ static char string_buf[8192];
 "false"                 { cout << "Boolean: " << yytext << '\n'; }
 
 
-"--"                    { comm_reset(); comment_start_line = yylineno; BEGIN(SCOMM); }
-"--[["                  { comm_reset(); comment_start_line = yylineno; BEGIN(MCOMM); }
+"--"                    { lexerStringMaster.clear(); comment_start_line = yylineno; BEGIN(SCOMM); }
+"--[["                  { lexerStringMaster.clear(); comment_start_line = yylineno; BEGIN(MCOMM); }
 
 
 <SCOMM>[^\r\n]*           { cout << "Single comment: " << yytext << '\n'; BEGIN(INITIAL); }
 
-<MCOMM>"]]"             { cout << "Multi comment: " << comment_buf << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
-<MCOMM>\r\n             { comm_append("\n", 1); }
+<MCOMM>"]]"             { cout << "Multi comment: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); } /* конец многострочного комментария */
+<MCOMM>\r\n             { lexerStringMaster.write("\n", 1); }
 <MCOMM>\r               { /* игнорируем одиночный CR */ }
-<MCOMM>.                { comm_append(yytext, yyleng); }
+<MCOMM>.                { lexerStringMaster.write(yytext, yyleng); }
 
 
 <MCOMM><<EOF>>          { cout << "ERROR: unterminated multiline comment (opened at line " << comment_start_line << ")\n"; BEGIN(INITIAL); }
 
 
-\"                      { str_reset(); BEGIN(DSTRING); } /* Старт строки с " */
-\'                      { str_reset(); BEGIN(SSTRING); } /* Старт строки с ' */
+\"                      { lexerStringMaster.clear(); BEGIN(DSTRING); } /* Старт строки с " */
+\'                      { lexerStringMaster.clear(); BEGIN(SSTRING); } /* Старт строки с ' */
 
 
-<DSTRING>[^"\\\n]+      { str_append(yytext, yyleng); }              
-<SSTRING>[^'\\\n]+      { str_append(yytext, yyleng); }
+<DSTRING>[^"\\\n]+      { lexerStringMaster.write(yytext, yyleng); }
+<SSTRING>[^'\\\n]+      { lexerStringMaster.write(yytext, yyleng); }
 
 
-<DSTRING,SSTRING>\\a    { str_putc('\a'); }
-<DSTRING,SSTRING>\\b    { str_putc('\b'); }
-<DSTRING,SSTRING>\\f    { str_putc('\f'); }
-<DSTRING,SSTRING>\\n    { str_putc('\n'); }
-<DSTRING,SSTRING>\\r    { str_putc('\r'); }
-<DSTRING,SSTRING>\\t    { str_putc('\t'); }
-<DSTRING,SSTRING>\\v    { str_putc('\v'); }
-<SSTRING,DSTRING>"\\\"" { str_putc('"');  }
-<SSTRING,DSTRING>"\\\'" { str_putc('\''); }
-<DSTRING,SSTRING>\\\\   { str_putc('\\'); }
+<DSTRING,SSTRING>\\a    { lexerStringMaster.write('\a'); }
+<DSTRING,SSTRING>\\b    { lexerStringMaster.write('\b'); }
+<DSTRING,SSTRING>\\f    { lexerStringMaster.write('\f'); }
+<DSTRING,SSTRING>\\n    { lexerStringMaster.write('\n'); }
+<DSTRING,SSTRING>\\r    { lexerStringMaster.write('\r'); }
+<DSTRING,SSTRING>\\t    { lexerStringMaster.write('\t'); }
+<DSTRING,SSTRING>\\v    { lexerStringMaster.write('\v'); }
+<SSTRING,DSTRING>"\\\"" { lexerStringMaster.write('"'); }
+<SSTRING,DSTRING>"\\\'" { lexerStringMaster.write('\''); }
+<DSTRING,SSTRING>\\\\   { lexerStringMaster.write('\\'); }
 
 
 <DSTRING,SSTRING>\\x[0-9A-Fa-f]{2} {
     int hi = hexval(yytext[2]);
     int lo = hexval(yytext[3]);
-    str_putc((char)((hi << 4) | lo));
+    lexerStringMaster.write((char)((hi << 4) | lo));
 }
 
 
@@ -139,7 +127,7 @@ static char string_buf[8192];
     int v = std::strtol(yytext + 1, nullptr, 10);
     if (v < 0) v = 0;
     if (v > 255) v = 255;
-    str_putc((char)v);
+    lexerStringMaster.write((char)v);
 }
 
 
@@ -151,15 +139,15 @@ static char string_buf[8192];
         cp = (cp << 4) | (unsigned)v;
         if (cp > 0x10FFFF) { cp = 0xFFFD; break; }
     }
-    utf8_from_codepoint(cp);
+    lexerStringMaster.writeUnicodeByCode(cp);
 }
 
 
-<DSTRING,SSTRING>\\\n  { str_putc('\n'); }
+<DSTRING,SSTRING>\\\n  { lexerStringMaster.write('\n'); }
 
 
-<DSTRING>\"             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
-<SSTRING>\'             { cout << "String: " << string_buf << '\n'; BEGIN(INITIAL); }
+<DSTRING>\"             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); }
+<SSTRING>\'             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); }
 
 
 <DSTRING>\n             { cout << "ERROR: unterminated string (\") at line " << yylineno << '\n'; BEGIN(INITIAL); }
@@ -171,7 +159,7 @@ static char string_buf[8192];
 
 <DSTRING,SSTRING>\\([^0-9abfnrtv\"\'\\xu\n]) {
     cout << "ERROR: invalid escape '" << yytext << "' at line " << yylineno << '\n';
-    str_append(yytext + 1, yyleng - 1); // добавим символ после '\' буквально
+    lexerStringMaster.write(yytext + 1, yyleng - 1);
 }
 
 
@@ -226,38 +214,6 @@ static char string_buf[8192];
 
 %%
 
-/* Функции для работы с комментариями */
-static inline void comm_append(const char* s, size_t n) {
-    if (comment_pos + n >= sizeof(comment_buf)) n = sizeof(comment_buf) - 1 - comment_pos;
-    if (n > 0) {
-        std::memcpy(comment_buf + comment_pos, s, n);
-        comment_pos += n;
-        comment_buf[comment_pos] = '\0';
-    }
-}
-
-static inline void comm_reset(){
-    comment_pos = 0;
-    comment_buf[0] = '\0';
-    comment_start_line = 0;
-}
-
-/* Функции для работы со строками */
-static inline void str_putc(char c) {
-    if (string_pos + 1 < sizeof(string_buf)) {
-        string_buf[string_pos++] = c;
-        string_buf[string_pos] = '\0';
-    }
-}
-
-static inline void str_append(const char* s, size_t n) {
-    if (string_pos + n >= sizeof(string_buf)) n = sizeof(string_buf) - 1 - string_pos;
-    if (n > 0) {
-        std::memcpy(string_buf + string_pos, s, n);
-        string_pos += n;
-        string_buf[string_pos] = '\0';
-    }
-}
 
 static inline int hexval(int c) {
     if ('0' <= c && c <= '9') return c - '0';
@@ -265,31 +221,3 @@ static inline int hexval(int c) {
     if ('A' <= c && c <= 'F') return 10 + (c - 'A');
     return -1;
 }
-
-/* кодпоинт (U+XXXXX) → UTF-8 */
-static inline void utf8_from_codepoint(unsigned cp) {
-    if (cp <= 0x7F) {
-        str_putc((char)cp);
-    } else if (cp <= 0x7FF) {
-        str_putc((char)(0xC0 | ((cp >> 6) & 0x1F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else if (cp <= 0xFFFF) {
-        str_putc((char)(0xE0 | ((cp >> 12) & 0x0F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else if (cp <= 0x10FFFF) {
-        str_putc((char)(0xF0 | ((cp >> 18) & 0x07)));
-        str_putc((char)(0x80 | ((cp >> 12) & 0x3F)));
-        str_putc((char)(0x80 | ((cp >> 6) & 0x3F)));
-        str_putc((char)(0x80 | (cp & 0x3F)));
-    } else {
-        utf8_from_codepoint(0xFFFD);
-    }
-}
-
-static inline void str_reset() {
-    string_pos = 0;
-    string_buf[0] = '\0';
-}
-
-
