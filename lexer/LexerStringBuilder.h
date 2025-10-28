@@ -16,6 +16,8 @@ public:
 
     std::string getString();
 
+    std::string* createString();
+
     void clear();
 
 private:

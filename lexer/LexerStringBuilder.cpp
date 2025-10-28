@@ -38,6 +38,11 @@ std::string LexerStringBuilder::getString()
     return newString;
 }
 
+std::string* LexerStringBuilder::createString()
+{
+    return new std::string(getString());
+}
+
 void LexerStringBuilder::clear()
 {
     stream_.str("");
