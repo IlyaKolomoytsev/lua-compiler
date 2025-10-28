@@ -20,10 +20,10 @@ void yyerror(const char *s) {
 %}
 
 %union {
-    int Int;
+    int64_t Int;
     char *ID;
-    double Double;
-    char *String;
+    double Float;
+    std::string* String;
 }
 
 %token TRUE FALSE NIL
