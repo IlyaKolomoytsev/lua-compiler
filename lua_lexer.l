@@ -56,29 +56,29 @@ static int comment_start_line = 0;
     // комментарий создан спустя неделю после консультации
 %}
 
-"and"                   { cout << "Keyword: " << yytext << '\n'; }
-"break"                 { cout << "Keyword: " << yytext << '\n'; }
-"do"                    { cout << "Keyword: " << yytext << '\n'; }
-"elseif"                { cout << "Keyword: " << yytext << '\n'; }
-"else"                  { cout << "Keyword: " << yytext << '\n'; }
-"end"                   { cout << "Keyword: " << yytext << '\n'; }
-"for"                   { cout << "Keyword: " << yytext << '\n'; }
-"function"              { cout << "Keyword: " << yytext << '\n'; }
-"goto"                  { cout << "Keyword: " << yytext << '\n'; }
-"if"                    { cout << "Keyword: " << yytext << '\n'; }
-"in"                    { cout << "Keyword: " << yytext << '\n'; }
-"local"                 { cout << "Keyword: " << yytext << '\n'; }
-"nil"                   { cout << "Keyword: " << yytext << '\n'; }
-"not"                   { cout << "Keyword: " << yytext << '\n'; }
-"or"                    { cout << "Keyword: " << yytext << '\n'; }
-"repeat"                { cout << "Keyword: " << yytext << '\n'; }
-"return"                { cout << "Keyword: " << yytext << '\n'; }
-"then"                  { cout << "Keyword: " << yytext << '\n'; }
-"until"                 { cout << "Keyword: " << yytext << '\n'; }
-"while"                 { cout << "Keyword: " << yytext << '\n'; }
+"and"                   { cout << "Keyword: " << yytext << '\n'; return AND; }
+"break"                 { cout << "Keyword: " << yytext << '\n'; return BREAK; }
+"do"                    { cout << "Keyword: " << yytext << '\n'; return DO; }
+"elseif"                { cout << "Keyword: " << yytext << '\n'; return ELSEIF; }
+"else"                  { cout << "Keyword: " << yytext << '\n'; return ELSE; }
+"end"                   { cout << "Keyword: " << yytext << '\n'; return END; }
+"for"                   { cout << "Keyword: " << yytext << '\n'; return FOR; }
+"function"              { cout << "Keyword: " << yytext << '\n'; return FUNCTION; }
+"goto"                  { cout << "Keyword: " << yytext << '\n'; return GOTO; }
+"if"                    { cout << "Keyword: " << yytext << '\n'; return IF; }
+"in"                    { cout << "Keyword: " << yytext << '\n'; return IN; }
+"local"                 { cout << "Keyword: " << yytext << '\n'; return LOCAL; }
+"nil"                   { cout << "Keyword: " << yytext << '\n'; return NIL; }
+"not"                   { cout << "Keyword: " << yytext << '\n'; return NOT; }
+"or"                    { cout << "Keyword: " << yytext << '\n'; return OR; }
+"repeat"                { cout << "Keyword: " << yytext << '\n'; return REPEAT; }
+"return"                { cout << "Keyword: " << yytext << '\n'; return RETURN; }
+"then"                  { cout << "Keyword: " << yytext << '\n'; return THEN; }
+"until"                 { cout << "Keyword: " << yytext << '\n'; return UNTIL; }
+"while"                 { cout << "Keyword: " << yytext << '\n'; return WHILE; }
 
-"true"                  { cout << "Boolean: " << yytext << '\n'; }
-"false"                 { cout << "Boolean: " << yytext << '\n'; }
+"true"                  { cout << "Boolean: " << yytext << '\n'; return TRUE; }
+"false"                 { cout << "Boolean: " << yytext << '\n'; return FALSE; }
 
 
 "--"                    { lexerStringMaster.clear(); comment_start_line = yylineno; BEGIN(SCOMM); }
@@ -141,8 +141,8 @@ static int comment_start_line = 0;
 <DSTRING,SSTRING>\\\n  { lexerStringMaster.write('\n'); }
 
 
-<DSTRING>\"             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); }
-<SSTRING>\'             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); }
+<DSTRING>\"             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); yylval.String = lexerStringMaster.createString(); return STRING; }
+<SSTRING>\'             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); yylval.String = lexerStringMaster.createString(); return STRING; }
 
 
 <DSTRING>\n             { cout << "ERROR: unterminated string (\") at line " << yylineno << '\n'; BEGIN(INITIAL); }
@@ -158,49 +158,49 @@ static int comment_start_line = 0;
 }
 
 
-{HEX_FLOAT}             { cout << "Float(hex): " << strtod(yytext, nullptr) << '\n'; }
-{HEX_INT}               { cout << "Int(hex): " << strtoll(yytext, nullptr, 0) << '\n'; }
-{DEC_FLOAT}             { cout << "Float: " << strtod(yytext, nullptr) << '\n'; }
-{DEC_INT}               { cout << "Int: " << strtoll(yytext, nullptr, 10) << '\n'; }
+{HEX_FLOAT}             { cout << "Float(hex): " << strtod(yytext, nullptr) << '\n'; yylval.Float = strtod(yytext, nullptr);  return FLOAT; }
+{HEX_INT}               { cout << "Int(hex): " << strtoll(yytext, nullptr, 0) << '\n'; yylval.Int = strtoll(yytext, nullptr, 0); return INT; }
+{DEC_FLOAT}             { cout << "Float: " << strtod(yytext, nullptr) << '\n'; yylval.Float = strtod(yytext, nullptr); return FLOAT; }
+{DEC_INT}               { cout << "Int: " << strtoll(yytext, nullptr, 10) << '\n'; yylval.Int = strtoll(yytext, nullptr, 10); return INT; }
 
 [0-9]+{ID_START}+ { cout << "Error: invalid identifier (starts with digit): " << yytext << " at line " << yylineno << '\n'; }
 
 
-"..."                   { cout << "Varargs: " << yytext << '\n'; }
-"::"                    { cout << "LabelSep: " << yytext << '\n'; }
-"//"                    { cout << "Operator: " << yytext << " (int div)\n"; }
-".."                    { cout << "Operator: " << yytext << " (concat)\n"; }
-"=="                    { cout << "Operator: " << yytext << '\n'; }
-"~="                    { cout << "Operator: " << yytext << '\n'; }
-"<="                    { cout << "Operator: " << yytext << '\n'; }
-">="                    { cout << "Operator: " << yytext << '\n'; }
+"..."                   { cout << "Varargs: " << yytext << '\n'; return VARARG; }
+"::"                    { cout << "LabelSep: " << yytext << '\n'; return LABEL_SEP; }
+"//"                    { cout << "Operator: " << yytext << " (int div)\n"; return '/';}
+".."                    { cout << "Operator: " << yytext << " (concat)\n"; return CONC; }
+"=="                    { cout << "Operator: " << yytext << '\n'; return EQUALITY; }
+"~="                    { cout << "Operator: " << yytext << '\n'; return INEQUALITY; }
+"<="                    { cout << "Operator: " << yytext << '\n'; return LESS_EQUAL; }
+">="                    { cout << "Operator: " << yytext << '\n'; return GREATER_EQUAL; }
 
 
-"+"                     { cout << "Operator: " << yytext << '\n'; }
-"-"                     { cout << "Operator: " << yytext << '\n'; }
-"*"                     { cout << "Operator: " << yytext << '\n'; }
-"/"                     { cout << "Operator: " << yytext << '\n'; }
-"%"                     { cout << "Operator: " << yytext << '\n'; }
-"^"                     { cout << "Operator: " << yytext << '\n'; }
-"#"                     { cout << "Operator: " << yytext << " (len)\n"; }
-"="                     { cout << "Operator: " << yytext << '\n'; }
-"<"                     { cout << "Operator: " << yytext << '\n'; }
-">"                     { cout << "Operator: " << yytext << '\n'; }
-"."                     { cout << "Operator: " << yytext << '\n'; }
-":"                     { cout << "Operator: " << yytext << '\n'; }
-","                     { cout << "Operator: " << yytext << '\n'; }
-";"                     { cout << "Operator: " << yytext << '\n'; }
+"+"                     { cout << "Operator: " << yytext << '\n'; return '+'; }
+"-"                     { cout << "Operator: " << yytext << '\n'; return '-'; }
+"*"                     { cout << "Operator: " << yytext << '\n'; return '*'; }
+"/"                     { cout << "Operator: " << yytext << '\n'; return '/'; }
+"%"                     { cout << "Operator: " << yytext << '\n'; return '%'; }
+"^"                     { cout << "Operator: " << yytext << '\n'; return '^'; }
+"#"                     { cout << "Operator: " << yytext << " (len)\n"; return '#'; }
+"="                     { cout << "Operator: " << yytext << '\n'; return '='; }
+"<"                     { cout << "Operator: " << yytext << '\n'; return '<'; }
+">"                     { cout << "Operator: " << yytext << '\n'; return '>'; }
+"."                     { cout << "Operator: " << yytext << '\n'; return '.'; }
+":"                     { cout << "Operator: " << yytext << '\n'; return ':'; }
+","                     { cout << "Operator: " << yytext << '\n'; return ','; }
+";"                     { cout << "Operator: " << yytext << '\n'; return ';'; }
 
 
-"("                     { cout << "LParen: "  << yytext << '\n'; }
-")"                     { cout << "RParen: "  << yytext << '\n'; }
-"["                     { cout << "LBracket: "<< yytext << '\n'; }
-"]"                     { cout << "RBracket: "<< yytext << '\n'; }
-"{"                     { cout << "LBrace: "  << yytext << '\n'; }
-"}"                     { cout << "RBrace: "  << yytext << '\n'; }
+"("                     { cout << "LParen: "  << yytext << '\n'; return '('; }
+")"                     { cout << "RParen: "  << yytext << '\n'; return ')'; }
+"["                     { cout << "LBracket: "<< yytext << '\n'; return '['; }
+"]"                     { cout << "RBracket: "<< yytext << '\n'; return ']'; }
+"{"                     { cout << "LBrace: "  << yytext << '\n'; return '{'; }
+"}"                     { cout << "RBrace: "  << yytext << '\n'; return '}'; }
 
 
-{ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; }
+{ID_START}{ID_CONT}     { cout << "Identifier: " << yytext << '\n'; yylval.String = new std::string(yytext, yyleng); return ID; }
 
 
 {WS}            ;
