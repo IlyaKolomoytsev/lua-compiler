@@ -132,13 +132,8 @@ static int comment_start_line = 0;
 
 
 <DSTRING,SSTRING>\\u\{[0-9A-Fa-f]+\} {
-    unsigned cp = 0;
-    for (int i = 3; yytext[i] != '}'; ++i) {
-        int v = hexval(yytext[i]);
-        if (v < 0) { cp = 0xFFFD; break; }
-        cp = (cp << 4) | (unsigned)v;
-        if (cp > 0x10FFFF) { cp = 0xFFFD; break; }
-    }
+    unsigned cp = std::strtol(yytext+3, nullptr, 16);
+    if (cp > 0x10FFFF) { cp = 0xFFFD; break; }
     lexerStringMaster.writeUnicodeByCode(cp);
 }
 
