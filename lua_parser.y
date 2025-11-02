@@ -31,6 +31,8 @@ void yyerror(const char *s) {
     char *ID;
     double Float;
     std::string* String;
+    ExpressionNode* exressionNode;
+    StatementNode* statementNode;
 }
 
 %token TRUE FALSE NIL
