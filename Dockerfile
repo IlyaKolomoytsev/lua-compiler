@@ -9,7 +9,7 @@ RUN apt-get update && \
     flex \
     cmake \
     graphviz \
-    git \
+    gdb \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project to working directory
