@@ -8,6 +8,7 @@ RUN apt-get update && \
     bison \
     flex \
     cmake \
+    graphviz \
     git \
     && rm -rf /var/lib/apt/lists/*
 
