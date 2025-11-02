@@ -256,5 +256,7 @@ private:
 
 std::string to_string(Scope scope);
 
+std::string to_string(StatementNode::Type type);
+
 
 #endif //LUA_COMPILER_STATEMENT_NODE_H

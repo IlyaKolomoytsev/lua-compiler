@@ -267,3 +267,35 @@ std::string to_string(Scope scope)
         return "Unknown";
     }
 }
+
+std::string to_string(StatementNode::Type type)
+{
+    switch (type)
+    {
+    case StatementNode::Type::Declaration:
+        return "Declaration";
+    case StatementNode::Type::Assignment:
+        return "Assignment";
+    case StatementNode::Type::FunctionCall:
+        return "FunctionCall";
+    case StatementNode::Type::Branching:
+        return "Branching";
+    case StatementNode::Type::ForLoop:
+        return "ForLoop";
+    case StatementNode::Type::WhileLoop:
+        return "WhileLoop";
+    case StatementNode::StatementNode::Type::RepeatLoop:
+        return "RepeatLoop";
+    case StatementNode::StatementNode::Type::Block:
+        return "Block";
+    case StatementNode::Type::GoTo:
+        return "GoTo";
+    case StatementNode::Type::Label:
+        return "Label";
+    case StatementNode::Type::Break:
+        return "Break";
+    default:
+        assert(false);
+        return "Unknown";
+    }
+}
