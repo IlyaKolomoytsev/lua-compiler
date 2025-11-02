@@ -1,6 +1,7 @@
 #include "StatementNode.h"
 
 #include <assert.h>
+#include "DotMacros.h"
 
 StatementNode* StatementNode::Declaration(NameList* names)
 {
@@ -132,7 +133,150 @@ StatementNode::StatementNode(Type type) : type_(type)
 
 void StatementNode::writeNodeInfoToDot(std::ostream& os) const
 {
-    os << getNodeId() << " [label=StatementNode]" << std::endl;
+    // write node information
+    switch (type_)
+    {
+    case Type::Assignment:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_) << "\n" << to_string(value_.assignment_v.scope));
+        break;
+    default:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_));
+    }
+
+    // write information about connections and child nodes
+    switch (type_)
+    {
+    case Type::Declaration:
+        {
+            auto declaration = value_.declaration_v;
+            // write arcs
+            for (auto node : *declaration)
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "declare");
+            // write nodes recursively
+            for (auto node : *declaration)
+                os << *node;
+            break;
+        }
+    case Type::Assignment:
+        {
+            auto assignment = value_.assignment_v;
+            // write arcs
+            int index = 0;
+            for (auto node : *assignment.names)
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "variable №" << index++);
+            index = 0;
+            for (auto node : *assignment.values)
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "value №" << index++);
+            // write nodes recursively
+            for (auto node : *assignment.names)
+                os << *node;
+            for (auto node : *assignment.values)
+                os << *node;
+            break;
+        }
+    case Type::FunctionCall:
+        {
+            auto functionCall = value_.functionCall_v;
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, functionCall, "expression");
+            os << *functionCall;
+            break;
+        }
+    case Type::Branching:
+        {
+            auto branching = value_.branching_v;
+            // write arcs
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.condition, "condition");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.successBlock, "success");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.failureBlock, "failure");
+            // write nodes recursively
+            os << *branching.condition;
+            os << *branching.successBlock;
+            os << *branching.failureBlock;
+            break;
+        }
+    case Type::ForLoop:
+        {
+            auto loop = value_.forLoop_v;
+            auto range = loop.range;
+            // write arcs
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.iteratorVariable, "variable");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.start, "range start value");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.finish, "range start finish");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.step, "range start step");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            // write nodes recursively
+            os << *loop.iteratorVariable;
+            os << *range.start;
+            os << *range.finish;
+            os << *range.step;
+            os << *loop.block;
+            break;
+        }
+    case Type::WhileLoop:
+        {
+            auto loop = value_.whileLoop_v;
+            // write arcs
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.condition, "condition");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            // write nodes recursively
+            os << *loop.condition;
+            os << *loop.block;
+            break;
+        }
+    case Type::RepeatLoop:
+        {
+            auto loop = value_.repeatLoop_v;
+            // write arcs
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.condition, "condition");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            // write nodes recursively
+            os << *loop.condition;
+            os << *loop.block;
+            break;
+        }
+    case Type::Block:
+        {
+            auto block = value_.block_v;
+            // write arcs
+            int index = 0;
+            for (auto statement : *block)
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, statement, "element №" << index++);
+            // write nodes recursively
+            for (auto statement : *block)
+                os << *statement;
+            break;
+        }
+    case Type::GoTo:
+        {
+            auto goTo = value_.goTo_v;
+            // ToDo: need change goTo type
+            assert(false);
+            break;
+        }
+    case Type::Label:
+        {
+            auto label = value_.label_v;
+            // ToDo: need change label type
+            assert(false);
+            break;
+        }
+    case Type::Break:
+        break;
+    case Type::Return:
+        {
+            auto return_v = value_.return_v;
+            // write arcs
+            int index = 0;
+            for (auto statement : *return_v)
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, statement, "expression №" << index++);
+            // write nodes recursively
+            for (auto statement : *return_v)
+                os << *statement;
+            break;
+        }
+    default:
+        assert(false);
+    }
 }
 
 StatementNode::ForLoopIteratorConverter::ForLoopIteratorConverter(
