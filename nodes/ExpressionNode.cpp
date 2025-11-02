@@ -427,6 +427,11 @@ ExpressionNode* ExpressionNode::getOperand()
     }
 }
 
+void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
+{
+    os << getNodeId() << " [label=ExpressionNode]" << std::endl;
+}
+
 ExpressionNode::ExpressionNode(Type type) : type_(type)
 {
 }

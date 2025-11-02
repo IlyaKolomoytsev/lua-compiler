@@ -127,6 +127,10 @@ public:
 
     Type getType() const;
 
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
+
 private:
     explicit StatementNode(Type type);
 

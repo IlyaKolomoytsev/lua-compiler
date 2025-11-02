@@ -10,9 +10,13 @@ class Node
 public:
     Node();
 
+    virtual ~Node() = default;
+
     node_id_t getNodeId() const;
 
     static node_id_t getMaxNideId();
+
+    virtual void writeNodeInfoToDot(std::ostream& os) const = 0;
 
 private:
     const node_id_t id;

@@ -193,6 +193,10 @@ public:
 
     ExpressionNode* getOperand();
 
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
+
 private:
     explicit ExpressionNode(Type type);
 

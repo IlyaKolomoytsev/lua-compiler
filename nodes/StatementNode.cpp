@@ -130,6 +130,11 @@ StatementNode::StatementNode(Type type) : type_(type)
 {
 }
 
+void StatementNode::writeNodeInfoToDot(std::ostream& os) const
+{
+    os << getNodeId() << " [label=StatementNode]" << std::endl;
+}
+
 StatementNode::ForLoopIteratorConverter::ForLoopIteratorConverter(
     NameList* names, ExpressionNodeList* explist, StatementNode* block
 ) : names_(names), explist_(explist), block_(block)
