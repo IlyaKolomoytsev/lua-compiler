@@ -12,7 +12,7 @@ StatementNode* StatementNode::Declaration(NameList* names)
 StatementNode* StatementNode::Assignment(Scope scope, NameList* names, ExpressionNodeList* values)
 {
     StatementNode* node = new StatementNode(Type::Assignment);
-    assigment_t* assignment = &node->value_.assigment_v;
+    assignment_t* assignment = &node->value_.assignment_v;
     assignment->scope = scope;
     assignment->names = names;
     assignment->values = values;

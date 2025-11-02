@@ -27,7 +27,7 @@ class StatementNode : public Node
     using declaration_type_t = NameList*;
     using label_t = uint;
 
-    struct assigment_t
+    struct assignment_t
     {
         Scope scope;
         NameList* names;
@@ -64,7 +64,7 @@ class StatementNode : public Node
     union Value
     {
         declaration_type_t declaration_v;
-        assigment_t assigment_v;
+        assignment_t assignment_v;
         function_call_t functionCall_v;
         branching_t branching_v;
         for_loop_t forLoop_v;
