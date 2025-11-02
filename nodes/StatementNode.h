@@ -130,10 +130,6 @@ public:
 private:
     explicit StatementNode(Type type);
 
-    Type type_;
-    Value value_;
-
-
     /**
      * Class interpret this statement
      * @code
@@ -249,6 +245,9 @@ private:
         ExpressionNodeList* explist_;
         StatementNode* block_;
     };
+
+    Type type_;
+    Value value_;
 };
 
 
