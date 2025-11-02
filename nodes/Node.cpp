@@ -4,7 +4,7 @@ Node::Node() : id(++maxId)
 {
 }
 
-inline Node::node_id_t Node::getNodeId() const
+Node::node_id_t Node::getNodeId() const
 {
     return id;
 }
