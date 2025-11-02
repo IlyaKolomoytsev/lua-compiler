@@ -54,6 +54,7 @@ set(HEADER_FILES
         nodes/StatementNode.h
         lexer/LexerStringBuilder.h
         nodes/Program.h
+        nodes/DotMacros.h
 )
 
 # Add files to executable target
