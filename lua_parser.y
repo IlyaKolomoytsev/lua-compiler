@@ -33,6 +33,8 @@ void yyerror(const char *s) {
     std::string* String;
     ExpressionNode* exressionNode;
     StatementNode* statementNode;
+    ExpressionNodeList* expressionNodeList;
+    StatementNodeList* statementNodeList;
 }
 
 %token TRUE FALSE NIL
