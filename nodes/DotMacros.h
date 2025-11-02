@@ -19,4 +19,13 @@
 #define DOT_ARC_NODE_ID_WITH_LABEL(source, destination, label) \
     DOT_ARC_NODE_ID(source, destination, DOT_LABEL(label))
 
+#define DOT_NODE(name, properties) \
+    name << " [" << properties << "]" << std::endl
+
+#define DOT_NODE_WITH_ID(node, properties) \
+    NODE_ID(node) << " [" << properties << "]" << std::endl
+
+#define DOT_NODE_WITH_ID_WITH_LABEL(name, label) \
+    DOT_NODE_WITH_ID(name, DOT_LABEL(label))
+
 #endif //LUA_COMPILER_DOT_MACROS_H
