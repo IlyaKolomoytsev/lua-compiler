@@ -43,6 +43,7 @@ set(SOURCE_FILES
         nodes/ExpressionNode.cpp
         nodes/StatementNode.cpp
         lexer/LexerStringBuilder.cpp
+        nodes/Program.cpp
 )
 
 set(HEADER_FILES
@@ -50,6 +51,7 @@ set(HEADER_FILES
         nodes/ExpressionNode.h
         nodes/StatementNode.h
         lexer/LexerStringBuilder.h
+        nodes/Program.h
 )
 
 # Add files to executable target
