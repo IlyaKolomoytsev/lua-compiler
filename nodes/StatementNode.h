@@ -22,7 +22,7 @@ enum class Scope
     Local,
 };
 
-class StatementNode
+class StatementNode : public Node
 {
     using declaration_type_t = NameList*;
     using label_t = uint;
