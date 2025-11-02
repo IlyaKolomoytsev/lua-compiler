@@ -121,7 +121,7 @@ StatementNode* StatementNode::Return(ExpressionNodeList* values)
     return node;
 }
 
-inline StatementNode::Type StatementNode::getType()
+inline StatementNode::Type StatementNode::getType() const
 {
     return type_;
 }

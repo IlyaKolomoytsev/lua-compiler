@@ -125,7 +125,7 @@ public:
 
     static StatementNode* Return(ExpressionNodeList* values);
 
-    Type getType();
+    Type getType() const;
 
 private:
     explicit StatementNode(Type type);
