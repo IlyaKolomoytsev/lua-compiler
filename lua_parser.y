@@ -19,6 +19,13 @@ void yyerror(const char *s) {
 
 %}
 
+%code requires {
+    #include <string>
+    #include "nodes/ExpressionNode.h"
+    #include "nodes/StatementNode.h"
+    #include "nodes/Program.h"
+}
+
 %union {
     int64_t Int;
     char *ID;
