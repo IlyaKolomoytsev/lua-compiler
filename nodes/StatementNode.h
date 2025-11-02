@@ -254,5 +254,7 @@ private:
     Value value_;
 };
 
+std::string to_string(Scope scope);
+
 
 #endif //LUA_COMPILER_STATEMENT_NODE_H

@@ -253,3 +253,17 @@ ExpressionNode* StatementNode::ForLoopIteratorConverter::getFirstName()
     std::string* nameCopy = new std::string(*firstName);
     return ExpressionNode::Id(nameCopy);
 }
+
+std::string to_string(Scope scope)
+{
+    switch (scope)
+    {
+    case Scope::Global:
+        return "Global";
+    case Scope::Local:
+        return "Local";
+    default:
+        assert(false);
+        return "Unknown";
+    }
+}
