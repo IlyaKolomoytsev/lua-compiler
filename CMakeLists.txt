@@ -16,15 +16,16 @@ if(NOT BISON_EXECUTABLE)
 endif()
 
 # Paths for generated files
-set(GENERATED_LEXER_FILE "${CMAKE_CURRENT_BINARY_DIR}/lex.yy.cpp")
-set(GENERATED_BISON_FILE "${CMAKE_CURRENT_BINARY_DIR}/lua_parser.tab.c")
-set(GENERATED_BISON_HEADER "${CMAKE_CURRENT_BINARY_DIR}/lua_parser.tab.h")
+set(GENERATED_LEXER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/lex.yy.cpp")
+set(GENERATED_BISON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/lua_parser.tab.c")
+set(GENERATED_BISON_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/lua_parser.tab.h")
 
 # Generation bison source file
 add_custom_command(
         OUTPUT ${GENERATED_BISON_FILE} ${GENERATED_BISON_HEADER}
         COMMAND ${BISON_EXECUTABLE} --verbose -d -o ${GENERATED_BISON_FILE} lua_parser.y
         DEPENDS lua_parser.y
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating C++ parser with Bison"
 )
 
@@ -33,6 +34,7 @@ add_custom_command(
         OUTPUT ${GENERATED_LEXER_FILE}
         COMMAND ${FLEX_EXECUTABLE} --c++ -o ${GENERATED_LEXER_FILE} lua_lexer.l
         DEPENDS lua_lexer.l
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating C++ lexer with Flex"
 )
 
