@@ -204,5 +204,6 @@ private:
     Value value_;
 };
 
+std::string to_string(ExpressionNode::Type type);
 
 #endif
