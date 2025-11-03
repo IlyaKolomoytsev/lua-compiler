@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdexcept>
+#include "DotMacros.h"
 
 ExpressionNode* ExpressionNode::Int(integer_t value)
 {
@@ -429,7 +430,145 @@ ExpressionNode* ExpressionNode::getOperand()
 
 void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
 {
-    os << getNodeId() << " [label=ExpressionNode]" << std::endl;
+    // write node information
+    switch (type_)
+    {
+    case Type::Integer:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.integer_v);
+        break;
+    case Type::Float:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.float_v);
+        break;
+    case Type::String:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.string_v);
+        break;
+    case Type::Boolean:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.boolean_v);
+        break;
+    case Type::Id:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, *value_.id_v);
+        break;
+    case Type::Summation:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "+");
+        break;
+    case Type::Subtraction:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "-");
+        break;
+    case Type::Multiplication:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "*");
+        break;
+    case Type::Division:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "/");
+        break;
+    case Type::Modulo:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "%");
+        break;
+    case Type::Exponentiation:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "^");
+        break;
+    case Type::Less:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "<");
+        break;
+    case Type::Greater:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, ">");
+        break;
+    case Type::Equality:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "==");
+        break;
+    case Type::Unequality:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "!=");
+        break;
+    case Type::LessEqual:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "<=");
+        break;
+    case Type::GreaterEqual:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, ">=");
+        break;
+    default:
+        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_));
+    }
+
+    // write information about connections and child nodes
+    switch (type_)
+    {
+    case Type::TableField:
+        {
+            auto tableField = value_.tableField_v;
+            // ToDo: I think key field has incorrect value type, need check it, now add assert
+            assert(false);
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, tableField.table, "table");
+            os << *tableField.table;
+            os << tableField.key;
+            break;
+        }
+    case Type::TableConstructor:
+        {
+            auto constructor = value_.tableConstructor_v;
+            int index = 0;
+            for (auto field : *constructor)
+            {
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, field.name, "name №" << index);
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, field.value, "value №" << index);
+                index++;
+            }
+            for (auto field : *constructor)
+            {
+                os << *field.name;
+                os << *field.value;
+            }
+        }
+    case Type::FunctionCall:
+        {
+            auto call = value_.functionCall_v;
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, call.functionId, "FunctionId");
+            int index = 0;
+            for (auto arg : *call.arguments)
+            {
+                os << DOT_ARC_NODE_ID_WITH_LABEL(this, arg, "argument №" << index++);
+            }
+            os << *call.functionId;
+            for (auto arg : *call.arguments)
+            {
+                os << *arg;
+            }
+        }
+    case Type::ExpressionList:
+        {
+            // ToDo: can't find expression list values
+            assert(false);
+        }
+    case Type::Summation:
+    case Type::Subtraction:
+    case Type::Multiplication:
+    case Type::Division:
+    case Type::Modulo:
+    case Type::IntegerDivision:
+    case Type::Exponentiation:
+    case Type::Less:
+    case Type::Greater:
+    case Type::Equality:
+    case Type::Unequality:
+    case Type::LessEqual:
+    case Type::GreaterEqual:
+    case Type::Or:
+    case Type::And:
+    case Type::Concatenation:
+        {
+            auto operands = value_.twoOperands_v;
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operands.left, "left");
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operands.right, "right");
+            os << *operands.left;
+            os << *operands.right;
+        }
+    case Type::Length:
+    case Type::Negation:
+    case Type::UnaryMinuses:
+        {
+            auto operand = value_.oneOperand_v;
+            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operand, "operand");
+            os << *operand;
+        }
+    }
 }
 
 ExpressionNode::ExpressionNode(Type type) : type_(type)
