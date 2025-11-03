@@ -63,18 +63,31 @@ void yyerror(const char *s) {
 %right '^'
 %nonassoc '(' ')'
 
+%type <statementNode> chunk;
+%type <statementNode> block;
+%type <statementNode> stmt;
+%type <statementNode> finish_stmt;
+%type <statementNodeList> stmt_list;
+%type <statementNodeList> stmt_list_em;
+%type <exressionNode> expr;
+%type <expressionNodeList> expr_list;
+%type <expressionNodeList> expr_list_em;
+%type <variableList> variable_list;
+%type <variableList> variable_list_em;
+%type <variable> variable;
+
 %start chunk
 
 %%
 
-chunk: block
+chunk: block { Program::addChunk($1); }
      ;
 
-block: stmt_list_em finish_stmt
+block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
      ;
 
 stmt: ';'
-    | variable_list '=' expr_list
+    | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
     | function_call
     | FUNCTION func_name '(' par_list_em ')' block END
     | LOCAL FUNCTION ID '(' par_list_em ')' block END
@@ -89,12 +102,12 @@ stmt: ';'
     | LABEL_SEP ID LABEL_SEP
     ;
 
-stmt_list: stmt
-         | stmt_list stmt
+stmt_list: stmt { $$ = new StatementNodeList{$1}; }
+         | stmt_list stmt { ($1)->push_back($2); $$ = $1; }
          ;
 
-stmt_list_em: /* empty*/
-            | stmt_list
+stmt_list_em: /* empty*/ { $$ = new StatementNodeList{}; }
+            | stmt_list { $$ = $1; }
             ;
 
 if_stmt: IF expr THEN block END
@@ -121,7 +134,7 @@ while_stmt: WHILE expr DO block END
 repeat_stmt: REPEAT block UNTIL expr
            ;
 
-finish_stmt: /* empty */
+finish_stmt: /* empty */ { $$ = nullptr; }
            | BREAK
            | RETURN expr_list_em
            ;
@@ -130,15 +143,15 @@ name_list: ID
          | name_list ',' ID
          ;
 
-variable: ID
-        | variable '.' ID
+variable: ID { $$ = ExpressionNode::Id($1); }
+        | variable '.' ID { $$ = ExpressionNode::TableField($1, $3); }
         | variable '[' expr ']'
         | function_call '.' ID
         | function_call '[' expr ']'
         ;
 
-variable_list: variable
-       | variable_list ',' variable
+variable_list: variable { $$ = new NameList{$1}; }
+       | variable_list ',' variable { ($1)->push_back($3); $$ = $1; }
        ;
 
 variable_list_em: /* empty */
@@ -190,7 +203,7 @@ field_sep: ','
          | ';'
          ;
 
-expr: INT
+expr: INT { $$ = ExpressionNode::Int($1); }
     | FLOAT
     | STRING
     | TRUE
@@ -223,8 +236,8 @@ expr: INT
     | '-' expr %prec UMINUS
     ;
 
-expr_list: expr
-         | expr_list ',' expr
+expr_list: expr { $$ = new ExpressionNodeList{$1}; }
+         | expr_list ',' expr { ($1)->push_back($3); $$ = $1; }
          ;
 
 expr_list_em: /* empty */
