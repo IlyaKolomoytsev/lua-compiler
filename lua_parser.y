@@ -35,6 +35,8 @@ void yyerror(const char *s) {
     StatementNode* statementNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
+    NameList* variableList;
+    ExpressionNode* variable;
 }
 
 %token TRUE FALSE NIL
