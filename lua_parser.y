@@ -28,7 +28,7 @@ void yyerror(const char *s) {
 
 %union {
     int64_t Int;
-    char *ID;
+    std::string* ID;
     double Float;
     std::string* String;
     ExpressionNode* exressionNode;
