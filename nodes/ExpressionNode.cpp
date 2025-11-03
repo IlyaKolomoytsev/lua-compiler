@@ -434,58 +434,58 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     switch (type_)
     {
     case Type::Integer:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.integer_v);
+        os << DOT_NODE_THIS_WITH_LABEL(value_.integer_v);
         break;
     case Type::Float:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.float_v);
+        os << DOT_NODE_THIS_WITH_LABEL(value_.float_v);
         break;
     case Type::String:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.string_v);
+        os << DOT_NODE_THIS_WITH_LABEL(value_.string_v);
         break;
     case Type::Boolean:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, value_.boolean_v);
+        os << DOT_NODE_THIS_WITH_LABEL(value_.boolean_v);
         break;
     case Type::Id:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, *value_.id_v);
+        os << DOT_NODE_THIS_WITH_LABEL(*value_.id_v);
         break;
     case Type::Summation:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "+");
+        os << DOT_NODE_THIS_WITH_LABEL("+");
         break;
     case Type::Subtraction:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "-");
+        os << DOT_NODE_THIS_WITH_LABEL("-");
         break;
     case Type::Multiplication:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "*");
+        os << DOT_NODE_THIS_WITH_LABEL("*");
         break;
     case Type::Division:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "/");
+        os << DOT_NODE_THIS_WITH_LABEL("/");
         break;
     case Type::Modulo:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "%");
+        os << DOT_NODE_THIS_WITH_LABEL("%");
         break;
     case Type::Exponentiation:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "^");
+        os << DOT_NODE_THIS_WITH_LABEL("^");
         break;
     case Type::Less:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "<");
+        os << DOT_NODE_THIS_WITH_LABEL("<");
         break;
     case Type::Greater:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, ">");
+        os << DOT_NODE_THIS_WITH_LABEL(">");
         break;
     case Type::Equality:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "==");
+        os << DOT_NODE_THIS_WITH_LABEL("==");
         break;
     case Type::Unequality:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "!=");
+        os << DOT_NODE_THIS_WITH_LABEL("!=");
         break;
     case Type::LessEqual:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, "<=");
+        os << DOT_NODE_THIS_WITH_LABEL("<=");
         break;
     case Type::GreaterEqual:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, ">=");
+        os << DOT_NODE_THIS_WITH_LABEL(">=");
         break;
     default:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_));
+        os << DOT_NODE_THIS_WITH_LABEL(to_string(type_));
     }
 
     // write information about connections and child nodes
@@ -496,7 +496,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             auto tableField = value_.tableField_v;
             // ToDo: I think key field has incorrect value type, need check it, now add assert
             assert(false);
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, tableField.table, "table");
+            os << DOT_ARC_THIS_OTHER_LABEL(tableField.table, "table");
             os << *tableField.table;
             os << tableField.key;
             break;
@@ -507,8 +507,8 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             int index = 0;
             for (auto field : *constructor)
             {
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, field.name, "name №" << index);
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, field.value, "value №" << index);
+                os << DOT_ARC_THIS_OTHER_LABEL(field.name, "name №" << index);
+                os << DOT_ARC_THIS_OTHER_LABEL(field.value, "value №" << index);
                 index++;
             }
             for (auto field : *constructor)
@@ -520,11 +520,11 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::FunctionCall:
         {
             auto call = value_.functionCall_v;
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, call.functionId, "FunctionId");
+            os << DOT_ARC_THIS_OTHER_LABEL(call.functionId, "FunctionId");
             int index = 0;
             for (auto arg : *call.arguments)
             {
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, arg, "argument №" << index++);
+                os << DOT_ARC_THIS_OTHER_LABEL(arg, "argument №" << index++);
             }
             os << *call.functionId;
             for (auto arg : *call.arguments)
@@ -555,8 +555,8 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::Concatenation:
         {
             auto operands = value_.twoOperands_v;
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operands.left, "left");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operands.right, "right");
+            os << DOT_ARC_THIS_OTHER_LABEL(operands.left, "left");
+            os << DOT_ARC_THIS_OTHER_LABEL(operands.right, "right");
             os << *operands.left;
             os << *operands.right;
         }
@@ -565,7 +565,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::UnaryMinuses:
         {
             auto operand = value_.oneOperand_v;
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, operand, "operand");
+            os << DOT_ARC_THIS_OTHER_LABEL(operand, "operand");
             os << *operand;
         }
     }

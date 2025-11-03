@@ -137,10 +137,10 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
     switch (type_)
     {
     case Type::Assignment:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_) << "\n" << to_string(value_.assignment_v.scope));
+        os << DOT_NODE_THIS_WITH_LABEL(to_string(type_) << "\n" << to_string(value_.assignment_v.scope));
         break;
     default:
-        os << DOT_NODE_WITH_ID_WITH_LABEL(this, to_string(type_));
+        os << DOT_NODE_THIS_WITH_LABEL(to_string(type_));
     }
 
     // write information about connections and child nodes
@@ -151,7 +151,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto declaration = value_.declaration_v;
             // write arcs
             for (auto node : *declaration)
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "declare");
+                os << DOT_ARC_THIS_OTHER_LABEL(node, "declare");
             // write nodes recursively
             for (auto node : *declaration)
                 os << *node;
@@ -163,10 +163,10 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             // write arcs
             int index = 0;
             for (auto node : *assignment.names)
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "variable №" << index++);
+                os << DOT_ARC_THIS_OTHER_LABEL(node, "variable №" << index++);
             index = 0;
             for (auto node : *assignment.values)
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, node, "value №" << index++);
+                os << DOT_ARC_THIS_OTHER_LABEL(node, "value №" << index++);
             // write nodes recursively
             for (auto node : *assignment.names)
                 os << *node;
@@ -177,7 +177,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::FunctionCall:
         {
             auto functionCall = value_.functionCall_v;
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, functionCall, "expression");
+            os << DOT_ARC_THIS_OTHER_LABEL(functionCall, "expression");
             os << *functionCall;
             break;
         }
@@ -185,9 +185,9 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto branching = value_.branching_v;
             // write arcs
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.condition, "condition");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.successBlock, "success");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, branching.failureBlock, "failure");
+            os << DOT_ARC_THIS_OTHER_LABEL(branching.condition, "condition");
+            os << DOT_ARC_THIS_OTHER_LABEL(branching.successBlock, "success");
+            os << DOT_ARC_THIS_OTHER_LABEL(branching.failureBlock, "failure");
             // write nodes recursively
             os << *branching.condition;
             os << *branching.successBlock;
@@ -199,11 +199,11 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto loop = value_.forLoop_v;
             auto range = loop.range;
             // write arcs
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.iteratorVariable, "variable");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.start, "range start value");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.finish, "range start finish");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, range.step, "range start step");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.iteratorVariable, "variable");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.start, "range start value");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.finish, "range start finish");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.step, "range start step");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.block, "block");
             // write nodes recursively
             os << *loop.iteratorVariable;
             os << *range.start;
@@ -216,8 +216,8 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto loop = value_.whileLoop_v;
             // write arcs
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.condition, "condition");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.condition, "condition");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.block, "block");
             // write nodes recursively
             os << *loop.condition;
             os << *loop.block;
@@ -227,8 +227,8 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto loop = value_.repeatLoop_v;
             // write arcs
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.condition, "condition");
-            os << DOT_ARC_NODE_ID_WITH_LABEL(this, loop.block, "block");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.condition, "condition");
+            os << DOT_ARC_THIS_OTHER_LABEL(loop.block, "block");
             // write nodes recursively
             os << *loop.condition;
             os << *loop.block;
@@ -240,7 +240,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             // write arcs
             int index = 0;
             for (auto statement : *block)
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, statement, "element №" << index++);
+                os << DOT_ARC_THIS_OTHER_LABEL(statement, "element №" << index++);
             // write nodes recursively
             for (auto statement : *block)
                 os << *statement;
@@ -268,7 +268,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             // write arcs
             int index = 0;
             for (auto statement : *return_v)
-                os << DOT_ARC_NODE_ID_WITH_LABEL(this, statement, "expression №" << index++);
+                os << DOT_ARC_THIS_OTHER_LABEL(statement, "expression №" << index++);
             // write nodes recursively
             for (auto statement : *return_v)
                 os << *statement;
