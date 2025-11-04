@@ -525,6 +525,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
                 os << *field.name;
                 os << *field.value;
             }
+            break;
         }
     case Type::FunctionCall:
         {
@@ -540,11 +541,13 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             {
                 os << *arg;
             }
+            break;
         }
     case Type::ExpressionList:
         {
             // ToDo: can't find expression list values
             assert(false);
+            break;
         }
     case Type::Summation:
     case Type::Subtraction:
@@ -568,6 +571,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             os << DOT_ARC_THIS_OTHER_LABEL(operands.right, "right");
             os << *operands.left;
             os << *operands.right;
+            break;
         }
     case Type::Length:
     case Type::Negation:
@@ -576,6 +580,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             auto operand = value_.oneOperand_v;
             os << DOT_ARC_THIS_OTHER_LABEL(operand, "operand");
             os << *operand;
+            break;
         }
     }
 }
