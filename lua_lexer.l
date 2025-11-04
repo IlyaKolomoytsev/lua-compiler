@@ -39,7 +39,6 @@ HEX_FLOAT               ({HEX_PREFIX}({HEX_DIGIT}+"."{HEX_DIGIT}*|"."{HEX_DIGIT}
 
 using std::cout;
 
-static LexerStringBuilder lexerStringMaster = LexerStringBuilder();
 
 /* Прототипы функций */
 static inline int hexval(int c);
@@ -50,6 +49,7 @@ static inline int hexval(int c);
 
 %{
     static int comment_start_line = 0;
+    static LexerStringBuilder lexerStringMaster = LexerStringBuilder();
 %}
 
 "and"                   { cout << "Keyword: " << yytext << '\n'; return AND; }
