@@ -145,7 +145,7 @@ name_list: ID
 
 variable: ID { $$ = ExpressionNode::Id($1); }
         | variable '.' ID { $$ = ExpressionNode::TableField($1, $3); }
-        | variable '[' expr ']'
+        | variable '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
         | function_call '.' ID
         | function_call '[' expr ']'
         ;
