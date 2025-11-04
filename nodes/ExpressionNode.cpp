@@ -54,6 +54,15 @@ ExpressionNode* ExpressionNode::TableField(ExpressionNode* table, token_id_t key
     return node;
 }
 
+ExpressionNode* ExpressionNode::TableFieldByIndex(ExpressionNode* table, ExpressionNode* index)
+{
+    ExpressionNode* node = new ExpressionNode(Type::TableFieldByIndex);
+    table_field_by_index_t* tableFieldByIndex = &node->value_.tableFieldByIndex_v;
+    tableFieldByIndex->table = table;
+    tableFieldByIndex->index = index;
+    return node;
+}
+
 ExpressionNode* ExpressionNode::TableConstructor(TableFieldList* fields)
 {
     ExpressionNode* node = new ExpressionNode(Type::TableConstructor);
