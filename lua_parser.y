@@ -209,7 +209,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | TRUE { $$ = ExpressionNode::Bool(true); }
     | FALSE { $$ = ExpressionNode::Bool(false); }
     | NIL { $$ = ExpressionNode::Nil(); }
-    | VARARG
+    | VARARG { $$ = ExpressionNode::Vararg(); }
     | FUNCTION '(' par_list_em ')' block END
     | '{' field_list_em '}'
     | variable
