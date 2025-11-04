@@ -224,16 +224,16 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | expr '<' expr { $$ = ExpressionNode::Less($1, $3); }
     | expr '>' expr { $$ = ExpressionNode::Greater($1, $3); }
     | expr INT_DIV expr { $$ = ExpressionNode::IntegerDivision($1, $3); }
-    | expr OR expr
-    | expr AND expr
-    | expr LESS_EQUAL expr
-    | expr GREATER_EQUAL expr
-    | expr EQUALITY expr
-    | expr INEQUALITY expr
-    | expr CONC expr
-    | '#' expr
-    | NOT expr
-    | '-' expr %prec UMINUS
+    | expr OR expr { $$ = ExpressionNode::Or($1, $3); }
+    | expr AND expr { $$ = ExpressionNode::And($1, $3); }
+    | expr LESS_EQUAL expr { $$ = ExpressionNode::LessEqual($1, $3); }
+    | expr GREATER_EQUAL expr { $$ = ExpressionNode::GreaterEqual($1, $3); }
+    | expr EQUALITY expr { $$ = ExpressionNode::Equality($1, $3); }
+    | expr INEQUALITY expr { $$ = ExpressionNode::Unequality($1, $3); }
+    | expr CONC expr { $$ = ExpressionNode::Concatenation($1, $3); }
+    | '#' expr { $$ = ExpressionNode::Length($2); }
+    | NOT expr { $$ = ExpressionNode::Negation($2); }
+    | '-' expr %prec UMINUS { $$ = ExpressionNode::UnaryMinus($2); }
     ;
 
 expr_list: expr { $$ = new ExpressionNodeList{$1}; }
