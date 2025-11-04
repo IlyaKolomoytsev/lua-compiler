@@ -47,7 +47,7 @@ void yyerror(const char *s) {
 %token VARARG
 %token LABEL_SEP
 
-%token <Double> FLOAT
+%token <Float> FLOAT
 %token <Int> INT
 %token <ID> ID
 %token <String> STRING
