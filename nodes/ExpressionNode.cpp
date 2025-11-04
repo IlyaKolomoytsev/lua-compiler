@@ -119,7 +119,7 @@ ExpressionNode* ExpressionNode::Division(ExpressionNode* left, ExpressionNode* r
 
 ExpressionNode* ExpressionNode::Modulo(ExpressionNode* left, ExpressionNode* right)
 {
-    ExpressionNode* node = new ExpressionNode(Type::Division);
+    ExpressionNode* node = new ExpressionNode(Type::Modulo);
     expression_two_operands_t* operands = &node->value_.twoOperands_v;
     operands->left = left;
     operands->right = right;
