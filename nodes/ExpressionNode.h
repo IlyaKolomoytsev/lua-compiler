@@ -56,7 +56,6 @@ class ExpressionNode : public Node
         float_t float_v;
         string_t* string_v;
         bool boolean_v;
-        table_filed_t tableField_v;
         table_field_t tableField_v;
         function_call_t functionCall_v;
         expression_two_operands_t twoOperands_v;
