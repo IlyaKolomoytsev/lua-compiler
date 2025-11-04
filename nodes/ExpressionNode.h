@@ -27,7 +27,7 @@ class ExpressionNode : public Node
     using string_t = std::string;
     using arguments_list_t = FunctionArgumentsList;
 
-    struct table_filed_t
+    struct table_field_t
     {
         ExpressionNode* table;
         token_id_t key;
@@ -57,6 +57,7 @@ class ExpressionNode : public Node
         string_t* string_v;
         bool boolean_v;
         table_filed_t tableField_v;
+        table_field_t tableField_v;
         function_call_t functionCall_v;
         expression_two_operands_t twoOperands_v;
         expression_one_operand_t oneOperand_v;
@@ -173,7 +174,7 @@ public:
 
     token_id_t getId() const;
 
-    table_filed_t* getTableField();
+    table_field_t* getTableField();
 
     ExpressionNode* getTableId();
 

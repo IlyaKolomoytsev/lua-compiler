@@ -48,7 +48,7 @@ ExpressionNode* ExpressionNode::Id(token_id_t value)
 ExpressionNode* ExpressionNode::TableField(ExpressionNode* table, token_id_t key)
 {
     ExpressionNode* node = new ExpressionNode(Type::TableField);
-    table_filed_t* tableField = &node->value_.tableField_v;
+    table_field_t* tableField = &node->value_.tableField_v;
     tableField->table = table;
     tableField->key = key;
     return node;
@@ -321,7 +321,7 @@ ExpressionNode::token_id_t ExpressionNode::getId() const
     }
 }
 
-ExpressionNode::table_filed_t* ExpressionNode::getTableField()
+ExpressionNode::table_field_t* ExpressionNode::getTableField()
 {
     bool correctType = getType() == Type::TableField;
     assert(correctType);
