@@ -204,26 +204,26 @@ field_sep: ','
          ;
 
 expr: INT { $$ = ExpressionNode::Int($1); }
-    | FLOAT
-    | STRING
-    | TRUE
-    | FALSE
-    | NIL
+    | FLOAT { $$ = ExpressionNode::Float($1); }
+    | STRING { $$ = ExpressionNode::String($1); }
+    | TRUE { $$ = ExpressionNode::Bool(true); }
+    | FALSE { $$ = ExpressionNode::Bool(false); }
+    | NIL { $$ = ExpressionNode::Nil(); }
     | VARARG
     | FUNCTION '(' par_list_em ')' block END
     | '{' field_list_em '}'
     | variable
     | function_call
     | '(' expr ')'
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '%' expr
-    | expr '^' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr INT_DIV expr
+    | expr '+' expr { $$ = ExpressionNode::Summation($1, $3); }
+    | expr '-' expr { $$ = ExpressionNode::Subtraction($1, $3); }
+    | expr '*' expr { $$ = ExpressionNode::Multiplication($1, $3); }
+    | expr '/' expr { $$ = ExpressionNode::Division($1, $3); }
+    | expr '%' expr { $$ = ExpressionNode::Modulo($1, $3); }
+    | expr '^' expr { $$ = ExpressionNode::Exponentiation($1, $3); }
+    | expr '<' expr { $$ = ExpressionNode::Less($1, $3); }
+    | expr '>' expr { $$ = ExpressionNode::Greater($1, $3); }
+    | expr INT_DIV expr { $$ = ExpressionNode::IntegerDivision($1, $3); }
     | expr OR expr
     | expr AND expr
     | expr LESS_EQUAL expr
