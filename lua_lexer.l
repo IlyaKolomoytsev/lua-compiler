@@ -44,16 +44,12 @@ static LexerStringBuilder lexerStringMaster = LexerStringBuilder();
 /* Прототипы функций */
 static inline int hexval(int c);
 
-/* Переменные для работы с комментариями */
-static int comment_start_line = 0;
-
 %}
 
 %%
 
 %{
-    // ToDo: объявления я так понял должны быть тут.
-    // комментарий создан спустя неделю после консультации
+    static int comment_start_line = 0;
 %}
 
 "and"                   { cout << "Keyword: " << yytext << '\n'; return AND; }
