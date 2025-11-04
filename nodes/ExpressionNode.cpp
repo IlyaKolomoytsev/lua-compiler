@@ -38,6 +38,12 @@ ExpressionNode* ExpressionNode::Nil()
     return node;
 }
 
+ExpressionNode* ExpressionNode::Vararg()
+{
+    ExpressionNode* node = new ExpressionNode(Type::Vararg);
+    return node;
+}
+
 ExpressionNode* ExpressionNode::Id(token_id_t value)
 {
     ExpressionNode* node = new ExpressionNode(Type::Id);
@@ -603,6 +609,8 @@ std::string to_string(ExpressionNode::Type type)
         return "Boolean";
     case ExpressionNode::Type::Nil:
         return "Nil";
+    case ExpressionNode::Type::Vararg:
+        return "Vararg";
     case ExpressionNode::Type::TableField:
         return "TableField";
     case ExpressionNode::Type::TableFieldByIndex:

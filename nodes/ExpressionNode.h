@@ -119,6 +119,8 @@ public:
 
     static ExpressionNode* Nil();
 
+    static ExpressionNode* Vararg();
+
     static ExpressionNode* Id(token_id_t value);
 
     static ExpressionNode* TableField(ExpressionNode* table, token_id_t key);
