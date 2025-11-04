@@ -605,6 +605,8 @@ std::string to_string(ExpressionNode::Type type)
         return "Nil";
     case ExpressionNode::Type::TableField:
         return "TableField";
+    case ExpressionNode::Type::TableFieldByIndex:
+        return "TableFieldByIndex";
     case ExpressionNode::Type::TableConstructor:
         return "TableConstructor";
     case ExpressionNode::Type::FunctionCall:
