@@ -146,8 +146,8 @@ name_list: ID
 variable: ID { $$ = ExpressionNode::Id($1); }
         | variable '.' ID { $$ = ExpressionNode::TableField($1, $3); }
         | variable '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
-        | function_call '.' ID
-        | function_call '[' expr ']'
+        | function_call '.' ID { $$ = ExpressionNode::TableField($1, $3); }
+        | function_call '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
         ;
 
 variable_list: variable { $$ = new NameList{$1}; }
@@ -212,7 +212,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | VARARG { $$ = ExpressionNode::Vararg(); }
     | FUNCTION '(' par_list_em ')' block END
     | '{' field_list_em '}'
-    | variable
+    | variable { $$ = $1; }
     | function_call
     | '(' expr ')' { $$ = $2; }
     | expr '+' expr { $$ = ExpressionNode::Summation($1, $3); }
