@@ -214,7 +214,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | '{' field_list_em '}'
     | variable
     | function_call
-    | '(' expr ')'
+    | '(' expr ')' { $$ = $2; }
     | expr '+' expr { $$ = ExpressionNode::Summation($1, $3); }
     | expr '-' expr { $$ = ExpressionNode::Subtraction($1, $3); }
     | expr '*' expr { $$ = ExpressionNode::Multiplication($1, $3); }
