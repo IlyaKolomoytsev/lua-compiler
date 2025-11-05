@@ -193,10 +193,10 @@ args: '(' expr_list_em ')' { $$ = $2; }
     | STRING { $$ = new ExpressionNodeList { ExpressionNode::String($1)}; }
     ;
 
-function_call: variable args
-             | variable ':' ID args
-             | function_call args
-             | function_call ':' ID args
+function_call: variable args { $$ = ExpressionNode::FunctionCall($1, $2); }
+             | variable ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, $3, $4); }
+             | function_call args { $$ = ExpressionNode::FunctionCall($1, $2); }
+             | function_call ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, $3, $4); }
              ;
 
 field_list_em: /* empty */ { $$ = new TableFieldList{}; }
@@ -226,7 +226,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | FUNCTION '(' par_list_em ')' block END
     | '{' field_list_em '}' { $$ = ExpressionNode::TableConstructor($2); }
     | variable { $$ = $1; }
-    | function_call
+    | function_call { $$ = $1; }
     | '(' expr ')' { $$ = $2; }
     | expr '+' expr { $$ = ExpressionNode::Summation($1, $3); }
     | expr '-' expr { $$ = ExpressionNode::Subtraction($1, $3); }
