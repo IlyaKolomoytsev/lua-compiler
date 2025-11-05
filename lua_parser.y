@@ -186,17 +186,17 @@ function_call: variable args
              | function_call ':' ID args
              ;
 
-field_list_em: /* empty */
-             | field_list
+field_list_em: /* empty */ { $$ = new TableFieldList{}; }
+             | field_list { $$ = $1; }
              ;
 
-field_list: field
-          | field_list field_sep field
+field_list: field { $$ = new TableFieldList{$1}; }
+          | field_list field_sep field { ($1)->push_back($3); $$ = $1; }
           ;
 
-field: '[' expr ']' '=' expr
-     | ID '=' expr
-     | expr
+field: '[' expr ']' '=' expr { $$ = new TableField{$2, $5}; }
+     | ID '=' expr { $$ = new TableField{ExpressionNode::String($1), $3}; }
+     | expr { $$ = new TableField{nullptr, $1}; }
      ;
 
 field_sep: ','
@@ -211,7 +211,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | NIL { $$ = ExpressionNode::Nil(); }
     | VARARG { $$ = ExpressionNode::Vararg(); }
     | FUNCTION '(' par_list_em ')' block END
-    | '{' field_list_em '}'
+    | '{' field_list_em '}' { $$ = ExpressionNode::TableConstructor($2); }
     | variable { $$ = $1; }
     | function_call
     | '(' expr ')' { $$ = $2; }
