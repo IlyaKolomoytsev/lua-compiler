@@ -35,7 +35,8 @@ void yyerror(const char *s) {
     StatementNode* statementNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
-    NameList* variableList;
+    NameList* nameList;
+    DottedNameList* dottedNameList;
     ExpressionNode* variable;
     TableField* tableField;
     TableFieldList* tableFieldList;
@@ -75,8 +76,14 @@ void yyerror(const char *s) {
 %type <expressionNode> function_call;
 %type <expressionNodeList> expr_list;
 %type <expressionNodeList> expr_list_em;
-%type <variableList> variable_list;
-%type <variableList> variable_list_em;
+%type <expressionNodeList> args;
+%type <nameList> variable_list;
+%type <nameList> variable_list_em;
+%type <nameList> name_list;
+%type <nameList> par_list;
+%type <nameList> par_list_em;
+%type <dottedNameList> dotted_name;
+%type <dottedNameList> func_name;
 %type <variable> variable;
 %type <tableField> field;
 %type <tableFieldList> field_list;
@@ -145,8 +152,8 @@ finish_stmt: /* empty */ { $$ = nullptr; }
            | RETURN expr_list_em
            ;
 
-name_list: ID
-         | name_list ',' ID
+name_list: ID { $$ = new NameList{ ExpressionNode::Id($1) }; }
+         | name_list ',' ID { ($1)->push_back( ExpressionNode::Id($3) ); $$ = $1; }
          ;
 
 variable: ID { $$ = ExpressionNode::Id($1); }
@@ -164,26 +171,26 @@ variable_list_em: /* empty */ { $$ = new NameList(); }
                 | variable_list { $$ = $1; }
                 ;
 
-par_list: name_list
-        | name_list ',' VARARG
-        | VARARG
+par_list: name_list { $$ = $1; }
+        | name_list ',' VARARG { ($1)->push_back(ExpressionNode::Vararg()); $$ = $1; }
+        | VARARG { $$ = new NameList{ExpressionNode::Vararg()}; }
         ;
 
-par_list_em: /* empty */
-           | par_list
+par_list_em: /* empty */ { $$ = new NameList(); }
+           | par_list { $$ = $1; }
            ;
 
-dotted_name: ID
-           | dotted_name '.' ID
+dotted_name: ID { $$ = new DottedNameList{$1}; }
+           | dotted_name '.' ID { ($1)->push_back($3); $$ = $1; }
            ;
 
-func_name: dotted_name
-         | dotted_name ':' ID
+func_name: dotted_name { $$ = $1; }
+         | dotted_name ':' ID { ($1)->push_back($3); $$ = $1; }
          ;
 
-args: '(' expr_list_em ')'
-    | '{' field_list_em '}'
-    | STRING
+args: '(' expr_list_em ')' { $$ = $2; }
+    | '{' field_list_em '}' { $$ = new ExpressionNodeList { ExpressionNode::TableConstructor($2)}; }
+    | STRING { $$ = new ExpressionNodeList { ExpressionNode::String($1)}; }
     ;
 
 function_call: variable args
@@ -246,8 +253,8 @@ expr_list: expr { $$ = new ExpressionNodeList{$1}; }
          | expr_list ',' expr { ($1)->push_back($3); $$ = $1; }
          ;
 
-expr_list_em: /* empty */
-            | expr_list
+expr_list_em: /* empty */ { $$ = new ExpressionNodeList{}; }
+            | expr_list { $$ = $1; }
             ;
 
 
