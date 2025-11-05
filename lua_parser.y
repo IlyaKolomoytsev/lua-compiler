@@ -31,12 +31,14 @@ void yyerror(const char *s) {
     std::string* ID;
     double Float;
     std::string* String;
-    ExpressionNode* exressionNode;
+    ExpressionNode* expressionNode;
     StatementNode* statementNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
     NameList* variableList;
     ExpressionNode* variable;
+    TableField* tableField;
+    TableFieldList* tableFieldList;
 }
 
 %token TRUE FALSE NIL
@@ -69,12 +71,16 @@ void yyerror(const char *s) {
 %type <statementNode> finish_stmt;
 %type <statementNodeList> stmt_list;
 %type <statementNodeList> stmt_list_em;
-%type <exressionNode> expr;
+%type <expressionNode> expr;
+%type <expressionNode> function_call;
 %type <expressionNodeList> expr_list;
 %type <expressionNodeList> expr_list_em;
 %type <variableList> variable_list;
 %type <variableList> variable_list_em;
 %type <variable> variable;
+%type <tableField> field;
+%type <tableFieldList> field_list;
+%type <tableFieldList> field_list_em;
 
 %start chunk
 
@@ -154,8 +160,8 @@ variable_list: variable { $$ = new NameList{$1}; }
        | variable_list ',' variable { ($1)->push_back($3); $$ = $1; }
        ;
 
-variable_list_em: /* empty */
-                | variable_list
+variable_list_em: /* empty */ { $$ = new NameList(); }
+                | variable_list { $$ = $1; }
                 ;
 
 par_list: name_list
@@ -190,8 +196,8 @@ field_list_em: /* empty */ { $$ = new TableFieldList{}; }
              | field_list { $$ = $1; }
              ;
 
-field_list: field { $$ = new TableFieldList{$1}; }
-          | field_list field_sep field { ($1)->push_back($3); $$ = $1; }
+field_list: field { $$ = new TableFieldList(); $$->push_back(*$1); delete $1; }
+          | field_list field_sep field { ($1)->push_back(*$3); delete $3; $$ = $1; }
           ;
 
 field: '[' expr ']' '=' expr { $$ = new TableField{$2, $5}; }
