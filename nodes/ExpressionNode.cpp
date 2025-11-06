@@ -455,7 +455,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
         os << DOT_NODE_THIS_WITH_LABEL(value_.float_v);
         break;
     case Type::String:
-        os << DOT_NODE_THIS_WITH_LABEL(value_.string_v);
+        os << DOT_NODE_THIS_WITH_LABEL(*value_.string_v);
         break;
     case Type::Boolean:
         os << DOT_NODE_THIS_WITH_LABEL(value_.boolean_v);
