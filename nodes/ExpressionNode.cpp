@@ -522,13 +522,16 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             int index = 0;
             for (auto field : *constructor)
             {
-                os << DOT_ARC_THIS_OTHER_LABEL(field.name, "name №" << index);
-                os << DOT_ARC_THIS_OTHER_LABEL(field.value, "value №" << index);
+                if (field.name) {
+                    os << DOT_ARC_THIS_OTHER_LABEL(field.name, "key " << index);
+                }
+                os << DOT_ARC_THIS_OTHER_LABEL(field.value, "value " << index);
                 index++;
             }
             for (auto field : *constructor)
             {
-                os << *field.name;
+                if (field.name)
+                    os << *field.name;
                 os << *field.value;
             }
             break;
