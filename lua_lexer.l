@@ -137,8 +137,8 @@ static inline int hexval(int c);
 <DSTRING,SSTRING>\\\n  { lexerStringMaster.write('\n'); }
 
 
-<DSTRING>\"             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); yylval.String = lexerStringMaster.createString(); return STRING; }
-<SSTRING>\'             { cout << "String: " << lexerStringMaster.getString() << '\n'; BEGIN(INITIAL); yylval.String = lexerStringMaster.createString(); return STRING; }
+<DSTRING>\"             { std::string s = lexerStringMaster.getString(); cout << "String: " << s << '\n'; yylval.String = new std::string(s); BEGIN(INITIAL);  return STRING; }
+<SSTRING>\'             { std::string s = lexerStringMaster.getString(); cout << "String: " << s << '\n'; yylval.String = new std::string(s); BEGIN(INITIAL);  return STRING; }
 
 
 <DSTRING>\n             { cout << "ERROR: unterminated string (\") at line " << yylineno << '\n'; BEGIN(INITIAL); }
