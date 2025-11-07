@@ -20,6 +20,7 @@ struct TableField
 };
 using TableFieldList = std::list<TableField>;
 
+class StatementNode;
 class ExpressionNode : public Node
 {
     using token_id_t = std::string*;
@@ -52,6 +53,12 @@ class ExpressionNode : public Node
         ExpressionNode* right;
     };
 
+    struct function_literal_t
+    {
+        NameList* parameters;
+        StatementNode* body;
+    };
+
     using expression_one_operand_t = ExpressionNode*;
 
     using table_constructor_t = TableFieldList*;
@@ -66,6 +73,7 @@ class ExpressionNode : public Node
         table_field_t tableField_v;
         table_field_by_index_t tableFieldByIndex_v;
         function_call_t functionCall_v;
+        function_literal_t functionLiteral_v;
         expression_two_operands_t twoOperands_v;
         expression_one_operand_t oneOperand_v;
         table_constructor_t tableConstructor_v;
@@ -85,7 +93,7 @@ public:
         TableFieldByIndex,
         TableConstructor,
         FunctionCall,
-        //ToDo: add function declaration
+        FunctionLiteral,
         ExpressionList,
         Summation,
         Subtraction,
@@ -133,6 +141,8 @@ public:
     static ExpressionNode* FunctionCall(ExpressionNode* functionId, arguments_list_t* arguments);
 
     static ExpressionNode* TableFunctionCall(ExpressionNode* table, token_id_t key, arguments_list_t* arguments);
+
+    static ExpressionNode* FunctionLiteral(NameList* params, StatementNode* body);
 
     static ExpressionNode* Summation(ExpressionNode* left, ExpressionNode* right);
 

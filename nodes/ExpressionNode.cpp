@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdexcept>
 #include "DotMacros.h"
+#include "StatementNode.h"
 
 ExpressionNode* ExpressionNode::Int(integer_t value)
 {
@@ -95,6 +96,16 @@ ExpressionNode* ExpressionNode::TableFunctionCall(
     arguments->push_front(table); // add table like first argument in argument list
     return FunctionCall(functionIdNode, arguments);
 }
+
+ExpressionNode* ExpressionNode::FunctionLiteral(NameList* params, StatementNode* body)
+{
+    ExpressionNode* node = new ExpressionNode(Type::FunctionLiteral);
+    auto literal = &node->value_.functionLiteral_v;
+    literal->parameters = params;
+    literal->body = body;
+    return node;
+}
+
 
 ExpressionNode* ExpressionNode::Summation(ExpressionNode* left, ExpressionNode* right)
 {
@@ -552,6 +563,22 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             }
             break;
         }
+    case Type::FunctionLiteral:
+        {
+            auto f = value_.functionLiteral_v;
+            // параметры
+            int i = 0;
+            for (auto p : *f.parameters)
+            {
+                os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
+                os << *p;
+            }
+
+            // тело функции
+            os << DOT_ARC_THIS_OTHER_LABEL(f.body, "body");
+            os << *f.body;
+            break;
+        }
     case Type::ExpressionList:
         {
             // ToDo: can't find expression list values
@@ -622,6 +649,8 @@ std::string to_string(ExpressionNode::Type type)
         return "TableConstructor";
     case ExpressionNode::Type::FunctionCall:
         return "FunctionCall";
+    case ExpressionNode::Type::FunctionLiteral:
+        return "FunctionLiteral";
     case ExpressionNode::Type::ExpressionList:
         return "ExpressionList";
     case ExpressionNode::Type::Summation:
