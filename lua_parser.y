@@ -223,7 +223,7 @@ expr: INT { $$ = ExpressionNode::Int($1); }
     | FALSE { $$ = ExpressionNode::Bool(false); }
     | NIL { $$ = ExpressionNode::Nil(); }
     | VARARG { $$ = ExpressionNode::Vararg(); }
-    | FUNCTION '(' par_list_em ')' block END
+    | FUNCTION '(' par_list_em ')' block END { $$ = ExpressionNode::FunctionLiteral($3, $5); }
     | '{' field_list_em '}' { $$ = ExpressionNode::TableConstructor($2); }
     | variable { $$ = $1; }
     | function_call { $$ = $1; }
