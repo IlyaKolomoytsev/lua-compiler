@@ -89,7 +89,7 @@ StatementNode* StatementNode::Block(StatementNodeList* statements, StatementNode
     StatementNode* node = new StatementNode(Type::Block);
     if (finishStatement != nullptr)
     {
-        statements->push_back(node);
+        statements->push_back(finishStatement);
     }
     node->value_.block_v = statements;
     return node;
