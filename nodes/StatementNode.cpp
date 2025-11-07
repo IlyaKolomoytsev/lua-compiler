@@ -20,19 +20,10 @@ StatementNode* StatementNode::Assignment(Scope scope, NameList* names, Expressio
     return node;
 }
 
-StatementNode* StatementNode::FunctionCall(ExpressionNode* functionId, ExpressionNodeList* arguments)
+StatementNode* StatementNode::FunctionCall(ExpressionNode* callExpr)
 {
     StatementNode* node = new StatementNode(Type::FunctionCall);
-    node->value_.functionCall_v = ExpressionNode::FunctionCall(functionId, arguments);
-    return node;
-}
-
-StatementNode* StatementNode::FunctionCall(ExpressionNode* functionId, ExpressionNode* argument)
-{
-    ExpressionNodeList* arguments = new ExpressionNodeList();
-    arguments->push_back(argument);
-
-    StatementNode* node = FunctionCall(functionId, arguments);
+    node->value_.functionCall_v = callExpr;
     return node;
 }
 

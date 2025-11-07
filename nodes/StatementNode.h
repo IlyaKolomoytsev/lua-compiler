@@ -97,9 +97,7 @@ public:
 
     static StatementNode* Assignment(Scope scope, NameList* names, ExpressionNodeList* values);
 
-    static StatementNode* FunctionCall(ExpressionNode* functionId, ExpressionNodeList* arguments);
-
-    static StatementNode* FunctionCall(ExpressionNode* functionId, ExpressionNode* argument);
+    static StatementNode* FunctionCall(ExpressionNode* exprCall);
 
     static StatementNode* Branching(
         ExpressionNode* condition,
