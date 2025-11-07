@@ -52,7 +52,7 @@ ExpressionNode* ExpressionNode::Id(token_id_t value)
     return node;
 }
 
-ExpressionNode* ExpressionNode::TableField(ExpressionNode* table, token_id_t key)
+ExpressionNode* ExpressionNode::TableField(ExpressionNode* table, ExpressionNode* key)
 {
     ExpressionNode* node = new ExpressionNode(Type::TableField);
     table_field_t* tableField = &node->value_.tableField_v;
@@ -88,7 +88,7 @@ ExpressionNode* ExpressionNode::FunctionCall(ExpressionNode* functionId, argumen
 
 ExpressionNode* ExpressionNode::TableFunctionCall(
     ExpressionNode* table,
-    token_id_t key,
+    ExpressionNode* key,
     arguments_list_t* arguments
 )
 {
@@ -366,7 +366,7 @@ ExpressionNode* ExpressionNode::getTableId()
     return getTableField()->table;
 }
 
-ExpressionNode::token_id_t ExpressionNode::getTableFieldKey()
+ExpressionNode* ExpressionNode::getTableFieldKey()
 {
     return getTableField()->key;
 }
@@ -520,11 +520,10 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::TableField:
         {
             auto tableField = value_.tableField_v;
-            // ToDo: I think key field has incorrect value type, need check it, now add assert
-            assert(false);
             os << DOT_ARC_THIS_OTHER_LABEL(tableField.table, "table");
+            os << DOT_ARC_THIS_OTHER_LABEL(tableField.key,   "key");
             os << *tableField.table;
-            os << tableField.key;
+            os << *tableField.key;
             break;
         }
     case Type::TableConstructor:

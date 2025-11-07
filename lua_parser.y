@@ -157,9 +157,9 @@ name_list: ID { $$ = new NameList{ ExpressionNode::Id($1) }; }
          ;
 
 variable: ID { $$ = ExpressionNode::Id($1); }
-        | variable '.' ID { $$ = ExpressionNode::TableField($1, $3); }
+        | variable '.' ID { $$ = ExpressionNode::TableField($1, ExpressionNode::Id($3)); }
         | variable '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
-        | function_call '.' ID { $$ = ExpressionNode::TableField($1, $3); }
+        | function_call '.' ID { $$ = ExpressionNode::TableField($1, ExpressionNode::Id($3)); }
         | function_call '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
         ;
 
@@ -194,9 +194,9 @@ args: '(' expr_list_em ')' { $$ = $2; }
     ;
 
 function_call: variable args { $$ = ExpressionNode::FunctionCall($1, $2); }
-             | variable ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, $3, $4); }
+             | variable ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, ExpressionNode::Id($3), $4); }
              | function_call args { $$ = ExpressionNode::FunctionCall($1, $2); }
-             | function_call ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, $3, $4); }
+             | function_call ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, ExpressionNode::Id($3), $4); }
              ;
 
 field_list_em: /* empty */ { $$ = new TableFieldList{}; }

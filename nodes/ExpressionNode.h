@@ -4,6 +4,7 @@
 #include <string>
 #include <sys/types.h>
 
+#include "ExpressionNode.h"
 #include "Node.h"
 
 class ExpressionNode;
@@ -32,7 +33,7 @@ class ExpressionNode : public Node
     struct table_field_t
     {
         ExpressionNode* table;
-        token_id_t key;
+        ExpressionNode* key;
     };
 
     struct table_field_by_index_t
@@ -132,7 +133,7 @@ public:
 
     static ExpressionNode* Id(token_id_t value);
 
-    static ExpressionNode* TableField(ExpressionNode* table, token_id_t key);
+    static ExpressionNode* TableField(ExpressionNode* table, ExpressionNode* key);
 
     static ExpressionNode* TableFieldByIndex(ExpressionNode* table, ExpressionNode* index);
 
@@ -140,7 +141,7 @@ public:
 
     static ExpressionNode* FunctionCall(ExpressionNode* functionId, arguments_list_t* arguments);
 
-    static ExpressionNode* TableFunctionCall(ExpressionNode* table, token_id_t key, arguments_list_t* arguments);
+    static ExpressionNode* TableFunctionCall(ExpressionNode* table, ExpressionNode* key, arguments_list_t* arguments);
 
     static ExpressionNode* FunctionLiteral(NameList* params, StatementNode* body);
 
@@ -200,7 +201,7 @@ public:
 
     ExpressionNode* getTableId();
 
-    token_id_t getTableFieldKey();
+    ExpressionNode* getTableFieldKey();
 
     function_call_t* getFunctionCall();
 
