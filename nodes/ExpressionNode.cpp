@@ -617,6 +617,11 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             os << *operand;
             break;
         }
+    case Type::Vararg:
+        {
+            os << DOT_NODE_THIS_WITH_LABEL("...");
+            break;
+        }
     }
 }
 
