@@ -93,7 +93,6 @@ ExpressionNode* ExpressionNode::TableFunctionCall(
 )
 {
     ExpressionNode* functionIdNode = TableField(table, key);
-    arguments->push_front(table); // add table like first argument in argument list
     return FunctionCall(functionIdNode, arguments);
 }
 
