@@ -526,6 +526,15 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             os << *tableField.key;
             break;
         }
+    case Type::TableFieldByIndex:
+        {
+            auto tableFieldByIndex = value_.tableFieldByIndex_v;
+            os << DOT_ARC_THIS_OTHER_LABEL(tableFieldByIndex.table, "table");
+            os << DOT_ARC_THIS_OTHER_LABEL(tableFieldByIndex.index,   "index");
+            os << *tableFieldByIndex.table;
+            os << *tableFieldByIndex.index;
+            break;
+        }
     case Type::TableConstructor:
         {
             auto constructor = value_.tableConstructor_v;
