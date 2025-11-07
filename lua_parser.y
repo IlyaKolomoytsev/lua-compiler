@@ -101,7 +101,7 @@ block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
 
 stmt: ';'
     | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
-    | function_call
+    | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END
     | LOCAL FUNCTION ID '(' par_list_em ')' block END
     | LOCAL name_list
