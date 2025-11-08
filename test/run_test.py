@@ -6,9 +6,12 @@ from pathlib import Path
 DEBUG = False
 
 BASE_RUN_DIRECTORY = "."
-BASE_IMAGE_NAME = "lua_flex_project"
+BASE_IMAGE_NAME = "lua_compiler_test_container"
 TEST_RESULT_DIRECTORY = "result"
-EXECUTABLE_TARGET = "./lua_compiler"
+EXECUTABLE_TARGET = "/app/lua_compiler"
+LOCAL_RESULT_DIRECTORY = "./result"
+DOCKER_RESULT_DIRECTORY = "/app/result"
+DIRECTORY_BINDINGS = LOCAL_RESULT_DIRECTORY + ":" + DOCKER_RESULT_DIRECTORY
 
 ENDLESS_LOOP_COMMAND = ["tail", "-f", "/dev/null"]
 
@@ -44,7 +47,7 @@ def build_docker_image(dockerfile_path=".", image_name=BASE_IMAGE_NAME):
 
 def run_docker_container(image_name=BASE_IMAGE_NAME):
     # Команда для запуска docker контейнера в фоновом режиме
-    command = ["docker", "run", "-d", image_name] + ENDLESS_LOOP_COMMAND
+    command = ["docker", "run", "-v", DIRECTORY_BINDINGS, "-d", image_name] + ENDLESS_LOOP_COMMAND
 
     if DEBUG: print("Run container command:\n", " ".join(command))
 
@@ -80,7 +83,7 @@ def run_command_inside_container(command: list[str], container_name: str, stdout
     # Создание команды
     if stdout_file is not None:
         # Команда с сохранением информации в файл
-        run_command = ["(" + "docker", "exec", "-it", container_name] + command + [")", ">>", str(stdout_file)]
+        run_command = ["docker", "exec", "-it", container_name] + command + [">>", str(stdout_file)]
     else:
         run_command = ["docker", "exec", "-it", container_name] + command
 
@@ -92,9 +95,9 @@ def run_command_inside_container(command: list[str], container_name: str, stdout
 
     # Проверка, успешно ли выполнена команда
     if result.returncode == 0:
-        print(f"Exec command {" ".join(command)} successfully.")
+        print(f"SUCCESS: Exec command {" ".join(command)} successfully.")
     else:
-        raise Exception(f"Exec command {" ".join(command)} failed:\n {result.stderr}")
+        print(f"FAILED: Exec command {" ".join(command)} failed:\n {result.stderr}")
 
 
 if __name__ == "__main__":
@@ -103,9 +106,10 @@ if __name__ == "__main__":
     container_name = run_docker_container(image_name=image_name)
     try:
         for file in files:
-            new_path = Path(TEST_RESULT_DIRECTORY) / Path(file).with_name(Path(file).name).with_suffix('.txt')
-            new_path.parent.mkdir(parents=True, exist_ok=True)
-            command = [EXECUTABLE_TARGET, Path(file).as_posix()]
-            run_command_inside_container(command, container_name, new_path)
+            result_dir = Path(TEST_RESULT_DIRECTORY) / Path(file).with_name(Path(file).stem)
+            output_path = result_dir / "output.txt"
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            command = [EXECUTABLE_TARGET, "-i", Path(file).as_posix(), "-o", str(result_dir)]
+            run_command_inside_container(command, container_name, output_path)
     finally:
         kill_docker_container(container_name)
