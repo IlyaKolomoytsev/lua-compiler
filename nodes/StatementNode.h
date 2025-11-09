@@ -24,7 +24,6 @@ enum class Scope
 
 class StatementNode : public Node
 {
-    using declaration_type_t = NameList*;
     using label_t = std::string*;
 
     struct assignment_t
@@ -32,6 +31,12 @@ class StatementNode : public Node
         Scope scope;
         NameList* names;
         ExpressionNodeList* values;
+    };
+
+    struct declaration_t
+    {
+        Scope scope;
+        NameList* names;
     };
 
     using function_call_t = ExpressionNode*;
@@ -64,7 +69,7 @@ class StatementNode : public Node
 
     union Value
     {
-        declaration_type_t declaration_v;
+        declaration_t declaration_v;
         assignment_t assignment_v;
         function_call_t functionCall_v;
         branching_t branching_v;
@@ -96,7 +101,7 @@ public:
         Return,
     };
 
-    static StatementNode* Declaration(NameList* names);
+    static StatementNode* Declaration(Scope scope, NameList* names);
 
     static StatementNode* Assignment(Scope scope, NameList* names, ExpressionNodeList* values);
 

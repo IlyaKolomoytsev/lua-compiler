@@ -3,10 +3,12 @@
 #include <assert.h>
 #include "DotMacros.h"
 
-StatementNode* StatementNode::Declaration(NameList* names)
+StatementNode* StatementNode::Declaration(Scope scope, NameList* names)
 {
     StatementNode* node = new StatementNode(Type::Declaration);
-    node->value_.declaration_v = names;
+    declaration_t* declaration = &node->value_.declaration_v;
+    declaration->names = names;
+    declaration->scope = scope;
     return node;
 }
 
@@ -153,6 +155,9 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::Assignment:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_) << "\n" << to_string(value_.assignment_v.scope));
         break;
+    case Type::Declaration:
+        os << DOT_NODE_THIS_WITH_LABEL(to_string(type_) << "\n" << to_string(value_.declaration_v.scope));
+        break;
     default:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_));
     }
@@ -165,10 +170,10 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto declaration = value_.declaration_v;
             // write arcs
             int index = 0;
-            for (auto node : *declaration)
+            for (auto node : *declaration.names)
                 os << DOT_ARC_THIS_OTHER_LABEL(node, "declare №" << index++);
             // write nodes recursively
-            for (auto node : *declaration)
+            for (auto node : *declaration.names)
                 os << *node;
             break;
         }

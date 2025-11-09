@@ -110,7 +110,7 @@ stmt: ';'
     | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END
     | LOCAL FUNCTION ID '(' par_list_em ')' block END
-    | LOCAL name_list { $$ = StatementNode::Declaration($2); }
+    | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
     | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
     | for_stmt { $$ = $1; }
