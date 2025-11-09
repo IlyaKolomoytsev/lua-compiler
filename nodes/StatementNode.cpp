@@ -253,16 +253,14 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         }
     case Type::GoTo:
         {
-            auto goTo = value_.goTo_v;
-            // ToDo: need change goTo type
-            assert(false);
+            auto label = value_.goTo_v;
+            os << DOT_NODE_THIS_WITH_LABEL("goto " << *label);
             break;
         }
     case Type::Label:
         {
             auto label = value_.label_v;
-            // ToDo: need change label type
-            assert(false);
+            os << DOT_NODE_THIS_WITH_LABEL("::" << *label << "::");
             break;
         }
     case Type::Break:
