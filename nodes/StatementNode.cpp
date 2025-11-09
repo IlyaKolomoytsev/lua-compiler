@@ -429,6 +429,8 @@ std::string to_string(StatementNode::Type type)
         return "Label";
     case StatementNode::Type::Break:
         return "Break";
+    case StatementNode::Type::Return:
+        return "Return";
     default:
         assert(false);
         return "Unknown";
