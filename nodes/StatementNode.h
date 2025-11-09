@@ -25,7 +25,7 @@ enum class Scope
 class StatementNode : public Node
 {
     using declaration_type_t = NameList*;
-    using label_t = uint;
+    using label_t = std::string*;
 
     struct assignment_t
     {
