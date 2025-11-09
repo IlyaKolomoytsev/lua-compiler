@@ -148,8 +148,9 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto declaration = value_.declaration_v;
             // write arcs
+            int index = 0;
             for (auto node : *declaration)
-                os << DOT_ARC_THIS_OTHER_LABEL(node, "declare");
+                os << DOT_ARC_THIS_OTHER_LABEL(node, "declare №" << index++);
             // write nodes recursively
             for (auto node : *declaration)
                 os << *node;
