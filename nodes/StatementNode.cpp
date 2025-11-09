@@ -186,11 +186,17 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             // write arcs
             os << DOT_ARC_THIS_OTHER_LABEL(branching.condition, "condition");
             os << DOT_ARC_THIS_OTHER_LABEL(branching.successBlock, "success");
-            os << DOT_ARC_THIS_OTHER_LABEL(branching.failureBlock, "failure");
+            if (branching.failureBlock)
+            {
+                os << DOT_ARC_THIS_OTHER_LABEL(branching.failureBlock, "failure");
+            }
             // write nodes recursively
             os << *branching.condition;
             os << *branching.successBlock;
-            os << *branching.failureBlock;
+            if (branching.failureBlock)
+            {
+                os << *branching.failureBlock;
+            }
             break;
         }
     case Type::ForLoop:
