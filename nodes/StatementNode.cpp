@@ -433,9 +433,9 @@ std::string to_string(StatementNode::Type type)
         return "ForLoop";
     case StatementNode::Type::WhileLoop:
         return "WhileLoop";
-    case StatementNode::StatementNode::Type::RepeatLoop:
+    case StatementNode::Type::RepeatLoop:
         return "RepeatLoop";
-    case StatementNode::StatementNode::Type::Block:
+    case StatementNode::Type::Block:
         return "Block";
     case StatementNode::Type::DoBlock:
         return "DoBlock";
