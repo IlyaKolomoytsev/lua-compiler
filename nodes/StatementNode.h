@@ -59,6 +59,7 @@ class StatementNode : public Node
     using while_loop_t = simple_loop;
     using repeat_loop_t = simple_loop;
     using block_t = StatementNodeList*;
+    using do_block_t = StatementNode*;
     using return_t = ExpressionNodeList*;
 
     union Value
@@ -71,6 +72,7 @@ class StatementNode : public Node
         while_loop_t whileLoop_v;
         repeat_loop_t repeatLoop_v;
         block_t block_v;
+        do_block_t doBlock_v;
         label_t goTo_v;
         label_t label_v;
         return_t return_v;
@@ -87,6 +89,7 @@ public:
         WhileLoop,
         RepeatLoop,
         Block,
+        DoBlock,
         GoTo,
         Label,
         Break,
@@ -114,6 +117,8 @@ public:
     static StatementNode* RepeatLoop(StatementNode* block, ExpressionNode* condition);
 
     static StatementNode* Block(StatementNodeList* statements, StatementNode* finishStatement = nullptr);
+
+    static StatementNode* DoBlock(StatementNode* block);
 
     static StatementNode* GoTo(label_t label);
 

@@ -86,6 +86,13 @@ StatementNode* StatementNode::Block(StatementNodeList* statements, StatementNode
     return node;
 }
 
+StatementNode* StatementNode::DoBlock(StatementNode* block)
+{
+    StatementNode* node = new StatementNode(Type::DoBlock);
+    node->value_.doBlock_v = block;
+    return node;
+}
+
 StatementNode* StatementNode::GoTo(label_t label)
 {
     StatementNode* node = new StatementNode(Type::GoTo);
@@ -235,6 +242,13 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             // write nodes recursively
             for (auto statement : *block)
                 os << *statement;
+            break;
+        }
+    case Type::DoBlock:
+        {
+            auto doBlock = value_.doBlock_v;
+            os << DOT_ARC_THIS_OTHER_LABEL(doBlock, "do");
+            os << *doBlock;
             break;
         }
     case Type::GoTo:
@@ -423,6 +437,8 @@ std::string to_string(StatementNode::Type type)
         return "RepeatLoop";
     case StatementNode::StatementNode::Type::Block:
         return "Block";
+    case StatementNode::Type::DoBlock:
+        return "DoBlock";
     case StatementNode::Type::GoTo:
         return "GoTo";
     case StatementNode::Type::Label:
