@@ -150,8 +150,8 @@ repeat_stmt: REPEAT block UNTIL expr { $$ = StatementNode::RepeatLoop($2, $4); }
            ;
 
 finish_stmt: /* empty */ { $$ = nullptr; }
-           | BREAK
-           | RETURN expr_list_em
+           | BREAK { $$ = StatementNode::Break(); }
+           | RETURN expr_list_em { $$ = StatementNode::Return($2); }
            ;
 
 name_list: ID { $$ = new NameList{ ExpressionNode::Id($1) }; }
