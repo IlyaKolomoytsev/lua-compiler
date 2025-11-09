@@ -199,9 +199,9 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto range = loop.range;
             // write arcs
             os << DOT_ARC_THIS_OTHER_LABEL(loop.iteratorVariable, "variable");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.start, "range start value");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.finish, "range start finish");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.step, "range start step");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.start, "range start");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.finish, "range end");
+            os << DOT_ARC_THIS_OTHER_LABEL(range.step, "range step");
             os << DOT_ARC_THIS_OTHER_LABEL(loop.block, "block");
             // write nodes recursively
             os << *loop.iteratorVariable;
