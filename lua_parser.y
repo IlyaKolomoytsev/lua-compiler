@@ -73,6 +73,9 @@ void yyerror(const char *s) {
 %type <statementNode> while_stmt;
 %type <statementNode> repeat_stmt;
 %type <statementNode> for_stmt;
+%type <statementNode> if_stmt;
+%type <statementNode> elseif_stmt;
+%type <statementNode> elseif_stmt_list;
 %type <statementNodeList> stmt_list;
 %type <statementNodeList> stmt_list_em;
 %type <expressionNode> expr;
@@ -109,7 +112,7 @@ stmt: ';'
     | LOCAL FUNCTION ID '(' par_list_em ')' block END
     | LOCAL name_list { $$ = StatementNode::Declaration($2); }
     | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
-    | if_stmt
+    | if_stmt { $$ = $1; }
     | for_stmt { $$ = $1; }
     | while_stmt { $$ = $1; }
     | repeat_stmt { $$ = $1; }
@@ -126,17 +129,17 @@ stmt_list_em: /* empty*/ { $$ = new StatementNodeList{}; }
             | stmt_list { $$ = $1; }
             ;
 
-if_stmt: IF expr THEN block END
-       | IF expr THEN block ELSE block END
-       | IF expr THEN block elseif_stmt_list END
-       | IF expr THEN block elseif_stmt_list ELSE block END
+if_stmt: IF expr THEN block END { $$ = StatementNode::Branching($2, $4); }
+       | IF expr THEN block ELSE block END { $$ = StatementNode::Branching($2, $4, $6); }
+       | IF expr THEN block elseif_stmt_list END { $$ = StatementNode::Branching($2, $4, $5); }
+       | IF expr THEN block elseif_stmt_list ELSE block END { $$ = StatementNode::Branching($2, $4, StatementNode::BranchingChain($5, $7)); }
        ;
 
-elseif_stmt: ELSEIF expr THEN block
+elseif_stmt: ELSEIF expr THEN block { $$ = StatementNode::Branching($2, $4); }
            ;
 
-elseif_stmt_list: elseif_stmt
-                | elseif_stmt_list elseif_stmt
+elseif_stmt_list: elseif_stmt { $$ = $1; }
+                | elseif_stmt_list elseif_stmt {$$ = StatementNode::BranchingChain($1, $2); }
                 ;
 
 for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = ExpressionNode::Int(1); $$ = StatementNode::ForLoop(ExpressionNode::Id($2), r, $8); }
