@@ -112,7 +112,7 @@ stmt: ';'
     | for_stmt
     | while_stmt { $$ = $1; }
     | repeat_stmt { $$ = $1; }
-    | DO block END
+    | DO block END { $$ = StatementNode::DoBlock($2); }
     | GOTO ID
     | LABEL_SEP ID LABEL_SEP
     ;
