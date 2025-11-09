@@ -108,6 +108,8 @@ public:
         StatementNode* failureBlock = nullptr
     );
 
+    static StatementNode* BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock);
+
     static StatementNode* ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block);
 
     static StatementNode* ForLoop(NameList* names, ExpressionNodeList* iterator, StatementNode* block);

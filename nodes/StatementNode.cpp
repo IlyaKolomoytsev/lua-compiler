@@ -41,6 +41,22 @@ StatementNode* StatementNode::Branching(
     return node;
 }
 
+StatementNode* StatementNode::BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock)
+{
+    StatementNode* current = elseifChain;
+    while (true)
+    {
+        auto& branching = current->value_.branching_v;
+        if (branching.failureBlock == nullptr)
+        {
+            branching.failureBlock = elseIfOrElseBlock;
+            break;
+        }
+        current = branching.failureBlock;
+    }
+    return elseifChain;
+}
+
 StatementNode* StatementNode::ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block)
 {
     StatementNode* node = new StatementNode(Type::ForLoop);
