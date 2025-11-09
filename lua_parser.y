@@ -72,6 +72,7 @@ void yyerror(const char *s) {
 %type <statementNode> finish_stmt;
 %type <statementNode> while_stmt;
 %type <statementNode> repeat_stmt;
+%type <statementNode> for_stmt;
 %type <statementNodeList> stmt_list;
 %type <statementNodeList> stmt_list_em;
 %type <expressionNode> expr;
@@ -109,7 +110,7 @@ stmt: ';'
     | LOCAL name_list { $$ = StatementNode::Declaration($2); }
     | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
     | if_stmt
-    | for_stmt
+    | for_stmt { $$ = $1; }
     | while_stmt { $$ = $1; }
     | repeat_stmt { $$ = $1; }
     | DO block END { $$ = StatementNode::DoBlock($2); }
@@ -138,9 +139,9 @@ elseif_stmt_list: elseif_stmt
                 | elseif_stmt_list elseif_stmt
                 ;
 
-for_stmt: FOR ID '=' expr ',' expr DO block END
-        | FOR ID '=' expr ',' expr ',' expr DO block END
-        | FOR name_list IN expr_list DO block END
+for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = ExpressionNode::Int(1); $$ = StatementNode::ForLoop(ExpressionNode::Id($2), r, $8); }
+        | FOR ID '=' expr ',' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = $8;  $$ = StatementNode::ForLoop(ExpressionNode::Id($2), r, $10); }
+        | FOR name_list IN expr_list DO block END { $$ = StatementNode::ForLoop($2, $4, $6); }
         ;
 
 while_stmt: WHILE expr DO block END { $$ = StatementNode::WhileLoop($2, $4); }
