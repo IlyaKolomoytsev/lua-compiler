@@ -106,8 +106,8 @@ stmt: ';'
     | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END
     | LOCAL FUNCTION ID '(' par_list_em ')' block END
-    | LOCAL name_list
-    | LOCAL name_list '=' expr_list
+    | LOCAL name_list { $$ = StatementNode::Declaration($2); }
+    | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
     | if_stmt
     | for_stmt
     | while_stmt { $$ = $1; }
