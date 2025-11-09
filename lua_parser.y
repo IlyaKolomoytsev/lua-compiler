@@ -113,8 +113,8 @@ stmt: ';'
     | while_stmt { $$ = $1; }
     | repeat_stmt { $$ = $1; }
     | DO block END { $$ = StatementNode::DoBlock($2); }
-    | GOTO ID
-    | LABEL_SEP ID LABEL_SEP
+    | GOTO ID { $$ = StatementNode::GoTo($2); }
+    | LABEL_SEP ID LABEL_SEP { $$ = StatementNode::Label($2); }
     ;
 
 stmt_list: stmt { $$ = new StatementNodeList{$1}; }
