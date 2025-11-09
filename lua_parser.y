@@ -70,6 +70,7 @@ void yyerror(const char *s) {
 %type <statementNode> block;
 %type <statementNode> stmt;
 %type <statementNode> finish_stmt;
+%type <statementNode> while_stmt;
 %type <statementNodeList> stmt_list;
 %type <statementNodeList> stmt_list_em;
 %type <expressionNode> expr;
@@ -108,7 +109,7 @@ stmt: ';'
     | LOCAL name_list '=' expr_list
     | if_stmt
     | for_stmt
-    | while_stmt
+    | while_stmt { $$ = $1; }
     | repeat_stmt
     | DO block END
     | GOTO ID
@@ -141,7 +142,7 @@ for_stmt: FOR ID '=' expr ',' expr DO block END
         | FOR name_list IN expr_list DO block END
         ;
 
-while_stmt: WHILE expr DO block END
+while_stmt: WHILE expr DO block END { $$ = StatementNode::WhileLoop($2, $4); }
           ;
 
 repeat_stmt: REPEAT block UNTIL expr
