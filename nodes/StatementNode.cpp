@@ -31,7 +31,7 @@ StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, Na
     if (funcName->isMethod)
     {
         NameList* parListNew = new NameList();
-        parListNew->push_back(ExpressionNode::String(new std::string("self")));
+        parListNew->push_back(ExpressionNode::Id(funcName->names.back()));
         if (parList != nullptr)
         {
             for (auto* p: *parList)
@@ -199,7 +199,6 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto& fd = value_.function_declaration_global_v;
 
-            // Собираем полное имя: a.b.c или a.b:c
             std::string fullName;
             bool first = true;
             char sep = fd.funcName->isMethod ? ':' : '.';
@@ -218,9 +217,8 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto& fd = value_.function_declaration_local_v;
 
-            // Пытаемся достать имя из ExpressionNode* id
             std::string localName = "<fn>";
-            if (auto idStr = fd.id->getId())  // предполагаю, что getId() есть у Id-выражения
+            if (auto idStr = fd.id->getId())
             {
                 localName = *idStr;
             }
