@@ -13,7 +13,6 @@ class ExpressionNode;
 using NameList = std::list<ExpressionNode*>;
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 using ExpressionNodeList = std::list<ExpressionNode*>;
-using DottedNameList = std::list<std::string*>;
 struct TableField
 {
     ExpressionNode* name;

@@ -9,6 +9,12 @@ class StatementNode;
 
 using StatementNodeList = std::list<StatementNode*>;
 
+struct DottedNameStruct
+{
+    std::list<std::string*> names;
+    bool isMethod;
+};
+
 struct ForRangeStruct
 {
     ExpressionNode* start;
@@ -37,6 +43,20 @@ class StatementNode : public Node
     {
         Scope scope;
         NameList* names;
+    };
+
+    struct function_declaration_global_t
+    {
+        DottedNameStruct* funcName;
+        NameList* parList;
+        StatementNode* block;
+    };
+
+    struct function_declaration_local_t
+    {
+        ExpressionNode* id;
+        NameList* parList;
+        StatementNode* block;
     };
 
     using function_call_t = ExpressionNode*;
@@ -71,6 +91,8 @@ class StatementNode : public Node
     {
         declaration_t declaration_v;
         assignment_t assignment_v;
+        function_declaration_global_t function_declaration_global_v;
+        function_declaration_local_t function_declaration_local_v;
         function_call_t functionCall_v;
         branching_t branching_v;
         for_loop_t forLoop_v;
@@ -88,6 +110,8 @@ public:
     {
         Declaration,
         Assignment,
+        FunctionDeclarationGlobal,
+        FunctionDeclarationLocal,
         FunctionCall,
         Branching,
         ForLoop,
@@ -104,6 +128,10 @@ public:
     static StatementNode* Declaration(Scope scope, NameList* names);
 
     static StatementNode* Assignment(Scope scope, NameList* names, ExpressionNodeList* values);
+
+    static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block);
+
+    static StatementNode* FunctionDeclaration(ExpressionNode* id, NameList* parList, StatementNode* block);
 
     static StatementNode* FunctionCall(ExpressionNode* exprCall);
 

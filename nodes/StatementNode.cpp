@@ -22,6 +22,43 @@ StatementNode* StatementNode::Assignment(Scope scope, NameList* names, Expressio
     return node;
 }
 
+StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block)
+{
+
+    StatementNode* node = new StatementNode(Type::FunctionDeclarationGlobal);
+    function_declaration_global_t* function_declaration = &node->value_.function_declaration_global_v;
+    function_declaration->funcName = funcName;
+    if (funcName->isMethod)
+    {
+        NameList* parListNew = new NameList();
+        parListNew->push_back(ExpressionNode::String(new std::string("self")));
+        if (parList != nullptr)
+        {
+            for (auto* p: *parList)
+            {
+                parListNew->push_back(p);
+            }
+        }
+        parList = parListNew;
+    }
+
+    function_declaration->parList = parList;
+    function_declaration->block = block;
+    return node;
+}
+
+StatementNode* StatementNode::FunctionDeclaration(ExpressionNode* id, NameList* parList, StatementNode* block)
+{
+    StatementNode* node = new StatementNode(Type::FunctionDeclarationLocal);
+    function_declaration_local_t* function_declaration = &node->value_.function_declaration_local_v;
+    function_declaration->id = id;
+    function_declaration->parList = parList;
+    function_declaration->block = block;
+    return node;
+}
+
+
+
 StatementNode* StatementNode::FunctionCall(ExpressionNode* callExpr)
 {
     StatementNode* node = new StatementNode(Type::FunctionCall);
@@ -158,6 +195,39 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::Declaration:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_) << "\n" << to_string(value_.declaration_v.scope));
         break;
+    case Type::FunctionDeclarationGlobal:
+        {
+            auto& fd = value_.function_declaration_global_v;
+
+            // Собираем полное имя: a.b.c или a.b:c
+            std::string fullName;
+            bool first = true;
+            char sep = fd.funcName->isMethod ? ':' : '.';
+
+            for (auto* name : fd.funcName->names)
+            {
+                if (!first) fullName += sep;
+                first = false;
+                fullName += *name;
+            }
+            os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationGlobal\n" << fullName);
+            break;
+        }
+
+    case Type::FunctionDeclarationLocal:
+        {
+            auto& fd = value_.function_declaration_local_v;
+
+            // Пытаемся достать имя из ExpressionNode* id
+            std::string localName = "<fn>";
+            if (auto idStr = fd.id->getId())  // предполагаю, что getId() есть у Id-выражения
+            {
+                localName = *idStr;
+            }
+
+            os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationLocal\n" << localName);
+            break;
+        }
     default:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_));
     }
@@ -201,6 +271,35 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             os << *functionCall;
             break;
         }
+    case Type::FunctionDeclarationGlobal: {
+            auto functionDeclaration = value_.function_declaration_global_v;
+
+            int i = 0;
+            for (auto* p : *functionDeclaration.parList) {
+                os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
+            }
+
+            os << DOT_ARC_THIS_OTHER_LABEL(functionDeclaration.block, "body");
+
+            for (auto* p : *functionDeclaration.parList) os << *p;
+            os << *functionDeclaration.block;
+            break;
+    }
+
+    case Type::FunctionDeclarationLocal: {
+            auto& fd = value_.function_declaration_local_v;
+
+            int i = 0;
+            for (auto* p : *fd.parList) {
+                os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
+            }
+
+            os << DOT_ARC_THIS_OTHER_LABEL(fd.block, "body");
+
+            for (auto* p : *fd.parList) os << *p;
+            os << *fd.block;
+            break;
+    }
     case Type::Branching:
         {
             auto branching = value_.branching_v;
