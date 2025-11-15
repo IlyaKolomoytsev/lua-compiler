@@ -36,7 +36,7 @@ void yyerror(const char *s) {
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
     NameList* nameList;
-    DottedNameList* dottedNameList;
+    DottedNameStruct* dottedNameStruct;
     ExpressionNode* variable;
     TableField* tableField;
     TableFieldList* tableFieldList;
@@ -88,8 +88,8 @@ void yyerror(const char *s) {
 %type <nameList> name_list;
 %type <nameList> par_list;
 %type <nameList> par_list_em;
-%type <dottedNameList> dotted_name;
-%type <dottedNameList> func_name;
+%type <dottedNameStruct> dotted_name;
+%type <dottedNameStruct> func_name;
 %type <variable> variable;
 %type <tableField> field;
 %type <tableFieldList> field_list;
@@ -108,8 +108,8 @@ block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
 stmt: ';'
     | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
     | function_call { $$ = StatementNode::FunctionCall($1); }
-    | FUNCTION func_name '(' par_list_em ')' block END
-    | LOCAL FUNCTION ID '(' par_list_em ')' block END
+    | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
+    | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(ExpressionNode::Id($3), $5, $7); }
     | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
     | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
@@ -186,12 +186,12 @@ par_list_em: /* empty */ { $$ = new NameList(); }
            | par_list { $$ = $1; }
            ;
 
-dotted_name: ID { $$ = new DottedNameList{$1}; }
-           | dotted_name '.' ID { ($1)->push_back($3); $$ = $1; }
+dotted_name: ID { auto dn = new DottedNameStruct{}; dn->names.push_back($1); $$ = dn; }
+           | dotted_name '.' ID { $1->names.push_back($3); $$ = $1; }
            ;
 
 func_name: dotted_name { $$ = $1; }
-         | dotted_name ':' ID { ($1)->push_back($3); $$ = $1; }
+         | dotted_name ':' ID { $1->isMethod = true; $1->names.push_back($3); $$ = $1; }
          ;
 
 args: '(' expr_list_em ')' { $$ = $2; }
