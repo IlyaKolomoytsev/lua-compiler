@@ -31,7 +31,8 @@ StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, Na
     if (funcName->isMethod)
     {
         NameList* parListNew = new NameList();
-        parListNew->push_back(ExpressionNode::Id(funcName->names.back()));
+        auto it = funcName->names.end();
+        parListNew->push_back(ExpressionNode::Id(*(--(--it)))); // penultimate
         if (parList != nullptr)
         {
             for (auto* p: *parList)
