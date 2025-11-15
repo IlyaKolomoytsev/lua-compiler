@@ -552,6 +552,10 @@ std::string to_string(StatementNode::Type type)
         return "Assignment";
     case StatementNode::Type::FunctionCall:
         return "FunctionCall";
+    case StatementNode::Type::FunctionDeclarationGlobal:
+        return "FunctionDeclarationGlobal";
+    case StatementNode::Type::FunctionDeclarationLocal:
+        return "FunctionDeclarationLocal";
     case StatementNode::Type::Branching:
         return "Branching";
     case StatementNode::Type::ForLoop:
