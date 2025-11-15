@@ -200,15 +200,26 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto& fd = value_.function_declaration_global_v;
 
             std::string fullName;
-            bool first = true;
-            char sep = fd.funcName->isMethod ? ':' : '.';
+            auto& ns = fd.funcName->names;
+            size_t count = ns.size();
 
-            for (auto* name : fd.funcName->names)
+            bool isMethod = fd.funcName->isMethod;
+
+            size_t i = 0;
+            for (auto* name : ns)
             {
-                if (!first) fullName += sep;
-                first = false;
                 fullName += *name;
+                if (i + 1 < count)
+                {
+                    if (isMethod && i + 1 == count - 1)
+                        fullName += ":";
+                    else
+                        fullName += ".";
+                }
+
+                i++;
             }
+
             os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationGlobal\n" << fullName);
             break;
         }
