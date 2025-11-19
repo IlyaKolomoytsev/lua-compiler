@@ -109,7 +109,7 @@ if __name__ == "__main__":
             result_dir = Path(TEST_RESULT_DIRECTORY) / Path(file).with_name(Path(file).stem)
             output_path = result_dir / "output.txt"
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            command = [EXECUTABLE_TARGET, "-i", Path(file).as_posix(), "-o", str(result_dir)]
+            command = [EXECUTABLE_TARGET, "-i", Path(file).as_posix(), "-o", str(result_dir.as_posix())]
             run_command_inside_container(command, container_name, output_path)
     finally:
         kill_docker_container(container_name)
