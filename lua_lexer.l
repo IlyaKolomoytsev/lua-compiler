@@ -164,7 +164,7 @@ static inline int hexval(int c);
 
 "..."                   { cout << "Varargs: " << yytext << '\n'; return VARARG; }
 "::"                    { cout << "LabelSep: " << yytext << '\n'; return LABEL_SEP; }
-"//"                    { cout << "Operator: " << yytext << " (int div)\n"; return '/';}
+"//"                    { cout << "Operator: " << yytext << " (int div)\n"; return INT_DIV;}
 ".."                    { cout << "Operator: " << yytext << " (concat)\n"; return CONC; }
 "=="                    { cout << "Operator: " << yytext << '\n'; return EQUALITY; }
 "~="                    { cout << "Operator: " << yytext << '\n'; return INEQUALITY; }
