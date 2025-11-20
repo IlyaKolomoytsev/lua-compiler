@@ -485,6 +485,9 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::Division:
         os << DOT_NODE_THIS_WITH_LABEL("/");
         break;
+    case Type::IntegerDivision:
+        os << DOT_NODE_THIS_WITH_LABEL("//");
+        break;
     case Type::Modulo:
         os << DOT_NODE_THIS_WITH_LABEL("%");
         break;
