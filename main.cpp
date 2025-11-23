@@ -98,8 +98,7 @@ int run_graphviz_dot(const fs::path& dotPath, const fs::path& svgPath) {
 
 bool write_dot_file(std::ostream& dst, const std::string& graphName, StatementNode* chunk) {
     // Шапка
-    dst << "digraph " << graphName << " {\n"
-        << "node [shape=plaintext];\n";
+    dst << "digraph " << graphName << " {\n";
     // Тело графа (как в исходнике: << **it)
     dst << *chunk;
     // Хвост
