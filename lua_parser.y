@@ -105,7 +105,7 @@ chunk: block { Program::addChunk($1); }
 block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
      ;
 
-stmt: ';'
+stmt: stmt ';' { $$ = $1; }
     | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
     | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
