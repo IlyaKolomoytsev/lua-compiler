@@ -156,6 +156,7 @@ repeat_stmt: REPEAT block UNTIL expr { $$ = StatementNode::RepeatLoop($2, $4); }
 finish_stmt: /* empty */ { $$ = nullptr; }
            | BREAK { $$ = StatementNode::Break(); }
            | RETURN expr_list_em { $$ = StatementNode::Return($2); }
+           | finish_stmt ';' { $$ = $1; }
            ;
 
 name_list: ID { $$ = new NameList{ ExpressionNode::Id($1) }; }
