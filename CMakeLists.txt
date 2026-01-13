@@ -36,6 +36,8 @@ add_custom_command(
         COMMENT "Generating C++ lexer with Flex"
 )
 
+add_subdirectory(jvm-class-builder)
+
 # Paths for nodes classes
 set(SOURCE_FILES
         main.cpp
@@ -75,4 +77,8 @@ set_target_properties(lua_compiler PROPERTIES
 )
 
 # Add link to flex library
-target_link_libraries(lua_compiler PRIVATE fl)
+target_link_libraries(lua_compiler
+        PRIVATE
+        fl
+        jvm::ClassBuilder
+)
