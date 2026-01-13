@@ -3,15 +3,15 @@ project(lua_compiler)
 
 # Add flex dependence to project
 find_program(FLEX_EXECUTABLE flex)
-if(NOT FLEX_EXECUTABLE)
+if (NOT FLEX_EXECUTABLE)
     message(FATAL_ERROR "Flex not found! Install flex and try again.")
-endif()
+endif ()
 
 # Add bison dependence to project
 find_program(BISON_EXECUTABLE bison)
-if(NOT BISON_EXECUTABLE)
+if (NOT BISON_EXECUTABLE)
     message(FATAL_ERROR "Bison not found! Install bison and try again.")
-endif()
+endif ()
 
 # Paths for generated files
 set(GENERATED_LEXER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/lex.yy.cpp")
