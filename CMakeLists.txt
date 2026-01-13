@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(lua_compiler)
 
-set(CMAKE_CXX_STANDARD 17)
-
 # Add flex dependence to project
 find_program(FLEX_EXECUTABLE flex)
 if(NOT FLEX_EXECUTABLE)
@@ -70,6 +68,11 @@ add_executable(lua_compiler
 set_source_files_properties(${GENERATED_LEXER_FILE} PROPERTIES LANGUAGE CXX)
 set_source_files_properties(${GENERATED_BISON_FILE} PROPERTIES LANGUAGE CXX)
 
+set_target_properties(lua_compiler PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
 
 # Add link to flex library
 target_link_libraries(lua_compiler PRIVATE fl)

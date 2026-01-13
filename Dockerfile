@@ -1,16 +1,23 @@
 # Base Ubuntu Linux image
 FROM ubuntu:20.04
 
-# Install package dependences
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential \
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Install package dependencies
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update &&  \
+    apt-get install -y \
+    g++-10 \
+    cmake \
     bison \
     flex \
-    cmake \
     graphviz \
     gdb \
+    openjdk-21-jdk-headless \
+    maven \
     && rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
 
 # Copy project to working directory
 WORKDIR /app
