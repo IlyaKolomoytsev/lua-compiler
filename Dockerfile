@@ -1,13 +1,12 @@
 # Base Ubuntu Linux image
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 
 # Install package dependencies
-ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update &&  \
-    apt-get install -y \
-    g++-10 \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
     cmake \
     bison \
     flex \
@@ -17,11 +16,20 @@ RUN apt-get update &&  \
     maven \
     && rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+ENV HOME=/home/builder
+
+RUN useradd -m builder
 
 # Copy project to working directory
 WORKDIR /app
 COPY . /app
+
+RUN chown -R builder:builder /app
+
+# Maven repo
+RUN mkdir -p /home/builder/.m2 && chown -R builder:builder /home/builder
+
+USER builder
 
 # Build
 RUN cmake . && make
