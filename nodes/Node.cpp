@@ -9,7 +9,7 @@ Node::node_id_t Node::getNodeId() const
     return id;
 }
 
-inline Node::node_id_t Node::getMaxNideId()
+inline Node::node_id_t Node::getMaxNodeId()
 {
     return maxId;
 }

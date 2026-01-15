@@ -15,7 +15,7 @@ public:
 
     node_id_t getNodeId() const;
 
-    static node_id_t getMaxNideId();
+    static node_id_t getMaxNodeId();
 
     virtual void writeNodeInfoToDot(std::ostream& os) const = 0;
 
