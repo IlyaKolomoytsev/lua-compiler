@@ -21,9 +21,9 @@ void yyerror(const char *s) {
 
 %code requires {
     #include <string>
-    #include "nodes/ExpressionNode.h"
-    #include "nodes/StatementNode.h"
-    #include "nodes/Program.h"
+    #include "ExpressionNode.h"
+    #include "StatementNode.h"
+    #include "Program.h"
 }
 
 %union {

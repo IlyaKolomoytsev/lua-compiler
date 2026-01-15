@@ -1,6 +1,6 @@
 #include "StatementNode.h"
 
-#include <assert.h>
+#include <cassert>
 #include "DotMacros.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, NameList* names)

@@ -1,7 +1,8 @@
 #include "ExpressionNode.h"
 
-#include <assert.h>
+#include <cassert>
 #include <stdexcept>
+
 #include "DotMacros.h"
 #include "StatementNode.h"
 
@@ -523,7 +524,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto tableField = value_.tableField_v;
             os << DOT_ARC_THIS_OTHER_LABEL(tableField.table, "table");
-            os << DOT_ARC_THIS_OTHER_LABEL(tableField.key,   "key");
+            os << DOT_ARC_THIS_OTHER_LABEL(tableField.key, "key");
             os << *tableField.table;
             os << *tableField.key;
             break;
@@ -532,7 +533,7 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
         {
             auto tableFieldByIndex = value_.tableFieldByIndex_v;
             os << DOT_ARC_THIS_OTHER_LABEL(tableFieldByIndex.table, "table");
-            os << DOT_ARC_THIS_OTHER_LABEL(tableFieldByIndex.index,   "index");
+            os << DOT_ARC_THIS_OTHER_LABEL(tableFieldByIndex.index, "index");
             os << *tableFieldByIndex.table;
             os << *tableFieldByIndex.index;
             break;
@@ -543,7 +544,8 @@ void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
             int index = 0;
             for (auto field : *constructor)
             {
-                if (field.name) {
+                if (field.name)
+                {
                     os << DOT_ARC_THIS_OTHER_LABEL(field.name, "key " << index);
                 }
                 os << DOT_ARC_THIS_OTHER_LABEL(field.value, "value " << index);

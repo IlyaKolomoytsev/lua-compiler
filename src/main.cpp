@@ -2,7 +2,7 @@
 #include <fstream>
 #include <FlexLexer.h>
 #include "lua_parser.tab.h"
-#include "nodes/Program.h"
+#include "Program.h"
 #include <filesystem>
 
 yyFlexLexer* lexer;

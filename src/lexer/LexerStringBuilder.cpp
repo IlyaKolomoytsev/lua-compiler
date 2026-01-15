@@ -1,4 +1,4 @@
-#include "LexerStringBuilder.h"
+#include "lexer/LexerStringBuilder.h"
 
 void LexerStringBuilder::write(const char* data, size_t size)
 {
