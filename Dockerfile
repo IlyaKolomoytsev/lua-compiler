@@ -1,8 +1,6 @@
 # Base Ubuntu Linux image
 FROM ubuntu:22.04
 
-ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-
 # Install package dependencies
 RUN apt-get update &&  \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -30,6 +28,9 @@ RUN chown -R builder:builder /app
 RUN mkdir -p /home/builder/.m2 && chown -R builder:builder /home/builder
 
 USER builder
+
+ARG TARGETARCH
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-${TARGETARCH}
 
 # Build
 RUN cmake . && make
