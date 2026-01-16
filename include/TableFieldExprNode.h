@@ -13,6 +13,9 @@ public:
     [[nodiscard]] ExpressionNode* getTable() const { return table_; }
     [[nodiscard]] ExpressionNode* getKey() const { return key_; }
 
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
 private:
     ExpressionNode* table_;
     ExpressionNode* key_;

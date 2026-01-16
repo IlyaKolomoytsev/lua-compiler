@@ -61,6 +61,7 @@ set(SOURCE_FILES
         src/node/FunctionCallExprNode.cpp
         src/node/FunctionExprNode.cpp
         src/node/TableConstructorExprNode.cpp
+        src/node/TableFieldExprNode.cpp
 )
 
 # Add files to executable target
