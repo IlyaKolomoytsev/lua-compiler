@@ -220,7 +220,7 @@ public:
 
     void writeNodeInfoToDot(std::ostream& os) const override;
 
-private:
+protected:
     explicit ExpressionNode(Type type);
 
     Type type_;

@@ -57,6 +57,7 @@ set(SOURCE_FILES
         src/node/StatementNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
+        include/LiteralExprNode.h
 )
 
 # Add files to executable target
