@@ -11,6 +11,9 @@ public:
 
     [[nodiscard]] const TableFieldList& tableFields() const;
 
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
 private:
     TableFieldList* fields_;
 };
