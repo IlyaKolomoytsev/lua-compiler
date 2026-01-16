@@ -5,15 +5,19 @@
 class FunctionCallExprNode : public ExpressionNode
 {
 public:
-    FunctionCallExprNode(ExpressionNode* functionExpr, FunctionArgumentsList* arguments) :
-    ExpressionNode(Type::FunctionCall), functionExpr_(functionExpr), arguments_(arguments)
+    FunctionCallExprNode(ExpressionNode* function, FunctionArgumentsList* arguments) :
+    ExpressionNode(Type::FunctionCall), function_(function), arguments_(arguments)
     {
     }
 
     [[nodiscard]] ExpressionNode* getFunctionExpression() const;
     [[nodiscard]] const ExpressionNodeList& getFunctionArguments() const;
+
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
 private:
-    ExpressionNode* functionExpr_;
+    ExpressionNode* function_;
     FunctionArgumentsList* arguments_;
 };
 
