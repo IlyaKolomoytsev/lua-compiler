@@ -59,6 +59,7 @@ set(SOURCE_FILES
         src/node/Program.cpp
         include/LiteralExprNode.h
         src/node/FunctionCallExprNode.cpp
+        src/node/FunctionExprNode.cpp
 )
 
 # Add files to executable target

@@ -13,6 +13,9 @@ public:
     [[nodiscard]] const NameList& parameters() const { return *parameters_; };
     [[nodiscard]] ExpressionNode* body() const { return body_; }
 
+    /* Overridden methods */
+
+    void writeNodeInfoToDot(std::ostream& os) const override;
 private:
     NameList* parameters_;
     ExpressionNode* body_;
