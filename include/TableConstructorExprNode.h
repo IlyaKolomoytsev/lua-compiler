@@ -5,14 +5,14 @@
 class TableConstructorExprNode : public ExpressionNode
 {
 public:
-    TableConstructorExprNode(const TableFieldList& fields) : ExpressionNode(Type::TableConstructor), fields_(fields)
+    TableConstructorExprNode(TableFieldList* fields) : ExpressionNode(Type::TableConstructor), fields_(fields)
     {
     }
 
     [[nodiscard]] const TableFieldList& tableFields() const;
 
 private:
-    TableFieldList fields_;
+    TableFieldList* fields_;
 };
 
 #endif //LUA_COMPILER_TABLE_CONSTRUCTOR_EXPR_NODE_H
