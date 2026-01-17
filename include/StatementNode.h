@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ExpressionNode.h"
+#include "NodeExpressionModule.h"
 
 class StatementNode;
 
@@ -54,7 +55,7 @@ class StatementNode : public Node
 
     struct function_declaration_local_t
     {
-        ExpressionNode* id;
+        IdExprNode* id;
         NameList* parList;
         StatementNode* block;
     };
@@ -131,7 +132,7 @@ public:
 
     static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block);
 
-    static StatementNode* FunctionDeclaration(ExpressionNode* id, NameList* parList, StatementNode* block);
+    static StatementNode* FunctionDeclaration(IdExprNode* id, NameList* parList, StatementNode* block);
 
     static StatementNode* FunctionCall(ExpressionNode* exprCall);
 

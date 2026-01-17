@@ -2,6 +2,7 @@
 #define LUA_COMPILER_LITERAL_EXPR_NODE_H
 
 #include "ExpressionNode.h"
+#include "DotMacros.h"
 
 template <typename V, ExpressionNode::Type T>
 class LiteralExprNode : public ExpressionNode
@@ -11,7 +12,16 @@ public:
     {
     }
 
+    explicit LiteralExprNode(V* value) : ExpressionNode(T), value_(*value)
+    {
+    }
+
     [[nodiscard]] const V& getValue() const noexcept { return value_; }
+
+    void writeNodeInfoToDot(std::ostream& os) const override
+    {
+        os << DOT_NODE_THIS_WITH_LABEL(value_);
+    }
 
 private:
     V value_;

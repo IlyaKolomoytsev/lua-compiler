@@ -21,7 +21,7 @@ void yyerror(const char *s) {
 
 %code requires {
     #include <string>
-    #include "ExpressionNode.h"
+    #include "NodeExpressionModule.h"
     #include "StatementNode.h"
     #include "Program.h"
 }
@@ -109,7 +109,7 @@ stmt: stmt ';' { $$ = $1; }
     | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
     | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
-    | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(ExpressionNode::Id($3), $5, $7); }
+    | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(new IdExprNode($3), $5, $7); }
     | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
     | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
@@ -142,8 +142,8 @@ elseif_stmt_list: elseif_stmt { $$ = $1; }
                 | elseif_stmt_list elseif_stmt {$$ = StatementNode::BranchingChain($1, $2); }
                 ;
 
-for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = ExpressionNode::Int(1); $$ = StatementNode::ForLoop(ExpressionNode::Id($2), r, $8); }
-        | FOR ID '=' expr ',' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = $8;  $$ = StatementNode::ForLoop(ExpressionNode::Id($2), r, $10); }
+for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = new IntegerExprNode(1); $$ = StatementNode::ForLoop(new IdExprNode($2), r, $8); }
+        | FOR ID '=' expr ',' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = $8;  $$ = StatementNode::ForLoop(new IdExprNode($2), r, $10); }
         | FOR name_list IN expr_list DO block END { $$ = StatementNode::ForLoop($2, $4, $6); }
         ;
 
@@ -159,15 +159,15 @@ finish_stmt: /* empty */ { $$ = nullptr; }
            | finish_stmt ';' { $$ = $1; }
            ;
 
-name_list: ID { $$ = new NameList{ ExpressionNode::Id($1) }; }
-         | name_list ',' ID { ($1)->push_back( ExpressionNode::Id($3) ); $$ = $1; }
+name_list: ID { $$ = new NameList{ new IdExprNode($1) }; }
+         | name_list ',' ID { ($1)->push_back( new IdExprNode($3) ); $$ = $1; }
          ;
 
-variable: ID { $$ = ExpressionNode::Id($1); }
-        | variable '.' ID { $$ = ExpressionNode::TableField($1, ExpressionNode::Id($3)); }
-        | variable '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
-        | function_call '.' ID { $$ = ExpressionNode::TableField($1, ExpressionNode::Id($3)); }
-        | function_call '[' expr ']' { $$ = ExpressionNode::TableFieldByIndex($1, $3); }
+variable: ID { $$ = new IdExprNode($1); }
+        | variable '.' ID { $$ = new TableFieldExprNode($1, new IdExprNode($3)); }
+        | variable '[' expr ']' { $$ = new TableFieldExprNode($1, $3); }
+        | function_call '.' ID { $$ = new TableFieldExprNode($1, new IdExprNode($3)); }
+        | function_call '[' expr ']' { $$ = new TableFieldExprNode($1, $3); }
         ;
 
 variable_list: variable { $$ = new NameList{$1}; }
@@ -179,8 +179,8 @@ variable_list_em: /* empty */ { $$ = new NameList(); }
                 ;
 
 par_list: name_list { $$ = $1; }
-        | name_list ',' VARARG { ($1)->push_back(ExpressionNode::Vararg()); $$ = $1; }
-        | VARARG { $$ = new NameList{ExpressionNode::Vararg()}; }
+        | name_list ',' VARARG { ($1)->push_back(new VarargExprNode()); $$ = $1; }
+        | VARARG { $$ = new NameList{new VarargExprNode()}; }
         ;
 
 par_list_em: /* empty */ { $$ = new NameList(); }
@@ -196,14 +196,14 @@ func_name: dotted_name { $$ = $1; }
          ;
 
 args: '(' expr_list_em ')' { $$ = $2; }
-    | '{' field_list_em '}' { $$ = new ExpressionNodeList { ExpressionNode::TableConstructor($2)}; }
-    | STRING { $$ = new ExpressionNodeList { ExpressionNode::String($1)}; }
+    | '{' field_list_em '}' { $$ = new ExpressionNodeList { new TableConstructorExprNode($2)}; }
+    | STRING { $$ = new ExpressionNodeList { new StringExprNode($1)}; }
     ;
 
-function_call: variable args { $$ = ExpressionNode::FunctionCall($1, $2); }
-             | variable ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, ExpressionNode::Id($3), $4); }
-             | function_call args { $$ = ExpressionNode::FunctionCall($1, $2); }
-             | function_call ':' ID args { $$ = ExpressionNode::TableFunctionCall($1, ExpressionNode::Id($3), $4); }
+function_call: variable args { $$ = new FunctionCallExprNode($1, $2, false); }
+             | variable ':' ID args { $$ = new FunctionCallExprNode(new TableFieldExprNode($1, new IdExprNode($3)), $4, true); }
+             | function_call args { $$ = new FunctionCallExprNode($1, $2, false); }
+             | function_call ':' ID args { $$ = new FunctionCallExprNode(new TableFieldExprNode($1, new IdExprNode($3)), $4, true);  }
              ;
 
 field_list_em: /* empty */ { $$ = new TableFieldList{}; }
@@ -215,7 +215,7 @@ field_list: field { $$ = new TableFieldList(); $$->push_back(*$1); delete $1; }
           ;
 
 field: '[' expr ']' '=' expr { $$ = new TableField{$2, $5}; }
-     | ID '=' expr { $$ = new TableField{ExpressionNode::String($1), $3}; }
+     | ID '=' expr { $$ = new TableField{new StringExprNode($1), $3}; }
      | expr { $$ = new TableField{nullptr, $1}; }
      ;
 
@@ -223,37 +223,37 @@ field_sep: ','
          | ';'
          ;
 
-expr: INT { $$ = ExpressionNode::Int($1); }
-    | FLOAT { $$ = ExpressionNode::Float($1); }
-    | STRING { $$ = ExpressionNode::String($1); }
-    | TRUE { $$ = ExpressionNode::Bool(true); }
-    | FALSE { $$ = ExpressionNode::Bool(false); }
-    | NIL { $$ = ExpressionNode::Nil(); }
-    | VARARG { $$ = ExpressionNode::Vararg(); }
-    | FUNCTION '(' par_list_em ')' block END { $$ = ExpressionNode::FunctionLiteral($3, $5); }
-    | '{' field_list_em '}' { $$ = ExpressionNode::TableConstructor($2); }
+expr: INT { $$ = new IntegerExprNode($1); }
+    | FLOAT { $$ = new FloatExprNode($1); }
+    | STRING { $$ = new StringExprNode($1); }
+    | TRUE { $$ = new BoolExprNode(true); }
+    | FALSE { $$ = new BoolExprNode(false); }
+    | NIL { $$ = new NilExprNode(); }
+    | VARARG { $$ = new VarargExprNode(); }
+    | FUNCTION '(' par_list_em ')' block END { $$ = new FunctionExprNode($3, $5); }
+    | '{' field_list_em '}' { $$ = new TableConstructorExprNode($2); }
     | variable { $$ = $1; }
     | function_call { $$ = $1; }
     | '(' expr ')' { $$ = $2; }
-    | expr '+' expr { $$ = ExpressionNode::Summation($1, $3); }
-    | expr '-' expr { $$ = ExpressionNode::Subtraction($1, $3); }
-    | expr '*' expr { $$ = ExpressionNode::Multiplication($1, $3); }
-    | expr '/' expr { $$ = ExpressionNode::Division($1, $3); }
-    | expr '%' expr { $$ = ExpressionNode::Modulo($1, $3); }
-    | expr '^' expr { $$ = ExpressionNode::Exponentiation($1, $3); }
-    | expr '<' expr { $$ = ExpressionNode::Less($1, $3); }
-    | expr '>' expr { $$ = ExpressionNode::Greater($1, $3); }
-    | expr INT_DIV expr { $$ = ExpressionNode::IntegerDivision($1, $3); }
-    | expr OR expr { $$ = ExpressionNode::Or($1, $3); }
-    | expr AND expr { $$ = ExpressionNode::And($1, $3); }
-    | expr LESS_EQUAL expr { $$ = ExpressionNode::LessEqual($1, $3); }
-    | expr GREATER_EQUAL expr { $$ = ExpressionNode::GreaterEqual($1, $3); }
-    | expr EQUALITY expr { $$ = ExpressionNode::Equality($1, $3); }
-    | expr INEQUALITY expr { $$ = ExpressionNode::Unequality($1, $3); }
-    | expr CONC expr { $$ = ExpressionNode::Concatenation($1, $3); }
-    | '#' expr { $$ = ExpressionNode::Length($2); }
-    | NOT expr { $$ = ExpressionNode::Negation($2); }
-    | '-' expr %prec UMINUS { $$ = ExpressionNode::UnaryMinus($2); }
+    | expr '+' expr { $$ = new SummationExprNode($1, $3); }
+    | expr '-' expr { $$ = new SubtractionExprNode($1, $3); }
+    | expr '*' expr { $$ = new MultiplicationExprNode($1, $3); }
+    | expr '/' expr { $$ = new DivisionExprNode($1, $3); }
+    | expr '%' expr { $$ = new ModuloExprNode($1, $3); }
+    | expr '^' expr { $$ = new ExponentiationExprNode($1, $3); }
+    | expr '<' expr { $$ = new LessExprNode($1, $3); }
+    | expr '>' expr { $$ = new GreaterExprNode($1, $3); }
+    | expr INT_DIV expr { $$ = new IntegerDivision($1, $3); }
+    | expr OR expr { $$ = new OrExprNode($1, $3); }
+    | expr AND expr { $$ = new AndExprNode($1, $3); }
+    | expr LESS_EQUAL expr { $$ = new LessEqualExprNode($1, $3); }
+    | expr GREATER_EQUAL expr { $$ = new GreaterEqualExprNode($1, $3); }
+    | expr EQUALITY expr { $$ = new EqualityExprNode($1, $3); }
+    | expr INEQUALITY expr { $$ = new UnequalityExprNode($1, $3); }
+    | expr CONC expr { $$ = new ConcatenationExprNode($1, $3); }
+    | '#' expr { $$ = new LengthExprNode($2); }
+    | NOT expr { $$ = new NegationExprNode($2); }
+    | '-' expr %prec UMINUS { $$ = new UnaryMinusExprNode($2); }
     ;
 
 expr_list: expr { $$ = new ExpressionNodeList{$1}; }

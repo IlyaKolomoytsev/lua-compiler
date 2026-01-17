@@ -2,6 +2,8 @@
 
 #include <cassert>
 #include "DotMacros.h"
+#include "FunctionCallExprNode.h"
+#include "NodeExpressionModule.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, NameList* names)
 {
@@ -24,23 +26,13 @@ StatementNode* StatementNode::Assignment(Scope scope, NameList* names, Expressio
 
 StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block)
 {
-
     StatementNode* node = new StatementNode(Type::FunctionDeclarationGlobal);
     function_declaration_global_t* function_declaration = &node->value_.function_declaration_global_v;
     function_declaration->funcName = funcName;
+
     if (funcName->isMethod)
     {
-        NameList* parListNew = new NameList();
-        auto it = funcName->names.end();
-        parListNew->push_back(ExpressionNode::Id(*(--(--it)))); // penultimate
-        if (parList != nullptr)
-        {
-            for (auto* p: *parList)
-            {
-                parListNew->push_back(p);
-            }
-        }
-        parList = parListNew;
+        parList->push_front(new IdExprNode("self"));
     }
 
     function_declaration->parList = parList;
@@ -48,7 +40,7 @@ StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, Na
     return node;
 }
 
-StatementNode* StatementNode::FunctionDeclaration(ExpressionNode* id, NameList* parList, StatementNode* block)
+StatementNode* StatementNode::FunctionDeclaration(IdExprNode* id, NameList* parList, StatementNode* block)
 {
     StatementNode* node = new StatementNode(Type::FunctionDeclarationLocal);
     function_declaration_local_t* function_declaration = &node->value_.function_declaration_local_v;
@@ -57,7 +49,6 @@ StatementNode* StatementNode::FunctionDeclaration(ExpressionNode* id, NameList* 
     function_declaration->block = block;
     return node;
 }
-
 
 
 StatementNode* StatementNode::FunctionCall(ExpressionNode* callExpr)
@@ -230,10 +221,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto& fd = value_.function_declaration_local_v;
 
             std::string localName = "<fn>";
-            if (auto idStr = fd.id->getId())
-            {
-                localName = *idStr;
-            }
+            localName = fd.id->getValue();
 
             os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationLocal\n" << localName);
             break;
@@ -281,11 +269,13 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             os << *functionCall;
             break;
         }
-    case Type::FunctionDeclarationGlobal: {
+    case Type::FunctionDeclarationGlobal:
+        {
             auto functionDeclaration = value_.function_declaration_global_v;
 
             int i = 0;
-            for (auto* p : *functionDeclaration.parList) {
+            for (auto* p : *functionDeclaration.parList)
+            {
                 os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
             }
 
@@ -294,13 +284,15 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             for (auto* p : *functionDeclaration.parList) os << *p;
             os << *functionDeclaration.block;
             break;
-    }
+        }
 
-    case Type::FunctionDeclarationLocal: {
+    case Type::FunctionDeclarationLocal:
+        {
             auto& fd = value_.function_declaration_local_v;
 
             int i = 0;
-            for (auto* p : *fd.parList) {
+            for (auto* p : *fd.parList)
+            {
                 os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
             }
 
@@ -309,7 +301,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             for (auto* p : *fd.parList) os << *p;
             os << *fd.block;
             break;
-    }
+        }
     case Type::Branching:
         {
             auto branching = value_.branching_v;
@@ -466,19 +458,20 @@ StatementNode* StatementNode::ForLoopIteratorConverter::getWhileLoop()
     statements->push_back(getVarAssigment());
     statements->push_back(block_);
     return StatementNode::WhileLoop(
-        ExpressionNode::Bool(true),
+        new BoolExprNode(true),
         StatementNode::Block(statements)
     );
 }
 
 inline StatementNode* StatementNode::ForLoopIteratorConverter::getInteratorResultAssigment()
 {
-    ExpressionNode* fCall = ExpressionNode::FunctionCall(
+    ExpressionNode* fCall = new FunctionCallExprNode(
         getF(),
         new ExpressionNodeList{
             getS(),
             getVar(),
-        }
+        },
+        false
     );
 
     StatementNode* assignment = StatementNode::Assignment(
@@ -492,9 +485,9 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getInteratorResul
 
 inline StatementNode* StatementNode::ForLoopIteratorConverter::getExitBranching()
 {
-    ExpressionNode* condition = ExpressionNode::Equality(
+    ExpressionNode* condition = new EqualityExprNode(
         getFirstName(),
-        ExpressionNode::Nil()
+        new NilExprNode()
     );
     StatementNode* successBlock = StatementNode::Block(
         new StatementNodeList{
@@ -518,24 +511,24 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getVarAssigment()
 
 ExpressionNode* StatementNode::ForLoopIteratorConverter::getF()
 {
-    return ExpressionNode::Id(new std::string("f"));
+    return new IdExprNode(std::string("f"));
 }
 
 ExpressionNode* StatementNode::ForLoopIteratorConverter::getS()
 {
-    return ExpressionNode::Id(new std::string("s"));
+    return new IdExprNode(std::string("s"));
 }
 
 ExpressionNode* StatementNode::ForLoopIteratorConverter::getVar()
 {
-    return ExpressionNode::Id(new std::string("var"));
+    return new IdExprNode(std::string("var"));
 }
 
 ExpressionNode* StatementNode::ForLoopIteratorConverter::getFirstName()
 {
-    std::string* firstName = names_->front()->getId();
-    std::string* nameCopy = new std::string(*firstName);
-    return ExpressionNode::Id(nameCopy);
+    std::string firstName = static_cast<IdExprNode*>(names_->front())->getValue();
+    std::string nameCopy = std::string(firstName);
+    return new IdExprNode(nameCopy);
 }
 
 std::string to_string(Scope scope)

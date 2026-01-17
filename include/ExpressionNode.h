@@ -4,81 +4,26 @@
 #include <string>
 #include <sys/types.h>
 
-#include "ExpressionNode.h"
 #include "Node.h"
 
 class ExpressionNode;
 
 
 using NameList = std::list<ExpressionNode*>;
-using FunctionArgumentsList = std::list<ExpressionNode*>;
 using ExpressionNodeList = std::list<ExpressionNode*>;
+
 struct TableField
 {
     ExpressionNode* name;
     ExpressionNode* value;
 };
+
 using TableFieldList = std::list<TableField>;
 
 class StatementNode;
+
 class ExpressionNode : public Node
 {
-    using token_id_t = std::string*;
-    using integer_t = int64_t;
-    using float_t = double;
-    using string_t = std::string;
-    using arguments_list_t = FunctionArgumentsList;
-
-    struct table_field_t
-    {
-        ExpressionNode* table;
-        ExpressionNode* key;
-    };
-
-    struct table_field_by_index_t
-    {
-        ExpressionNode* table;
-        ExpressionNode* index;
-    };
-
-    struct function_call_t
-    {
-        ExpressionNode* functionId;
-        arguments_list_t* arguments;
-    };
-
-    struct expression_two_operands_t
-    {
-        ExpressionNode* left;
-        ExpressionNode* right;
-    };
-
-    struct function_literal_t
-    {
-        NameList* parameters;
-        StatementNode* body;
-    };
-
-    using expression_one_operand_t = ExpressionNode*;
-
-    using table_constructor_t = TableFieldList*;
-
-    union Value
-    {
-        token_id_t id_v;
-        integer_t integer_v;
-        float_t float_v;
-        string_t* string_v;
-        bool boolean_v;
-        table_field_t tableField_v;
-        table_field_by_index_t tableFieldByIndex_v;
-        function_call_t functionCall_v;
-        function_literal_t functionLiteral_v;
-        expression_two_operands_t twoOperands_v;
-        expression_one_operand_t oneOperand_v;
-        table_constructor_t tableConstructor_v;
-    };
-
 public:
     enum class Type
     {
@@ -116,115 +61,10 @@ public:
         UnaryMinuses,
     };
 
-    /* Static constructors */
-
-    static ExpressionNode* Int(integer_t value);
-
-    static ExpressionNode* Float(float_t value);
-
-    static ExpressionNode* String(string_t* string);
-
-    static ExpressionNode* Bool(bool value);
-
-    static ExpressionNode* Nil();
-
-    static ExpressionNode* Vararg();
-
-    static ExpressionNode* Id(token_id_t value);
-
-    static ExpressionNode* TableField(ExpressionNode* table, ExpressionNode* key);
-
-    static ExpressionNode* TableFieldByIndex(ExpressionNode* table, ExpressionNode* index);
-
-    static ExpressionNode* TableConstructor(TableFieldList* fields);
-
-    static ExpressionNode* FunctionCall(ExpressionNode* functionId, arguments_list_t* arguments);
-
-    static ExpressionNode* TableFunctionCall(ExpressionNode* table, ExpressionNode* key, arguments_list_t* arguments);
-
-    static ExpressionNode* FunctionLiteral(NameList* params, StatementNode* body);
-
-    static ExpressionNode* Summation(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Subtraction(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Multiplication(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Division(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Modulo(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* IntegerDivision(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Exponentiation(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Less(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Greater(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Equality(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Unequality(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* LessEqual(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* GreaterEqual(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Or(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* And(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Concatenation(ExpressionNode* left, ExpressionNode* right);
-
-    static ExpressionNode* Length(ExpressionNode* expression);
-
-    static ExpressionNode* Negation(ExpressionNode* expression);
-
-    static ExpressionNode* UnaryMinus(ExpressionNode* expression);
-
-    /* Getters */
-
-    Type getType() const;
-
-    integer_t getInteger() const;
-
-    float_t getFloat() const;
-
-    std::string* getString();
-
-    bool getBool() const;
-
-    token_id_t getId() const;
-
-    table_field_t* getTableField();
-
-    ExpressionNode* getTableId();
-
-    ExpressionNode* getTableFieldKey();
-
-    function_call_t* getFunctionCall();
-
-    ExpressionNode* getFunctionId();
-
-    arguments_list_t* getFunctionArguments();
-
-    expression_two_operands_t* getExpressionTwoOperands();
-
-    ExpressionNode* getLeftOperand();
-
-    ExpressionNode* getRightOperand();
-
-    ExpressionNode* getOperand();
-
-    /* Overridden methods */
-
-    void writeNodeInfoToDot(std::ostream& os) const override;
-
 protected:
     explicit ExpressionNode(Type type);
 
     Type type_;
-    Value value_;
 };
 
 std::string to_string(ExpressionNode::Type type);

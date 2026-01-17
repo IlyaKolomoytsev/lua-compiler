@@ -1,5 +1,6 @@
 #include "FunctionExprNode.h"
 #include "DotMacros.h"
+#include "StatementNode.h"
 
 void FunctionExprNode::writeNodeInfoToDot(std::ostream& os) const
 {
@@ -13,4 +14,8 @@ void FunctionExprNode::writeNodeInfoToDot(std::ostream& os) const
         os << DOT_ARC_THIS_OTHER_LABEL(parameter, "param " << index++);
         os << *parameter;
     }
+
+    // Write function body
+    os << DOT_ARC_THIS_OTHER_LABEL(body_, "body");
+    os << *body_;
 }

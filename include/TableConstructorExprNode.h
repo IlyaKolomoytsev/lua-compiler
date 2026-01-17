@@ -9,11 +9,12 @@ public:
     {
     }
 
-    [[nodiscard]] const TableFieldList& tableFields() const;
+    [[nodiscard]] const TableFieldList& tableFields() const { return *fields_; }
 
     /* Overridden methods */
 
     void writeNodeInfoToDot(std::ostream& os) const override;
+
 private:
     TableFieldList* fields_;
 };
