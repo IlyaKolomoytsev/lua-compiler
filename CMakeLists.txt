@@ -57,6 +57,8 @@ set(SOURCE_FILES
         src/node/StatementNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
+        src/node/generation/ExpressionBytecodeBuilder.cpp
+        src/node/generation/CodeGenContext.cpp
 )
 
 # Add files to executable target
