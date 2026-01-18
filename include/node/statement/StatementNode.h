@@ -182,10 +182,6 @@ public:
 
     static StatementNode* RepeatLoop(StatementNode* block, ExpressionNode* condition);
 
-    static StatementNode* Block(StatementNodeList* statements, StatementNode* finishStatement = nullptr);
-
-    static StatementNode* DoBlock(StatementNode* block);
-
     static StatementNode* GoTo(label_t label);
 
     static StatementNode* Label(label_t label);

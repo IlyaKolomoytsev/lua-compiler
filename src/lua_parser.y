@@ -35,6 +35,7 @@ void yyerror(const char *s) {
     std::string* String;
     ExpressionNode* expressionNode;
     StatementNode* statementNode;
+    BlockStmtNode* blockStatementNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
     DottedNameStruct* dottedNameStruct;
@@ -68,7 +69,7 @@ void yyerror(const char *s) {
 %nonassoc '(' ')'
 
 %type <statementNode> chunk;
-%type <statementNode> block;
+%type <blockStatementNode> block;
 %type <statementNode> stmt;
 %type <statementNode> finish_stmt;
 %type <statementNode> while_stmt;
@@ -103,7 +104,7 @@ void yyerror(const char *s) {
 chunk: block { Program::addChunk($1); }
      ;
 
-block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
+block: stmt_list_em finish_stmt { $$ = parser::Block($1, $2); }
      ;
 
 stmt: stmt ';' { $$ = $1; }
@@ -117,7 +118,7 @@ stmt: stmt ';' { $$ = $1; }
     | for_stmt { $$ = $1; }
     | while_stmt { $$ = $1; }
     | repeat_stmt { $$ = $1; }
-    | DO block END { $$ = StatementNode::DoBlock($2); }
+    | DO block END { $$ = $2; }
     | GOTO ID { $$ = StatementNode::GoTo($2); }
     | LABEL_SEP ID LABEL_SEP { $$ = StatementNode::Label($2); }
     ;

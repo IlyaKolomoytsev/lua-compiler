@@ -1,6 +1,7 @@
 #ifndef LUA_COMPILER_PARSER_H
 #define LUA_COMPILER_PARSER_H
 #include "NodeExpressionModule.h"
+#include "NodeStatementModule.h"
 
 namespace parser
 {
@@ -15,6 +16,15 @@ namespace parser
     {
         auto tableField = new TableFieldExprNode(table, new IdExprNode(methodName));
         return new FunctionCallExprNode(tableField, arguments, true);
+    }
+
+    inline BlockStmtNode* Block(StatementNodeList* statements, StatementNode* optionalFinishStatement)
+    {
+        if (optionalFinishStatement != nullptr)
+        {
+            statements->push_back(optionalFinishStatement);
+        }
+        return new BlockStmtNode(statements);
     }
 } // parser
 

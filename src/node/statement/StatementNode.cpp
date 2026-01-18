@@ -5,6 +5,7 @@
 #include "node/expression/FunctionCallExprNode.h"
 #include "node/NodeExpressionModule.h"
 #include "node/statement/AssignmentStmtNode.h"
+#include "node/statement/BlockStmtNode.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names)
 {
@@ -110,24 +111,6 @@ StatementNode* StatementNode::RepeatLoop(StatementNode* block, ExpressionNode* c
     repeat_loop_t* loop = &node->value_.repeatLoop_v;
     loop->condition = condition;
     loop->block = block;
-    return node;
-}
-
-StatementNode* StatementNode::Block(StatementNodeList* statements, StatementNode* finishStatement)
-{
-    StatementNode* node = new StatementNode(Type::Block);
-    if (finishStatement != nullptr)
-    {
-        statements->push_back(finishStatement);
-    }
-    node->value_.block_v = statements;
-    return node;
-}
-
-StatementNode* StatementNode::DoBlock(StatementNode* block)
-{
-    StatementNode* node = new StatementNode(Type::DoBlock);
-    node->value_.doBlock_v = block;
     return node;
 }
 
@@ -424,7 +407,7 @@ StatementNode* StatementNode::ForLoopIteratorConverter::generate()
     StatementNodeList* statements = new StatementNodeList();
     statements->push_back(getExplistAssigment());
     statements->push_back(getWhileLoop());
-    StatementNode* result = StatementNode::Block(statements);
+    StatementNode* result = new BlockStmtNode(statements);
     return result;
 }
 
@@ -450,7 +433,7 @@ StatementNode* StatementNode::ForLoopIteratorConverter::getWhileLoop()
     statements->push_back(block_);
     return StatementNode::WhileLoop(
         new BoolExprNode(true),
-        StatementNode::Block(statements)
+        new BlockStmtNode(statements)
     );
 }
 
@@ -480,7 +463,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getExitBranching(
         getFirstName(),
         new NilExprNode()
     );
-    StatementNode* successBlock = StatementNode::Block(
+    StatementNode* successBlock = new BlockStmtNode(
         new StatementNodeList{
             StatementNode::Break()
         }
