@@ -30,7 +30,7 @@ StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, Na
     function_declaration_global_t* function_declaration = &node->value_.function_declaration_global_v;
     function_declaration->funcName = funcName;
 
-    if (funcName->isMethod)
+    if (funcName->isMethod())
     {
         parList->push_front(new IdExprNode("self"));
     }
@@ -192,15 +192,15 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto& fd = value_.function_declaration_global_v;
 
             std::string fullName;
-            auto& ns = fd.funcName->names;
+            const auto& ns = fd.funcName->names();
             size_t count = ns.size();
 
-            bool isMethod = fd.funcName->isMethod;
+            bool isMethod = fd.funcName->isMethod();
 
             size_t i = 0;
-            for (auto* name : ns)
+            for (const auto& name : ns)
             {
-                fullName += *name;
+                fullName += name;
                 if (i + 1 < count)
                 {
                     if (isMethod && i + 1 == count - 1)

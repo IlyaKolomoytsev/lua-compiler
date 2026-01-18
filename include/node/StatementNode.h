@@ -1,5 +1,6 @@
 #ifndef LUA_COMPILER_STATEMENT_NODE_H
 #define LUA_COMPILER_STATEMENT_NODE_H
+#include <cassert>
 #include <functional>
 #include <vector>
 
@@ -12,8 +13,39 @@ using StatementNodeList = std::list<StatementNode*>;
 
 struct DottedNameStruct
 {
-    std::list<std::string*> names;
-    bool isMethod = false;
+    DottedNameStruct(const std::string& firstName)
+    {
+        names_.push_back(firstName);
+    }
+
+    DottedNameStruct* nextName(const std::string& name)
+    {
+        assert(!isMethod_);
+        names_.push_back(name);
+        return this;
+    }
+
+    DottedNameStruct* nextMethod(const std::string& name)
+    {
+        assert(!isMethod_);
+        isMethod_ = true;
+        names_.push_back(name);
+        return this;
+    }
+
+    [[nodiscard]] bool isMethod() const
+    {
+        return isMethod_;
+    }
+
+    [[nodiscard]] const std::list<std::string>& names() const
+    {
+        return names_;
+    }
+
+private:
+    std::list<std::string> names_;
+    bool isMethod_ = false;
 };
 
 struct ForRangeStruct

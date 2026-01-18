@@ -187,12 +187,12 @@ par_list_em: /* empty */ { $$ = new NameList(); }
            | par_list { $$ = $1; }
            ;
 
-dotted_name: ID { auto dn = new DottedNameStruct{}; dn->names.push_back($1); $$ = dn; }
-           | dotted_name '.' ID { $1->names.push_back($3); $$ = $1; }
+dotted_name: ID { $$ = new DottedNameStruct(std::move(*$1)); delete $1; }
+           | dotted_name '.' ID { $$ = $1->nextName(std::move(*$3)); delete $3; }
            ;
 
 func_name: dotted_name { $$ = $1; }
-         | dotted_name ':' ID { $1->isMethod = true; $1->names.push_back($3); $$ = $1; }
+         | dotted_name ':' ID { $$ = $1->nextMethod(std::move(*$3)); delete $3; }
          ;
 
 args: '(' expr_list_em ')' { $$ = $2; }
