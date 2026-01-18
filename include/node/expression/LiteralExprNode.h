@@ -27,4 +27,10 @@ private:
     V value_;
 };
 
+using IdExprNode = LiteralExprNode<std::string, ExpressionNode::Type::Id>;
+using IntegerExprNode = LiteralExprNode<int64_t, ExpressionNode::Type::Integer>;
+using FloatExprNode = LiteralExprNode<double, ExpressionNode::Type::Float>;
+using StringExprNode = LiteralExprNode<std::string, ExpressionNode::Type::String>;
+using BoolExprNode = LiteralExprNode<bool, ExpressionNode::Type::Boolean>;
+
 #endif //LUA_COMPILER_LITERAL_EXPR_NODE_H
