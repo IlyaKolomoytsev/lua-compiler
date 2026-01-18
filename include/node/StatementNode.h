@@ -13,7 +13,7 @@ using StatementNodeList = std::list<StatementNode*>;
 struct DottedNameStruct
 {
     std::list<std::string*> names;
-    bool isMethod;
+    bool isMethod = false;
 };
 
 struct ForRangeStruct
