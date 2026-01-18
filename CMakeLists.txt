@@ -53,14 +53,14 @@ add_subdirectory(jvm-class-builder)
 set(SOURCE_FILES
         src/main.cpp
         src/node/Node.cpp
-        src/node/ExpressionNode.cpp
+        src/node/expression/ExpressionNode.cpp
+        src/node/expression/FunctionCallExprNode.cpp
+        src/node/expression/FunctionExprNode.cpp
+        src/node/expression/TableConstructorExprNode.cpp
+        src/node/expression/TableFieldExprNode.cpp
         src/node/StatementNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
-        src/node/FunctionCallExprNode.cpp
-        src/node/FunctionExprNode.cpp
-        src/node/TableConstructorExprNode.cpp
-        src/node/TableFieldExprNode.cpp
 )
 
 # Add files to executable target
