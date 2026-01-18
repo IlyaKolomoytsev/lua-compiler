@@ -29,6 +29,18 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
         {
             PushFloat(expression);
         }
+    case ExpressionNode::Type::Boolean:
+        {
+            PushBool(expression);
+        }
+    case ExpressionNode::Type::String:
+        {
+            PushString(expression);
+        }
+    case ExpressionNode::Type::Nil:
+        {
+            PushNull(expression);
+        }
     default:
         break;
     }
