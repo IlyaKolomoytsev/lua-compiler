@@ -373,7 +373,7 @@ ExpressionNode* ExpressionNode::getTableFieldKey()
 
 ExpressionNode::function_call_t* ExpressionNode::getFunctionCall()
 {
-    bool correctType = getType() == Type::TableField;
+    bool correctType = getType() == Type::FunctionCall;
     assert(correctType);
     if (correctType)
     {
