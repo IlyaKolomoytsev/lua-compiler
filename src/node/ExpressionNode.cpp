@@ -454,6 +454,22 @@ ExpressionNode* ExpressionNode::getOperand()
     }
 }
 
+TableFieldList* ExpressionNode::getTableConstructor() const
+{
+    bool correctType = getType() == Type::TableConstructor;
+    assert(correctType);
+    if (correctType)
+    {
+        return value_.tableConstructor_v;
+    }
+    else
+    {
+        throw std::runtime_error(
+            "Can't get table constructor value because node is of wrong type."
+        );
+    }
+}
+
 void ExpressionNode::writeNodeInfoToDot(std::ostream& os) const
 {
     // write node information

@@ -216,6 +216,8 @@ public:
 
     ExpressionNode* getOperand();
 
+    [[nodiscard]] TableFieldList* getTableConstructor() const;
+
     /* Overridden methods */
 
     void writeNodeInfoToDot(std::ostream& os) const override;
