@@ -10,7 +10,7 @@ void ExpressionBytecodeBuilder::buildExpression(ExpressionNode* expression)
 
     for (auto child : children)
     {
-        build(child);
+        buildExpression(child);
     }
 
     build(expression);
