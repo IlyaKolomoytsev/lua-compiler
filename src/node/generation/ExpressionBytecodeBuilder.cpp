@@ -56,9 +56,10 @@ void ExpressionBytecodeBuilder::pushInt(const ExpressionNode* expression) const
     auto runtimeRefs = context_->runtime_;
 
     *code
+        << code->New(runtimeRefs.luaValueClass)
+        << code->Duplicate()
         << code->PushInt(static_cast<int32_t>(expression->getInteger()))
-        << code->InvokeStatic(runtimeRefs.integerValueOf)
-        << code->InvokeStatic(runtimeRefs.luaValueCreate);
+        << code->InvokeSpecial(runtimeRefs.luaValueCtorInt);
 }
 
 void ExpressionBytecodeBuilder::pushFloat(const ExpressionNode* expression) const
@@ -67,9 +68,10 @@ void ExpressionBytecodeBuilder::pushFloat(const ExpressionNode* expression) cons
     auto runtimeRefs = context_->runtime_;
 
     *code
+        << code->New(runtimeRefs.luaValueClass)
+        << code->Duplicate()
         << code->PushFloat(static_cast<float>(expression->getFloat()))
-        << code->InvokeStatic(runtimeRefs.floatValueOf)
-        << code->InvokeStatic(runtimeRefs.luaValueCreate);
+        << code->InvokeSpecial(runtimeRefs.luaValueCtorFloat);
 }
 
 void ExpressionBytecodeBuilder::pushBool(const ExpressionNode* expression) const
@@ -78,9 +80,10 @@ void ExpressionBytecodeBuilder::pushBool(const ExpressionNode* expression) const
     auto runtimeRefs = context_->runtime_;
 
     *code
+        << code->New(runtimeRefs.luaValueClass)
+        << code->Duplicate()
         << code->PushInt(expression->getBool() ? 1 : 0)
-        << code->InvokeStatic(runtimeRefs.booleanValueOf)
-        << code->InvokeStatic(runtimeRefs.luaValueCreate);
+        << code->InvokeSpecial(runtimeRefs.luaValueCtorBool);
 }
 
 void ExpressionBytecodeBuilder::pushString(ExpressionNode* expression) const
@@ -89,18 +92,21 @@ void ExpressionBytecodeBuilder::pushString(ExpressionNode* expression) const
     auto runtimeRefs = context_->runtime_;
 
     *code
+        << code->New(runtimeRefs.luaValueClass)
+        << code->Duplicate()
         << code->PushString(*expression->getString())
-        << code->InvokeStatic(runtimeRefs.luaValueCreate);
+        << code->InvokeSpecial(runtimeRefs.luaValueCtorString);
 }
 
-void ExpressionBytecodeBuilder::pushNull(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushNull() const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
 
     *code
-        << code->PushNull()
-        << code->InvokeStatic(runtimeRefs.luaValueCreate);
+        << code->New(runtimeRefs.luaValueClass)
+        << code->Duplicate()
+        << code->InvokeSpecial(runtimeRefs.luaValueCtorNil);
 }
 
 ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* expression)

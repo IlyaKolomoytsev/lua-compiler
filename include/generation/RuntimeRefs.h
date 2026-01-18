@@ -9,42 +9,53 @@
 
 using namespace jvm;
 
-struct RuntimeRefs {
+struct RuntimeRefs
+{
+    // classes
+    ConstantClass* luaValueClass = nullptr;
+
+    // constructors
+    ConstantMethodref* luaValueCtorNil = nullptr;
+    ConstantMethodref* luaValueCtorInt = nullptr;
+    ConstantMethodref* luaValueCtorFloat = nullptr;
+    ConstantMethodref* luaValueCtorBool = nullptr;
+    ConstantMethodref* luaValueCtorString = nullptr;
+
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
-    ConstantMethodref* integerValueOf = nullptr;
-    ConstantMethodref* floatValueOf = nullptr;
-    ConstantMethodref* booleanValueOf = nullptr;
 
-    void init(jvm::Class* owner) {
-        // Integer.valueOf(int) : Integer
-        integerValueOf = owner->getOrCreateMethodrefConstant(
-            "java/lang/Integer",
-            "valueOf",
-            DescriptorMethod(
-                DescriptorField("java/lang/Integer"),
-                {{DescriptorMethod::Int}}
-            )
+    void init(Class* owner)
+    {
+        luaValueClass = owner->getOrCreateClassConstant("com/luajvm/LuaValue");
+
+        luaValueCtorNil = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "<init>",
+            DescriptorMethod(std::nullopt, {}) // ()V
         );
 
-        // Float.valueOf(float) : Float
-        integerValueOf = owner->getOrCreateMethodrefConstant(
-            "java/lang/Float",
-            "valueOf",
-            DescriptorMethod(
-                DescriptorField("java/lang/Float"),
-                {{DescriptorMethod::Float}}
-            )
+        luaValueCtorInt = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "<init>",
+            DescriptorMethod(std::nullopt, {DescriptorMethod::Int})
         );
 
-        // Boolean.valueOf(boolean) : Boolean
-        integerValueOf = owner->getOrCreateMethodrefConstant(
-            "java/lang/Boolean",
-            "valueOf",
-            DescriptorMethod(
-                DescriptorField("java/lang/Boolean"),
-                {{DescriptorMethod::Boolean}}
-            )
+        luaValueCtorFloat = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "<init>",
+            DescriptorMethod(std::nullopt, {DescriptorMethod::Float})
+        );
+
+        luaValueCtorBool = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "<init>",
+            DescriptorMethod(std::nullopt, {DescriptorMethod::Boolean})
+        );
+
+        luaValueCtorString = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "<init>",
+            DescriptorMethod(std::nullopt, {DescriptorField("java/lang/String")})
         );
 
         // LuaValue.create(Object) : LuaValue
