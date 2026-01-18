@@ -4,7 +4,7 @@
 #include <string>
 #include <sys/types.h>
 
-#include "Node.h"
+#include "node/Node.h"
 
 class ExpressionNode;
 

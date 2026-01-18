@@ -1,8 +1,8 @@
 #ifndef LUA_COMPILER_LITERAL_EXPR_NODE_H
 #define LUA_COMPILER_LITERAL_EXPR_NODE_H
 
-#include "ExpressionNode.h"
-#include "DotMacros.h"
+#include "node/expression/ExpressionNode.h"
+#include "node/DotMacros.h"
 
 template <typename V, ExpressionNode::Type T>
 class LiteralExprNode : public ExpressionNode

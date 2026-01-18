@@ -1,6 +1,6 @@
 #ifndef LUA_COMPILER_PROGRAM_H
 #define LUA_COMPILER_PROGRAM_H
-#include "StatementNode.h"
+#include "node/StatementNode.h"
 
 class Program {
 public:

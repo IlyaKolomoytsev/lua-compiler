@@ -1,4 +1,4 @@
-#include "Node.h"
+#include "node/Node.h"
 
 Node::Node() : id(++maxId)
 {

@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 
-#include "ExpressionNode.h"
+#include "expression/ExpressionNode.h"
 #include "NodeExpressionModule.h"
 
 class StatementNode;

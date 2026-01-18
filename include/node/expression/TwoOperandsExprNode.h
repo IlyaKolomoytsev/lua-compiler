@@ -2,7 +2,7 @@
 #define LUA_COMPILER_TWO_OPERANDS_EXPR_NODE_H
 #include "ExpressionNodeOf.h"
 #include "FixedString.h"
-#include "DotMacros.h"
+#include "node/DotMacros.h"
 
 template <ExpressionNode::Type T, fixed_string N>
 class TwoOperandsExprNode : public ExpressionNodeOf<T, N>

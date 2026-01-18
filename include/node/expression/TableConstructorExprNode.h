@@ -1,6 +1,6 @@
 #ifndef LUA_COMPILER_TABLE_CONSTRUCTOR_EXPR_NODE_H
 #define LUA_COMPILER_TABLE_CONSTRUCTOR_EXPR_NODE_H
-#include "ExpressionNode.h"
+#include "node/expression/ExpressionNode.h"
 
 class TableConstructorExprNode : public ExpressionNode
 {

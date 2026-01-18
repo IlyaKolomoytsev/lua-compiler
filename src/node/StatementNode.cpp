@@ -1,9 +1,9 @@
-#include "StatementNode.h"
+#include "node/StatementNode.h"
 
 #include <cassert>
-#include "DotMacros.h"
-#include "FunctionCallExprNode.h"
-#include "NodeExpressionModule.h"
+#include "node/DotMacros.h"
+#include "node/expression/FunctionCallExprNode.h"
+#include "node/NodeExpressionModule.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, NameList* names)
 {

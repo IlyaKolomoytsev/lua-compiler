@@ -1,5 +1,5 @@
-#include "FunctionCallExprNode.h"
-#include "DotMacros.h"
+#include "node/expression/FunctionCallExprNode.h"
+#include "node/DotMacros.h"
 
 void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
 {

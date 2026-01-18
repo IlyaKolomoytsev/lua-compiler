@@ -1,10 +1,10 @@
-#include "ExpressionNode.h"
+#include "node/expression/ExpressionNode.h"
 
 #include <cassert>
 #include <stdexcept>
 
-#include "DotMacros.h"
-#include "StatementNode.h"
+#include "node/DotMacros.h"
+#include "node/StatementNode.h"
 
 ExpressionNode::ExpressionNode(Type type) : type_(type)
 {

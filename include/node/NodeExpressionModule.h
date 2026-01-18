@@ -1,14 +1,14 @@
 #ifndef LUA_COMPILER_NODEMODULE_H
 #define LUA_COMPILER_NODEMODULE_H
-#include "ExpressionNode.h"
-#include "LiteralExprNode.h"
-#include "ExpressionNodeOf.h"
-#include "TwoOperandsExprNode.h"
-#include "OneOperandExprNode.h"
-#include "FunctionExprNode.h"
-#include "FunctionCallExprNode.h"
-#include "TableConstructorExprNode.h"
-#include "TableFieldExprNode.h"
+#include "node/expression/ExpressionNode.h"
+#include "node/expression/LiteralExprNode.h"
+#include "node/expression/ExpressionNodeOf.h"
+#include "node/expression/TwoOperandsExprNode.h"
+#include "node/expression/OneOperandExprNode.h"
+#include "node/expression/FunctionExprNode.h"
+#include "node/expression/FunctionCallExprNode.h"
+#include "node/expression/TableConstructorExprNode.h"
+#include "node/expression/TableFieldExprNode.h"
 
 // Literal expression nodes
 using IdExprNode = LiteralExprNode<std::string, ExpressionNode::Type::Id>;

@@ -57,7 +57,6 @@ set(SOURCE_FILES
         src/node/StatementNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
-        include/LiteralExprNode.h
         src/node/FunctionCallExprNode.cpp
         src/node/FunctionExprNode.cpp
         src/node/TableConstructorExprNode.cpp

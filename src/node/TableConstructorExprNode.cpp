@@ -1,5 +1,5 @@
-#include "TableConstructorExprNode.h"
-#include "DotMacros.h"
+#include "node/expression/TableConstructorExprNode.h"
+#include "node/DotMacros.h"
 
 void TableConstructorExprNode::writeNodeInfoToDot(std::ostream& os) const
 {

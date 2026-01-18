@@ -2,8 +2,8 @@
 #define LUA_COMPILER_FUNCTION_CALL_EXPR_NODE_H
 #include <complex>
 
-#include "ExpressionNode.h"
-#include "TableFieldExprNode.h"
+#include "node/expression/ExpressionNode.h"
+#include "node/expression/TableConstructorExprNode.h"
 
 using FunctionArgumentsList = std::list<ExpressionNode*>;
 

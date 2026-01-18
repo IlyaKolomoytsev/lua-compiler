@@ -1,9 +1,9 @@
 #ifndef LUA_COMPILER_EXPRESSION_NODE_OF_H
 #define LUA_COMPILER_EXPRESSION_NODE_OF_H
-#include "DotMacros.h"
-#include "Node.h"
+#include "node/DotMacros.h"
+#include "node/Node.h"
 #include "FixedString.h"
-#include "ExpressionNode.h"
+#include "node/expression/ExpressionNode.h"
 
 template <ExpressionNode::Type T, fixed_string N>
 class ExpressionNodeOf : public ExpressionNode
