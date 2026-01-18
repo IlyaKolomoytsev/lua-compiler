@@ -68,16 +68,6 @@ StatementNode* StatementNode::BranchingChain(StatementNode* elseifChain, Stateme
     return elseifChain;
 }
 
-StatementNode* StatementNode::ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block)
-{
-    StatementNode* node = new StatementNode(Type::ForLoopClassic);
-    for_loop_t* loop = &node->value_.forLoop_v;
-    loop->iteratorVariable = id;
-    loop->range = range;
-    loop->block = block;
-    return node;
-}
-
 StatementNode* StatementNode::ForLoop(ExpressionNodeList* names, ExpressionNodeList* explist, StatementNode* block)
 {
     auto converter = ForLoopIteratorConverter(names, explist, block);
@@ -275,24 +265,6 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             {
                 os << *branching.failureBlock;
             }
-            break;
-        }
-    case Type::ForLoopIterator:
-        {
-            auto loop = value_.forLoop_v;
-            auto range = loop.range;
-            // write arcs
-            os << DOT_ARC_THIS_OTHER_LABEL(loop.iteratorVariable, "variable");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.start, "range start");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.finish, "range end");
-            os << DOT_ARC_THIS_OTHER_LABEL(range.step, "range step");
-            os << DOT_ARC_THIS_OTHER_LABEL(loop.block, "block");
-            // write nodes recursively
-            os << *loop.iteratorVariable;
-            os << *range.start;
-            os << *range.finish;
-            os << *range.step;
-            os << *loop.block;
             break;
         }
     case Type::WhileLoop:

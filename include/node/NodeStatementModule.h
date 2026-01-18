@@ -5,5 +5,6 @@
 #include "node/statement/BlockStmtNode.h"
 #include "node/statement/BranchingStmtNode.h"
 #include "node/statement/BreakStmtNode.h"
+#include "node/statement/ForLoopClassicStmtNode.h"
 
 #endif //LUA_COMPILER_NODE_STATEMENT_MODULE_H

@@ -48,13 +48,6 @@ private:
     bool isMethod_ = false;
 };
 
-struct ForRangeStruct
-{
-    ExpressionNode* start;
-    ExpressionNode* finish;
-    ExpressionNode* step;
-};
-
 enum class Scope
 {
     Global,
@@ -101,13 +94,6 @@ class StatementNode : public Node
         StatementNode* failureBlock;
     };
 
-    struct for_loop_t
-    {
-        ExpressionNode* iteratorVariable;
-        ForRangeStruct range;
-        StatementNode* block;
-    };
-
     struct simple_loop
     {
         ExpressionNode* condition;
@@ -128,7 +114,6 @@ class StatementNode : public Node
         function_declaration_local_t function_declaration_local_v;
         function_call_t functionCall_v;
         branching_t branching_v;
-        for_loop_t forLoop_v;
         while_loop_t whileLoop_v;
         repeat_loop_t repeatLoop_v;
         block_t block_v;
@@ -168,8 +153,6 @@ public:
     static StatementNode* FunctionCall(ExpressionNode* exprCall);
 
     static StatementNode* BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock);
-
-    static StatementNode* ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block);
 
     static StatementNode* ForLoop(ExpressionNodeList* names, ExpressionNodeList* iterator, StatementNode* block);
 

@@ -145,8 +145,8 @@ elseif_stmt_list: elseif_stmt { $$ = $1; }
                 | elseif_stmt_list elseif_stmt {$$ = parser::ContinueElseifBranching($1, $2); }
                 ;
 
-for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = new IntegerExprNode(1); $$ = StatementNode::ForLoop(new IdExprNode($2), r, $8); }
-        | FOR ID '=' expr ',' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = $8;  $$ = StatementNode::ForLoop(new IdExprNode($2), r, $10); }
+for_stmt: FOR ID '=' expr ',' expr DO block END { $$ = new ForLoopClassicStmtNode(new IdExprNode($2), {$4, $6, new IntegerExprNode(1)}, $8); }
+        | FOR ID '=' expr ',' expr ',' expr DO block END { $$ = new ForLoopClassicStmtNode(new IdExprNode($2), {$4, $6, $8}, $10); }
         | FOR name_list IN expr_list DO block END { $$ = StatementNode::ForLoop($2, $4, $6); }
         ;
 
