@@ -70,7 +70,7 @@ StatementNode* StatementNode::BranchingChain(StatementNode* elseifChain, Stateme
 
 StatementNode* StatementNode::ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block)
 {
-    StatementNode* node = new StatementNode(Type::ForLoop);
+    StatementNode* node = new StatementNode(Type::ForLoopClassic);
     for_loop_t* loop = &node->value_.forLoop_v;
     loop->iteratorVariable = id;
     loop->range = range;
@@ -277,7 +277,7 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             }
             break;
         }
-    case Type::ForLoop:
+    case Type::ForLoopIterator:
         {
             auto loop = value_.forLoop_v;
             auto range = loop.range;
@@ -517,7 +517,7 @@ std::string to_string(StatementNode::Type type)
         return "FunctionDeclarationLocal";
     case StatementNode::Type::Branching:
         return "Branching";
-    case StatementNode::Type::ForLoop:
+    case StatementNode::Type::ForLoopClassic:
         return "ForLoop";
     case StatementNode::Type::WhileLoop:
         return "WhileLoop";
