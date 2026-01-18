@@ -23,6 +23,18 @@ struct RuntimeRefs
 
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
+    ConstantMethodref* luaValueAdd = nullptr;
+    ConstantMethodref* luaValueSub = nullptr;
+    ConstantMethodref* luaValueMul = nullptr;
+    ConstantMethodref* luaValueDiv = nullptr;
+    ConstantMethodref* luaValueIntegerDiv = nullptr;
+    ConstantMethodref* luaValueMod = nullptr;
+    ConstantMethodref* luaValuePow = nullptr;
+    ConstantMethodref* luaValueConcat = nullptr;
+
+    // Field descriptors
+    DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
+
 
     void init(Class* owner)
     {
@@ -62,11 +74,76 @@ struct RuntimeRefs
         luaValueCreate = owner->getOrCreateMethodrefConstant(
             "com/luajvm/LuaValue",
             "create",
-            jvm::DescriptorMethod(
+            DescriptorMethod(
                 DescriptorField("com/luajvm/LuaValue"),
                 {{"java/lang/Object"}}
             )
         );
+
+        // LuaValue.add(LuaValue, LuaValue): LuaValue
+        luaValueAdd = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "add",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.sub(LuaValue, LuaValue): LuaValue
+        luaValueSub = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "sub",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.mul(LuaValue, LuaValue): LuaValue
+        luaValueMul = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "mul",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.div(LuaValue, LuaValue): LuaValue
+        luaValueDiv = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "div",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.idiv(LuaValue, LuaValue): LuaValue
+        luaValueIntegerDiv = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "idiv",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.mod(LuaValue, LuaValue): LuaValue
+        luaValueMod = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "mod",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.pow(LuaValue, LuaValue): LuaValue
+        luaValuePow = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "pow",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.concat(LuaValue, LuaValue): LuaValue
+        luaValueConcat = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "concat",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
     }
 };
 #endif //LUA_COMPILER_RUNTIME_REFS_H

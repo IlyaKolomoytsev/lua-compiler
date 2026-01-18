@@ -11,6 +11,7 @@ public:
         : context_(context){}
 
     void buildExpression(ExpressionNode* expression);
+
 private:
     void build(ExpressionNode* expression);
 
@@ -20,6 +21,16 @@ private:
     void pushString(ExpressionNode* expression) const;
     void pushNull() const;
 
+    void sum() const;
+    void sub() const;
+    void mul() const;
+    void div() const;
+    void idiv() const;
+    void mod() const;
+    void pow() const;
+    void concat() const;
+
+    void emitBinaryCall(ConstantMethodref* methodref) const;
     ExpressionNodeList getChildren(ExpressionNode* expression);
 
     CodeGenContext* context_;
