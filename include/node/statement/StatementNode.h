@@ -160,8 +160,6 @@ public:
 
     static StatementNode* Declaration(Scope scope, ExpressionNodeList* names);
 
-    static StatementNode* Assignment(Scope scope, ExpressionNodeList* names, ExpressionNodeList* values);
-
     static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, ExpressionNodeList* parList, StatementNode* block);
 
     static StatementNode* FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block);
@@ -202,9 +200,10 @@ public:
 
     void writeNodeInfoToDot(std::ostream& os) const override;
 
-private:
+protected:
     explicit StatementNode(Type type);
 
+private:
     /**
      * Class interpret this statement
      * @code

@@ -22,6 +22,7 @@ void yyerror(const char *s) {
 %code requires {
     #include <string>
     #include "node/NodeExpressionModule.h"
+    #include "node/NodeStatementModule.h"
     #include "node/statement/StatementNode.h"
     #include "node/Program.h"
     #include "node/Parser.h"
@@ -106,12 +107,12 @@ block: stmt_list_em finish_stmt { $$ = StatementNode::Block($1, $2); }
      ;
 
 stmt: stmt ';' { $$ = $1; }
-    | variable_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Global, $1, $3); }
+    | variable_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Global, $1, $3); }
     | function_call { $$ = StatementNode::FunctionCall($1); }
     | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
     | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(new IdExprNode($3), $5, $7); }
     | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
-    | LOCAL name_list '=' expr_list { $$ = StatementNode::Assignment(Scope::Local, $2, $4); }
+    | LOCAL name_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
     | for_stmt { $$ = $1; }
     | while_stmt { $$ = $1; }

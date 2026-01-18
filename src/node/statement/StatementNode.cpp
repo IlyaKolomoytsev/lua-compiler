@@ -4,6 +4,7 @@
 #include "node/DotMacros.h"
 #include "node/expression/FunctionCallExprNode.h"
 #include "node/NodeExpressionModule.h"
+#include "node/statement/AssignmentStmtNode.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names)
 {
@@ -11,16 +12,6 @@ StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names
     declaration_t* declaration = &node->value_.declaration_v;
     declaration->names = names;
     declaration->scope = scope;
-    return node;
-}
-
-StatementNode* StatementNode::Assignment(Scope scope, ExpressionNodeList* names, ExpressionNodeList* values)
-{
-    StatementNode* node = new StatementNode(Type::Assignment);
-    assignment_t* assignment = &node->value_.assignment_v;
-    assignment->scope = scope;
-    assignment->names = names;
-    assignment->values = values;
     return node;
 }
 
@@ -439,7 +430,7 @@ StatementNode* StatementNode::ForLoopIteratorConverter::generate()
 
 inline StatementNode* StatementNode::ForLoopIteratorConverter::getExplistAssigment()
 {
-    return StatementNode::Assignment(
+    return new AssignmentStmtNode(
         Scope::Local,
         new ExpressionNodeList{
             getF(),
@@ -474,7 +465,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getInteratorResul
         false
     );
 
-    StatementNode* assignment = StatementNode::Assignment(
+    StatementNode* assignment = new AssignmentStmtNode(
         Scope::Local,
         names_,
         new ExpressionNodeList{fCall}
@@ -502,7 +493,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getExitBranching(
 
 inline StatementNode* StatementNode::ForLoopIteratorConverter::getVarAssigment()
 {
-    return StatementNode::Assignment(
+    return new AssignmentStmtNode(
         Scope::Global,
         new ExpressionNodeList{getVar()},
         new ExpressionNodeList{getFirstName()}

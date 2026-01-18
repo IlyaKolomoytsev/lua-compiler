@@ -59,6 +59,7 @@ set(SOURCE_FILES
         src/node/expression/TableConstructorExprNode.cpp
         src/node/expression/TableFieldExprNode.cpp
         src/node/statement/StatementNode.cpp
+        src/node/statement/AssignmentStmtNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
 )
