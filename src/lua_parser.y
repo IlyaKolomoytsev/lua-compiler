@@ -36,6 +36,7 @@ void yyerror(const char *s) {
     ExpressionNode* expressionNode;
     StatementNode* statementNode;
     BlockStmtNode* blockStatementNode;
+    BranchingStmtNode* branchingStmtNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
     DottedNameStruct* dottedNameStruct;
@@ -76,8 +77,8 @@ void yyerror(const char *s) {
 %type <statementNode> repeat_stmt;
 %type <statementNode> for_stmt;
 %type <statementNode> if_stmt;
-%type <statementNode> elseif_stmt;
-%type <statementNode> elseif_stmt_list;
+%type <branchingStmtNode> elseif_stmt;
+%type <branchingStmtNode> elseif_stmt_list;
 %type <statementNodeList> stmt_list;
 %type <statementNodeList> stmt_list_em;
 %type <expressionNode> expr;
@@ -131,17 +132,17 @@ stmt_list_em: /* empty*/ { $$ = new StatementNodeList{}; }
             | stmt_list { $$ = $1; }
             ;
 
-if_stmt: IF expr THEN block END { $$ = StatementNode::Branching($2, $4); }
-       | IF expr THEN block ELSE block END { $$ = StatementNode::Branching($2, $4, $6); }
-       | IF expr THEN block elseif_stmt_list END { $$ = StatementNode::Branching($2, $4, $5); }
-       | IF expr THEN block elseif_stmt_list ELSE block END { $$ = StatementNode::Branching($2, $4, StatementNode::BranchingChain($5, $7)); }
+if_stmt: IF expr THEN block END { $$ = new BranchingStmtNode($2, $4); }
+       | IF expr THEN block ELSE block END { $$ = new BranchingStmtNode($2, $4, $6); }
+       | IF expr THEN block elseif_stmt_list END { $$ = new BranchingStmtNode($2, $4, $5); }
+       | IF expr THEN block elseif_stmt_list ELSE block END { $$ = parser::IfElseifChainElse($2, $4, $5, $7); }
        ;
 
-elseif_stmt: ELSEIF expr THEN block { $$ = StatementNode::Branching($2, $4); }
+elseif_stmt: ELSEIF expr THEN block { $$ = new BranchingStmtNode($2, $4); }
            ;
 
 elseif_stmt_list: elseif_stmt { $$ = $1; }
-                | elseif_stmt_list elseif_stmt {$$ = StatementNode::BranchingChain($1, $2); }
+                | elseif_stmt_list elseif_stmt {$$ = parser::ContinueElseifBranching($1, $2); }
                 ;
 
 for_stmt: FOR ID '=' expr ',' expr DO block END { ForRangeStruct r; r.start = $4; r.finish = $6; r.step = new IntegerExprNode(1); $$ = StatementNode::ForLoop(new IdExprNode($2), r, $8); }

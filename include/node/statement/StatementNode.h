@@ -166,12 +166,6 @@ public:
 
     static StatementNode* FunctionCall(ExpressionNode* exprCall);
 
-    static StatementNode* Branching(
-        ExpressionNode* condition,
-        StatementNode* successBlock,
-        StatementNode* failureBlock = nullptr
-    );
-
     static StatementNode* BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock);
 
     static StatementNode* ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block);

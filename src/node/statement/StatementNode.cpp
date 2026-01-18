@@ -6,6 +6,7 @@
 #include "node/NodeExpressionModule.h"
 #include "node/statement/AssignmentStmtNode.h"
 #include "node/statement/BlockStmtNode.h"
+#include "node/statement/BranchingStmtNode.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names)
 {
@@ -47,20 +48,6 @@ StatementNode* StatementNode::FunctionCall(ExpressionNode* callExpr)
 {
     StatementNode* node = new StatementNode(Type::FunctionCall);
     node->value_.functionCall_v = callExpr;
-    return node;
-}
-
-StatementNode* StatementNode::Branching(
-    ExpressionNode* condition,
-    StatementNode* successBlock,
-    StatementNode* failureBlock
-)
-{
-    StatementNode* node = new StatementNode(Type::Branching);
-    branching_t* branching = &node->value_.branching_v;
-    branching->condition = condition;
-    branching->successBlock = successBlock;
-    branching->failureBlock = failureBlock;
     return node;
 }
 
@@ -463,12 +450,12 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getExitBranching(
         getFirstName(),
         new NilExprNode()
     );
-    StatementNode* successBlock = new BlockStmtNode(
+    BlockStmtNode* successBlock = new BlockStmtNode(
         new StatementNodeList{
             StatementNode::Break()
         }
     );
-    return StatementNode::Branching(
+    return new BranchingStmtNode(
         condition,
         successBlock
     );

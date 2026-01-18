@@ -26,6 +26,19 @@ namespace parser
         }
         return new BlockStmtNode(statements);
     }
+
+    inline BranchingStmtNode* IfElseifChainElse(ExpressionNode* condition, BlockStmtNode* successBlock,
+                                                    BranchingStmtNode* elseifChain, BlockStmtNode* elseBlock)
+    {
+        elseifChain->appendElseToDeepestIf(elseBlock);
+        return new BranchingStmtNode(condition, successBlock, elseifChain);
+    }
+
+    inline BranchingStmtNode* ContinueElseifBranching(BranchingStmtNode* elseIfChain, BranchingStmtNode* newChain)
+    {
+        elseIfChain->appendElseToDeepestIf(newChain);
+        return elseIfChain;
+    }
 } // parser
 
 #endif //LUA_COMPILER_PARSER_H
