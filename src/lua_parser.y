@@ -36,7 +36,6 @@ void yyerror(const char *s) {
     StatementNode* statementNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
-    NameList* nameList;
     DottedNameStruct* dottedNameStruct;
     ExpressionNode* variable;
     TableField* tableField;
@@ -84,11 +83,11 @@ void yyerror(const char *s) {
 %type <expressionNodeList> expr_list;
 %type <expressionNodeList> expr_list_em;
 %type <expressionNodeList> args;
-%type <nameList> variable_list;
-%type <nameList> variable_list_em;
-%type <nameList> name_list;
-%type <nameList> par_list;
-%type <nameList> par_list_em;
+%type <expressionNodeList> variable_list;
+%type <expressionNodeList> variable_list_em;
+%type <expressionNodeList> name_list;
+%type <expressionNodeList> par_list;
+%type <expressionNodeList> par_list_em;
 %type <dottedNameStruct> dotted_name;
 %type <dottedNameStruct> func_name;
 %type <variable> variable;
@@ -160,7 +159,7 @@ finish_stmt: /* empty */ { $$ = nullptr; }
            | finish_stmt ';' { $$ = $1; }
            ;
 
-name_list: ID { $$ = new NameList{ new IdExprNode($1) }; }
+name_list: ID { $$ = new ExpressionNodeList{ new IdExprNode($1) }; }
          | name_list ',' ID { ($1)->push_back( new IdExprNode($3) ); $$ = $1; }
          ;
 
@@ -171,20 +170,20 @@ variable: ID { $$ = new IdExprNode($1); }
         | function_call '[' expr ']' { $$ = new TableFieldExprNode($1, $3); }
         ;
 
-variable_list: variable { $$ = new NameList{$1}; }
+variable_list: variable { $$ = new ExpressionNodeList{$1}; }
        | variable_list ',' variable { ($1)->push_back($3); $$ = $1; }
        ;
 
-variable_list_em: /* empty */ { $$ = new NameList(); }
+variable_list_em: /* empty */ { $$ = new ExpressionNodeList(); }
                 | variable_list { $$ = $1; }
                 ;
 
 par_list: name_list { $$ = $1; }
         | name_list ',' VARARG { ($1)->push_back(new VarargExprNode()); $$ = $1; }
-        | VARARG { $$ = new NameList{new VarargExprNode()}; }
+        | VARARG { $$ = new ExpressionNodeList{new VarargExprNode()}; }
         ;
 
-par_list_em: /* empty */ { $$ = new NameList(); }
+par_list_em: /* empty */ { $$ = new ExpressionNodeList(); }
            | par_list { $$ = $1; }
            ;
 

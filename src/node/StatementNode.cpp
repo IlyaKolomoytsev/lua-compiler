@@ -5,7 +5,7 @@
 #include "node/expression/FunctionCallExprNode.h"
 #include "node/NodeExpressionModule.h"
 
-StatementNode* StatementNode::Declaration(Scope scope, NameList* names)
+StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names)
 {
     StatementNode* node = new StatementNode(Type::Declaration);
     declaration_t* declaration = &node->value_.declaration_v;
@@ -14,7 +14,7 @@ StatementNode* StatementNode::Declaration(Scope scope, NameList* names)
     return node;
 }
 
-StatementNode* StatementNode::Assignment(Scope scope, NameList* names, ExpressionNodeList* values)
+StatementNode* StatementNode::Assignment(Scope scope, ExpressionNodeList* names, ExpressionNodeList* values)
 {
     StatementNode* node = new StatementNode(Type::Assignment);
     assignment_t* assignment = &node->value_.assignment_v;
@@ -24,7 +24,7 @@ StatementNode* StatementNode::Assignment(Scope scope, NameList* names, Expressio
     return node;
 }
 
-StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block)
+StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, ExpressionNodeList* parList, StatementNode* block)
 {
     StatementNode* node = new StatementNode(Type::FunctionDeclarationGlobal);
     function_declaration_global_t* function_declaration = &node->value_.function_declaration_global_v;
@@ -40,7 +40,7 @@ StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, Na
     return node;
 }
 
-StatementNode* StatementNode::FunctionDeclaration(IdExprNode* id, NameList* parList, StatementNode* block)
+StatementNode* StatementNode::FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block)
 {
     StatementNode* node = new StatementNode(Type::FunctionDeclarationLocal);
     function_declaration_local_t* function_declaration = &node->value_.function_declaration_local_v;
@@ -98,7 +98,7 @@ StatementNode* StatementNode::ForLoop(ExpressionNode* id, ForRangeStruct range, 
     return node;
 }
 
-StatementNode* StatementNode::ForLoop(NameList* names, ExpressionNodeList* explist, StatementNode* block)
+StatementNode* StatementNode::ForLoop(ExpressionNodeList* names, ExpressionNodeList* explist, StatementNode* block)
 {
     auto converter = ForLoopIteratorConverter(names, explist, block);
     return converter.generate();
@@ -412,12 +412,12 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
 }
 
 StatementNode::ForLoopIteratorConverter::ForLoopIteratorConverter(
-    NameList* names, ExpressionNodeList* explist, StatementNode* block
+    ExpressionNodeList* names, ExpressionNodeList* explist, StatementNode* block
 ) : names_(names), explist_(explist), block_(block)
 {
     // assert for name list
-    bool correctNameListSize = names->size() > 0;
-    assert(correctNameListSize);
+    bool correctExpressionNodeListSize = names->size() > 0;
+    assert(correctExpressionNodeListSize);
 
     // assert for expression list
     bool correctExplistSize = explist->size() > 0;
@@ -441,7 +441,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getExplistAssigme
 {
     return StatementNode::Assignment(
         Scope::Local,
-        new NameList{
+        new ExpressionNodeList{
             getF(),
             getS(),
             getVar(),
@@ -504,7 +504,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getVarAssigment()
 {
     return StatementNode::Assignment(
         Scope::Global,
-        new NameList{getVar()},
+        new ExpressionNodeList{getVar()},
         new ExpressionNodeList{getFirstName()}
     );
 }

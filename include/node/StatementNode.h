@@ -68,27 +68,27 @@ class StatementNode : public Node
     struct assignment_t
     {
         Scope scope;
-        NameList* names;
+        ExpressionNodeList* names;
         ExpressionNodeList* values;
     };
 
     struct declaration_t
     {
         Scope scope;
-        NameList* names;
+        ExpressionNodeList* names;
     };
 
     struct function_declaration_global_t
     {
         DottedNameStruct* funcName;
-        NameList* parList;
+        ExpressionNodeList* parList;
         StatementNode* block;
     };
 
     struct function_declaration_local_t
     {
         IdExprNode* id;
-        NameList* parList;
+        ExpressionNodeList* parList;
         StatementNode* block;
     };
 
@@ -158,13 +158,13 @@ public:
         Return,
     };
 
-    static StatementNode* Declaration(Scope scope, NameList* names);
+    static StatementNode* Declaration(Scope scope, ExpressionNodeList* names);
 
-    static StatementNode* Assignment(Scope scope, NameList* names, ExpressionNodeList* values);
+    static StatementNode* Assignment(Scope scope, ExpressionNodeList* names, ExpressionNodeList* values);
 
-    static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, NameList* parList, StatementNode* block);
+    static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, ExpressionNodeList* parList, StatementNode* block);
 
-    static StatementNode* FunctionDeclaration(IdExprNode* id, NameList* parList, StatementNode* block);
+    static StatementNode* FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block);
 
     static StatementNode* FunctionCall(ExpressionNode* exprCall);
 
@@ -178,7 +178,7 @@ public:
 
     static StatementNode* ForLoop(ExpressionNode* id, ForRangeStruct range, StatementNode* block);
 
-    static StatementNode* ForLoop(NameList* names, ExpressionNodeList* iterator, StatementNode* block);
+    static StatementNode* ForLoop(ExpressionNodeList* names, ExpressionNodeList* iterator, StatementNode* block);
 
     static StatementNode* WhileLoop(ExpressionNode* condition, StatementNode* block);
 
@@ -232,7 +232,7 @@ private:
          * @param explist expression list.
          * @param block for body block statement.
          */
-        ForLoopIteratorConverter(NameList* names, ExpressionNodeList* explist, StatementNode* block);
+        ForLoopIteratorConverter(ExpressionNodeList* names, ExpressionNodeList* explist, StatementNode* block);
 
         /**
          * Generate converted for loop statement node.
@@ -316,7 +316,7 @@ private:
 
         ExpressionNode* getFirstName();
 
-        NameList* names_;
+        ExpressionNodeList* names_;
         ExpressionNodeList* explist_;
         StatementNode* block_;
     };

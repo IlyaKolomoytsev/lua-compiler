@@ -5,12 +5,12 @@
 class FunctionExprNode : public ExpressionNode
 {
 public:
-    FunctionExprNode(NameList* parameters, StatementNode* body) :
+    FunctionExprNode(ExpressionNodeList* parameters, StatementNode* body) :
         ExpressionNode(Type::FunctionLiteral), parameters_(parameters), body_(body)
     {
     }
 
-    [[nodiscard]] const NameList& parameters() const { return *parameters_; };
+    [[nodiscard]] const ExpressionNodeList& parameters() const { return *parameters_; };
     [[nodiscard]] StatementNode* body() const { return body_; }
 
     /* Overridden methods */
@@ -18,7 +18,7 @@ public:
     void writeNodeInfoToDot(std::ostream& os) const override;
 
 private:
-    NameList* parameters_;
+    ExpressionNodeList* parameters_;
     StatementNode* body_;
 };
 
