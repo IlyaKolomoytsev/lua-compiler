@@ -22,27 +22,27 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
     {
     case ExpressionNode::Type::Integer:
         {
-            PushInt(expression);
+            pushInt(expression);
             break;
         }
     case ExpressionNode::Type::Float:
         {
-            PushFloat(expression);
+            pushFloat(expression);
             break;
         }
     case ExpressionNode::Type::Boolean:
         {
-            PushBool(expression);
+            pushBool(expression);
             break;
         }
     case ExpressionNode::Type::String:
         {
-            PushString(expression);
+            pushString(expression);
             break;
         }
     case ExpressionNode::Type::Nil:
         {
-            PushNull(expression);
+            pushNull(expression);
             break;
         }
     default:
@@ -50,7 +50,7 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
     }
 }
 
-void ExpressionBytecodeBuilder::PushInt(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushInt(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -61,7 +61,7 @@ void ExpressionBytecodeBuilder::PushInt(const ExpressionNode* expression) const
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushFloat(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushFloat(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -72,7 +72,7 @@ void ExpressionBytecodeBuilder::PushFloat(const ExpressionNode* expression) cons
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushBool(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushBool(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -83,7 +83,7 @@ void ExpressionBytecodeBuilder::PushBool(const ExpressionNode* expression) const
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushString(ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushString(ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -93,7 +93,7 @@ void ExpressionBytecodeBuilder::PushString(ExpressionNode* expression) const
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushNull(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushNull(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
