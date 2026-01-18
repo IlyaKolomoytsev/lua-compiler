@@ -24,6 +24,7 @@ void yyerror(const char *s) {
     #include "node/NodeExpressionModule.h"
     #include "node/StatementNode.h"
     #include "node/Program.h"
+    #include "node/Parser.h"
 }
 
 %union {
@@ -200,10 +201,10 @@ args: '(' expr_list_em ')' { $$ = $2; }
     | STRING { $$ = new ExpressionNodeList { new StringExprNode($1)}; }
     ;
 
-function_call: variable args { $$ = new FunctionCallExprNode($1, $2, false); }
-             | variable ':' ID args { $$ = new FunctionCallExprNode(new TableFieldExprNode($1, new IdExprNode($3)), $4, true); }
-             | function_call args { $$ = new FunctionCallExprNode($1, $2, false); }
-             | function_call ':' ID args { $$ = new FunctionCallExprNode(new TableFieldExprNode($1, new IdExprNode($3)), $4, true);  }
+function_call: variable args { $$ = parser::FunctionCallWithArgs($1, $2); }
+             | variable ':' ID args { $$ = parser::TableMethodCall($1, $3, $4); }
+             | function_call args { $$ = parser::FunctionCallWithArgs($1, $2); }
+             | function_call ':' ID args {  $$ = parser::TableMethodCall($1, $3, $4); }
              ;
 
 field_list_em: /* empty */ { $$ = new TableFieldList{}; }
