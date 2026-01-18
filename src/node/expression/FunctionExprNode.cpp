@@ -1,6 +1,6 @@
 #include "node/expression/FunctionExprNode.h"
 #include "node/DotMacros.h"
-#include "node/StatementNode.h"
+#include "node/statement/StatementNode.h"
 
 void FunctionExprNode::writeNodeInfoToDot(std::ostream& os) const
 {

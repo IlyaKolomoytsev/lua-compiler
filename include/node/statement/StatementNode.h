@@ -4,8 +4,8 @@
 #include <functional>
 #include <vector>
 
-#include "expression/ExpressionNode.h"
-#include "NodeExpressionModule.h"
+#include "node/expression/ExpressionNode.h"
+#include "node/NodeExpressionModule.h"
 
 class StatementNode;
 

@@ -1,4 +1,4 @@
-#include "node/StatementNode.h"
+#include "node/statement/StatementNode.h"
 
 #include <cassert>
 #include "node/DotMacros.h"

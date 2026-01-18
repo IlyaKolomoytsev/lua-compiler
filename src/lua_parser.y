@@ -22,7 +22,7 @@ void yyerror(const char *s) {
 %code requires {
     #include <string>
     #include "node/NodeExpressionModule.h"
-    #include "node/StatementNode.h"
+    #include "node/statement/StatementNode.h"
     #include "node/Program.h"
     #include "node/Parser.h"
 }

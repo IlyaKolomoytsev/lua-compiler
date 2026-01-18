@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 #include "node/DotMacros.h"
-#include "node/StatementNode.h"
+#include "node/statement/StatementNode.h"
 
 ExpressionNode::ExpressionNode(Type type) : type_(type)
 {

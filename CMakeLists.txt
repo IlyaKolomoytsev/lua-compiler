@@ -58,7 +58,7 @@ set(SOURCE_FILES
         src/node/expression/FunctionExprNode.cpp
         src/node/expression/TableConstructorExprNode.cpp
         src/node/expression/TableFieldExprNode.cpp
-        src/node/StatementNode.cpp
+        src/node/statement/StatementNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
 )
