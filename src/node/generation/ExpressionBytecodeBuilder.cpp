@@ -1,8 +1,6 @@
 #include "generation/ExpressionBytecodeBuilder.h"
 
-#include <optional>
-
-#include "jvm/descriptor-method.h"
+using type = ExpressionNode::Type;
 
 void ExpressionBytecodeBuilder::buildExpression(ExpressionNode* expression)
 {
@@ -20,29 +18,69 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
 {
     switch (expression->getType())
     {
-    case ExpressionNode::Type::Integer:
+    case type::Integer:
         {
             pushInt(expression);
             break;
         }
-    case ExpressionNode::Type::Float:
+    case type::Float:
         {
             pushFloat(expression);
             break;
         }
-    case ExpressionNode::Type::Boolean:
+    case type::Boolean:
         {
             pushBool(expression);
             break;
         }
-    case ExpressionNode::Type::String:
+    case type::String:
         {
             pushString(expression);
             break;
         }
-    case ExpressionNode::Type::Nil:
+    case type::Nil:
         {
-            pushNull(expression);
+            pushNull();
+            break;
+        }
+    case type::Summation:
+        {
+            sum();
+            break;
+        }
+    case type::Subtraction:
+        {
+            sub();
+            break;
+        }
+    case type::Multiplication:
+        {
+            mul();
+            break;
+        }
+    case type::Division:
+        {
+            div();
+            break;
+        }
+    case type::IntegerDivision:
+        {
+            idiv();
+            break;
+        }
+    case type::Modulo:
+        {
+            mod();
+            break;
+        }
+    case type::Exponentiation:
+        {
+            pow();
+            break;
+        }
+    case type::Concatenation:
+        {
+            concat();
             break;
         }
     default:
@@ -108,6 +146,53 @@ void ExpressionBytecodeBuilder::pushNull() const
         << code->Duplicate()
         << code->InvokeSpecial(runtimeRefs.luaValueCtorNil);
 }
+
+void ExpressionBytecodeBuilder::sum() const
+{
+    emitBinaryCall(context_->runtime_.luaValueAdd);
+}
+
+void ExpressionBytecodeBuilder::sub() const
+{
+    emitBinaryCall(context_->runtime_.luaValueSub);
+}
+
+void ExpressionBytecodeBuilder::mul() const
+{
+    emitBinaryCall(context_->runtime_.luaValueMul);
+}
+
+void ExpressionBytecodeBuilder::div() const
+{
+    emitBinaryCall(context_->runtime_.luaValueDiv);
+}
+
+void ExpressionBytecodeBuilder::idiv() const
+{
+    emitBinaryCall(context_->runtime_.luaValueIntegerDiv);
+}
+
+void ExpressionBytecodeBuilder::mod() const
+{
+    emitBinaryCall(context_->runtime_.luaValueMod);
+}
+
+void ExpressionBytecodeBuilder::pow() const
+{
+    emitBinaryCall(context_->runtime_.luaValuePow);
+}
+
+void ExpressionBytecodeBuilder::concat() const
+{
+    emitBinaryCall(context_->runtime_.luaValueConcat);
+}
+
+void ExpressionBytecodeBuilder::emitBinaryCall(ConstantMethodref* methodref) const
+{
+    auto* code = context_->attributeCode_;
+    *code << code->InvokeStatic(methodref);
+}
+
 
 ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* expression)
 {
