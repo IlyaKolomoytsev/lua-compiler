@@ -180,8 +180,6 @@ public:
 
     static StatementNode* Label(label_t label);
 
-    static StatementNode* Break();
-
     static StatementNode* Return(ExpressionNodeList* values);
 
     Type getType() const;

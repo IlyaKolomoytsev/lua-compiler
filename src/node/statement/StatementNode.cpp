@@ -7,6 +7,7 @@
 #include "node/statement/AssignmentStmtNode.h"
 #include "node/statement/BlockStmtNode.h"
 #include "node/statement/BranchingStmtNode.h"
+#include "node/statement/BreakStmtNode.h"
 
 StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names)
 {
@@ -112,12 +113,6 @@ StatementNode* StatementNode::Label(label_t label)
 {
     StatementNode* node = new StatementNode(Type::Label);
     node->value_.label_v = label;
-    return node;
-}
-
-StatementNode* StatementNode::Break()
-{
-    StatementNode* node = new StatementNode(Type::Break);
     return node;
 }
 
@@ -452,7 +447,7 @@ inline StatementNode* StatementNode::ForLoopIteratorConverter::getExitBranching(
     );
     BlockStmtNode* successBlock = new BlockStmtNode(
         new StatementNodeList{
-            StatementNode::Break()
+            new BreakStmtNode()
         }
     );
     return new BranchingStmtNode(
