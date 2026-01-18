@@ -18,7 +18,7 @@ private:
     void pushFloat(const ExpressionNode* expression) const;
     void pushBool(const ExpressionNode* expression) const;
     void pushString(ExpressionNode* expression) const;
-    void pushNull(const ExpressionNode* expression) const;
+    void pushNull() const;
 
     ExpressionNodeList getChildren(ExpressionNode* expression);
 
