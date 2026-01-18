@@ -14,11 +14,11 @@ public:
 private:
     void build(ExpressionNode* expression);
 
-    void PushInt(ExpressionNode* expression);
-    void PushFloat(ExpressionNode* expression);
-    void PushBool(ExpressionNode* expression);
-    void PushString(ExpressionNode* expression);
-    void PushNull(ExpressionNode* expression);
+    void PushInt(const ExpressionNode* expression) const;
+    void PushFloat(const ExpressionNode* expression) const;
+    void PushBool(const ExpressionNode* expression) const;
+    void PushString(ExpressionNode* expression) const;
+    void PushNull(const ExpressionNode* expression) const;
 
     ExpressionNodeList getChildren(ExpressionNode* expression);
 

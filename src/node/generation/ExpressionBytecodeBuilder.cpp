@@ -46,7 +46,7 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
     }
 }
 
-void ExpressionBytecodeBuilder::PushInt(ExpressionNode* expression)
+void ExpressionBytecodeBuilder::PushInt(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -57,7 +57,7 @@ void ExpressionBytecodeBuilder::PushInt(ExpressionNode* expression)
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushFloat(ExpressionNode* expression)
+void ExpressionBytecodeBuilder::PushFloat(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -68,7 +68,7 @@ void ExpressionBytecodeBuilder::PushFloat(ExpressionNode* expression)
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushBool(ExpressionNode* expression)
+void ExpressionBytecodeBuilder::PushBool(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -79,7 +79,7 @@ void ExpressionBytecodeBuilder::PushBool(ExpressionNode* expression)
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushString(ExpressionNode* expression)
+void ExpressionBytecodeBuilder::PushString(ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -89,7 +89,7 @@ void ExpressionBytecodeBuilder::PushString(ExpressionNode* expression)
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-void ExpressionBytecodeBuilder::PushNull(ExpressionNode* expression)
+void ExpressionBytecodeBuilder::PushNull(const ExpressionNode* expression) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -99,15 +99,15 @@ void ExpressionBytecodeBuilder::PushNull(ExpressionNode* expression)
         << code->InvokeStatic(runtimeRefs.luaValueCreate);
 }
 
-ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* e)
+ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* expression)
 {
     ExpressionNodeList children;
 
-    switch (e->getType())
+    switch (expression->getType())
     {
     case ExpressionNode::Type::TableConstructor:
         {
-            for (const auto& field : *e->getTableConstructor())
+            for (const auto& field : *expression->getTableConstructor())
             {
                 if (field.name) children.push_back(field.name);
                 if (field.value) children.push_back(field.value);
@@ -117,15 +117,15 @@ ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* e)
 
     case ExpressionNode::Type::TableField:
         {
-            children.push_back(e->getTableId());
-            children.push_back(e->getTableFieldKey());
+            children.push_back(expression->getTableId());
+            children.push_back(expression->getTableFieldKey());
             break;
         }
 
     case ExpressionNode::Type::FunctionCall:
         {
-            children.push_back(e->getFunctionId());
-            for (auto* arg : *e->getFunctionArguments())
+            children.push_back(expression->getFunctionId());
+            for (auto* arg : *expression->getFunctionArguments())
                 children.push_back(arg);
             break;
         }
@@ -134,7 +134,7 @@ ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* e)
     case ExpressionNode::Type::Negation:
     case ExpressionNode::Type::UnaryMinuses:
         {
-            children.push_back(e->getOperand());
+            children.push_back(expression->getOperand());
             break;
         }
 
@@ -155,8 +155,8 @@ ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* e)
     case ExpressionNode::Type::And:
     case ExpressionNode::Type::Concatenation:
         {
-            children.push_back(e->getLeftOperand());
-            children.push_back(e->getRightOperand());
+            children.push_back(expression->getLeftOperand());
+            children.push_back(expression->getRightOperand());
             break;
         }
 
