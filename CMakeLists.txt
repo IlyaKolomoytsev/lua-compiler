@@ -70,6 +70,8 @@ set(SOURCE_FILES
         src/node/statement/FunctionCallStmtNode.cpp
         src/node/statement/ReturnStmtNode.cpp
         src/node/statement/WhileRepeatLoopStmtNode.cpp
+        src/node/statement/GotoStmtNode.cpp
+        src/node/statement/LabelStmtNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
 )

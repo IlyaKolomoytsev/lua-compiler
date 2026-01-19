@@ -11,5 +11,7 @@
 #include "node/statement/RepeatLoopStmtNode.h"
 #include "node/statement/FunctionCallStmtNode.h"
 #include "node/statement/ReturnStmtNode.h"
+#include "node/statement/GotoStmtNode.h"
+#include "node/statement/LabelStmtNode.h"
 
 #endif //LUA_COMPILER_NODE_STATEMENT_MODULE_H
