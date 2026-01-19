@@ -83,6 +83,41 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
             concat();
             break;
         }
+    case type::Equality:
+        {
+            equal();
+            break;
+        }
+    case type::Greater:
+        {
+            greaterThan();
+            break;
+        }
+    case type::GreaterEqual:
+        {
+            greaterEqual();
+            break;
+        }
+    case type::Less:
+        {
+            lessThan();
+            break;
+        }
+    case type::LessEqual:
+        {
+            lessEqual();
+            break;
+        }
+    case type::Length:
+        {
+            len();
+            break;
+        }
+    case type::UnaryMinuses:
+        {
+            unm();
+            break;
+        }
     default:
         break;
     }
@@ -149,45 +184,86 @@ void ExpressionBytecodeBuilder::pushNull() const
 
 void ExpressionBytecodeBuilder::sum() const
 {
-    emitBinaryCall(context_->runtime_.luaValueAdd);
+    emitStaticCall(context_->runtime_.luaValueAdd);
 }
 
 void ExpressionBytecodeBuilder::sub() const
 {
-    emitBinaryCall(context_->runtime_.luaValueSub);
+    emitStaticCall(context_->runtime_.luaValueSub);
 }
 
 void ExpressionBytecodeBuilder::mul() const
 {
-    emitBinaryCall(context_->runtime_.luaValueMul);
+    emitStaticCall(context_->runtime_.luaValueMul);
 }
 
 void ExpressionBytecodeBuilder::div() const
 {
-    emitBinaryCall(context_->runtime_.luaValueDiv);
+    emitStaticCall(context_->runtime_.luaValueDiv);
 }
 
 void ExpressionBytecodeBuilder::idiv() const
 {
-    emitBinaryCall(context_->runtime_.luaValueIntegerDiv);
+    emitStaticCall(context_->runtime_.luaValueIntegerDiv);
 }
 
 void ExpressionBytecodeBuilder::mod() const
 {
-    emitBinaryCall(context_->runtime_.luaValueMod);
+    emitStaticCall(context_->runtime_.luaValueMod);
 }
 
 void ExpressionBytecodeBuilder::pow() const
 {
-    emitBinaryCall(context_->runtime_.luaValuePow);
+    emitStaticCall(context_->runtime_.luaValuePow);
 }
 
 void ExpressionBytecodeBuilder::concat() const
 {
-    emitBinaryCall(context_->runtime_.luaValueConcat);
+    emitStaticCall(context_->runtime_.luaValueConcat);
 }
 
-void ExpressionBytecodeBuilder::emitBinaryCall(ConstantMethodref* methodref) const
+void ExpressionBytecodeBuilder::equal() const
+{
+    emitStaticCall(context_->runtime_.luaValueEqual);
+}
+
+void ExpressionBytecodeBuilder::lessThan() const
+{
+    emitStaticCall(context_->runtime_.luaValueLessThan);
+}
+
+void ExpressionBytecodeBuilder::lessEqual() const
+{
+    emitStaticCall(context_->runtime_.luaValueLessEqual);
+}
+
+void ExpressionBytecodeBuilder::greaterThan() const
+{
+    auto* code = context_->attributeCode_;
+    *code << code->Swap();
+    emitStaticCall(context_->runtime_.luaValueLessThan);
+}
+
+void ExpressionBytecodeBuilder::greaterEqual() const
+{
+    auto* code = context_->attributeCode_;
+    *code << code->Swap();
+    emitStaticCall(context_->runtime_.luaValueLessEqual);
+}
+
+void ExpressionBytecodeBuilder::unm() const
+{
+    emitStaticCall(context_->runtime_.luaValueUnMinus);
+}
+
+void ExpressionBytecodeBuilder::len() const
+{
+    emitStaticCall(context_->runtime_.luaValueLen);
+}
+
+// TODO Разобраться с and, or и not
+
+void ExpressionBytecodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
 {
     auto* code = context_->attributeCode_;
     *code << code->InvokeStatic(methodref);
