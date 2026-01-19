@@ -211,6 +211,21 @@ struct RuntimeRefs
                 DescriptorField::Boolean,
                 {{DescriptorField::Boolean}}));
 
+        // LuaValue.index(LuaValue): LuaValue
+        luaValueGetBool = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "index",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}}));
+
+        // LuaContext.get(String): LuaValue
+        luaContextGetLuaValueById = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaContext",
+            "get",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{DescriptorField("java/lang/String")}}));
     }
 };
 #endif //LUA_COMPILER_RUNTIME_REFS_H
