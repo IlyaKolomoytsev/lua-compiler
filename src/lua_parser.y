@@ -112,7 +112,7 @@ stmt: stmt ';' { $$ = $1; }
     | FUNCTION dotted_name '(' par_list_em ')' block END { $$ = parser::FunctionDeclaration(Scope::Global, $2, $4, $6); }
     | FUNCTION dotted_name ':' ID '(' par_list_em ')' block END { $$ = parser::MethodDeclaration($2, $4, $6, $8); }
     | LOCAL FUNCTION ID '(' par_list_em ')' block END {  $$ = parser::FunctionDeclaration(Scope::Local, new IdExprNode($3), $5, $7); }
-    | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
+    | LOCAL name_list { $$ = new DeclarationStmtNode($2); }
     | LOCAL name_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
     | for_stmt { $$ = $1; }
