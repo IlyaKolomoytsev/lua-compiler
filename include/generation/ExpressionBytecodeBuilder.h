@@ -14,6 +14,8 @@ public:
 
 private:
     void build(ExpressionNode* expression);
+    void buildAnd(ExpressionNode* left, ExpressionNode* right);
+    void buildOr(ExpressionNode* left, ExpressionNode* right);
 
     // Push on stack
     void pushInt(const ExpressionNode* expression) const;

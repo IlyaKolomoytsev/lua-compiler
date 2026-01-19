@@ -36,9 +36,12 @@ struct RuntimeRefs
     ConstantMethodref* luaValueLessEqual = nullptr;
     ConstantMethodref* luaValueNot = nullptr;
     ConstantMethodref* luaValueGetBool = nullptr;
+    ConstantMethodref* luaValueGetFieldByKey = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;
+
+    ConstantMethodref* luaContextGetLuaValueById = nullptr;
 
     // Field descriptors
     DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
