@@ -7,6 +7,7 @@
 #include "node/statement/BranchingStmtNode.h"
 #include "node/statement/BreakStmtNode.h"
 #include "node/statement/ForLoopClassicStmtNode.h"
+#include "node/statement/ForLoopIteratorStmtNode.h"
 #include "node/statement/WhileLoopStmtNode.h"
 #include "node/statement/RepeatLoopStmtNode.h"
 #include "node/statement/FunctionCallStmtNode.h"

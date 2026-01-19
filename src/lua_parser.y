@@ -146,7 +146,7 @@ elseif_stmt_list: elseif_stmt { $$ = $1; }
 
 for_stmt: FOR ID '=' expr ',' expr DO block END { $$ = new ForLoopClassicStmtNode(new IdExprNode($2), {$4, $6, new IntegerExprNode(1)}, $8); }
         | FOR ID '=' expr ',' expr ',' expr DO block END { $$ = new ForLoopClassicStmtNode(new IdExprNode($2), {$4, $6, $8}, $10); }
-        | FOR name_list IN expr_list DO block END { $$ = StatementNode::ForLoop($2, $4, $6); }
+        | FOR name_list IN expr_list DO block END { $$ = new ForLoopIteratorStmtNode($2, $4, $6); }
         ;
 
 while_stmt: WHILE expr DO block END { $$ = new WhileLoopStmtNode($2, $4); }
