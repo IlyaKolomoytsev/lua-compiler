@@ -118,6 +118,16 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
             unm();
             break;
         }
+    case type::Unequality:
+        {
+            notEqual();
+            break;
+        }
+    case type::Negation:
+        {
+            Not();
+            break;
+        }
     default:
         break;
     }
@@ -227,6 +237,12 @@ void ExpressionBytecodeBuilder::equal() const
     emitStaticCall(context_->runtime_.luaValueEqual);
 }
 
+void ExpressionBytecodeBuilder::notEqual() const
+{
+    equal();
+    Not();
+}
+
 void ExpressionBytecodeBuilder::lessThan() const
 {
     emitStaticCall(context_->runtime_.luaValueLessThan);
@@ -261,7 +277,11 @@ void ExpressionBytecodeBuilder::len() const
     emitStaticCall(context_->runtime_.luaValueLen);
 }
 
-// TODO Разобраться с and, or и not
+void ExpressionBytecodeBuilder::Not() const
+{
+    emitStaticCall(context_->runtime_.luaValueNot);
+}
+
 
 void ExpressionBytecodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
 {

@@ -32,6 +32,7 @@ private:
     void pow() const;
     void concat() const;
     void equal() const;
+    void notEqual() const;
     void lessThan() const;
     void lessEqual() const;
     void greaterThan() const;
@@ -40,6 +41,7 @@ private:
     // Operations with one operand
     void unm() const;
     void len() const;
+    void Not() const;
 
     // Helpers
     void emitStaticCall(ConstantMethodref* methodref) const;
