@@ -128,6 +128,17 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
             unm();
             break;
         }
+    case type::Id:
+        {
+            id(expression);
+            break;
+        }
+    case type::TableField:
+    case type::TableFieldByIndex:
+        {
+            getFieldByKey();
+            break;
+        }
     case type::Unequality:
         {
             notEqual();
@@ -242,6 +253,18 @@ void ExpressionBytecodeBuilder::pushNull() const
         << code->InvokeSpecial(runtimeRefs.luaValueCtorNil);
 }
 
+void ExpressionBytecodeBuilder::id(ExpressionNode* expression) const
+{
+    // TODO Разобраться с тем, что мы храним контекст в 0 слоте локалов
+    auto* code = context_->attributeCode_;
+    auto runtimeRefs = context_->runtime_;
+
+    *code
+        << code-> LoadReference(0)
+        << code->PushString(*expression->getString())
+        << code->InvokeVirtual(runtimeRefs.luaContextGetLuaValueById);
+}
+
 void ExpressionBytecodeBuilder::sum() const
 {
     emitStaticCall(context_->runtime_.luaValueAdd);
@@ -315,6 +338,14 @@ void ExpressionBytecodeBuilder::greaterEqual() const
     auto* code = context_->attributeCode_;
     *code << code->Swap();
     emitStaticCall(context_->runtime_.luaValueLessEqual);
+}
+
+void ExpressionBytecodeBuilder::getFieldByKey() const
+{
+    auto* code = context_->attributeCode_;
+    const auto rt = context_->runtime_;
+    *code
+        << code->InvokeVirtual(rt.luaValueGetFieldByKey);
 }
 
 void ExpressionBytecodeBuilder::unm() const

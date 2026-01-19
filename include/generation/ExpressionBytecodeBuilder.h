@@ -24,6 +24,8 @@ private:
     void pushString(ExpressionNode* expression) const;
     void pushNull() const;
 
+    void id(ExpressionNode* expression) const;
+
     // Operations with two operands
     void sum() const;
     void sub() const;
@@ -39,6 +41,7 @@ private:
     void lessEqual() const;
     void greaterThan() const;
     void greaterEqual() const;
+    void getFieldByKey() const;
 
     // Operations with one operand
     void unm() const;
