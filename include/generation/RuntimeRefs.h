@@ -34,6 +34,8 @@ struct RuntimeRefs
     ConstantMethodref* luaValueEqual = nullptr;
     ConstantMethodref* luaValueLessThan = nullptr;
     ConstantMethodref* luaValueLessEqual = nullptr;
+    ConstantMethodref* luaValueNot = nullptr;
+    ConstantMethodref* luaValueGetBool = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;
@@ -174,7 +176,7 @@ struct RuntimeRefs
                 luaValueDescriptor,
                 {{luaValueDescriptor}, {luaValueDescriptor}}));
 
-        // LuaValue.unm(LuaValue, LuaValue): LuaValue
+        // LuaValue.unm(LuaValue): LuaValue
         luaValueUnMinus = owner->getOrCreateMethodrefConstant(
             "com/luajvm/LuaValue",
             "unm",
@@ -182,13 +184,29 @@ struct RuntimeRefs
                 luaValueDescriptor,
                 {{luaValueDescriptor}}));
 
-        // LuaValue.len(LuaValue, LuaValue): LuaValue
-        luaValueLessThan = owner->getOrCreateMethodrefConstant(
+        // LuaValue.len(LuaValue): LuaValue
+        luaValueLen = owner->getOrCreateMethodrefConstant(
             "com/luajvm/LuaValue",
             "len",
             DescriptorMethod(
                 luaValueDescriptor,
                 {{luaValueDescriptor}}));
+
+        // LuaValue.not(LuaValue): LuaValue
+        luaValueNot = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "not",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}}));
+
+        // LuaValue.getBoolValue(LuaValue): boolean
+        luaValueGetBool = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "getBoolValue",
+            DescriptorMethod(
+                DescriptorField::Boolean,
+                {{DescriptorField::Boolean}}));
 
     }
 };
