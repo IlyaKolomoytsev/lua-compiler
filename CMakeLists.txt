@@ -64,8 +64,11 @@ set(SOURCE_FILES
         src/node/statement/BranchingStmtNode.cpp
         src/node/statement/BreakStmtNode.cpp
         src/node/statement/ForLoopClassicStmtNode.cpp
+        src/node/statement/WhileLoopStmtNode.cpp
+        src/node/statement/RepeatLoopStmtNode.cpp
         src/node/statement/FunctionCallStmtNode.cpp
         src/node/statement/ReturnStmtNode.cpp
+        src/node/statement/WhileRepeatLoopStmtNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
 )

@@ -149,10 +149,10 @@ for_stmt: FOR ID '=' expr ',' expr DO block END { $$ = new ForLoopClassicStmtNod
         | FOR name_list IN expr_list DO block END { $$ = StatementNode::ForLoop($2, $4, $6); }
         ;
 
-while_stmt: WHILE expr DO block END { $$ = StatementNode::WhileLoop($2, $4); }
+while_stmt: WHILE expr DO block END { $$ = new WhileLoopStmtNode($2, $4); }
           ;
 
-repeat_stmt: REPEAT block UNTIL expr { $$ = StatementNode::RepeatLoop($2, $4); }
+repeat_stmt: REPEAT block UNTIL expr { $$ = new RepeatLoopStmtNode($4, $2); }
            ;
 
 finish_stmt: /* empty */ { $$ = nullptr; }
