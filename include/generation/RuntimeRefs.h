@@ -31,6 +31,12 @@ struct RuntimeRefs
     ConstantMethodref* luaValueMod = nullptr;
     ConstantMethodref* luaValuePow = nullptr;
     ConstantMethodref* luaValueConcat = nullptr;
+    ConstantMethodref* luaValueEqual = nullptr;
+    ConstantMethodref* luaValueLessThan = nullptr;
+    ConstantMethodref* luaValueLessEqual = nullptr;
+
+    ConstantMethodref* luaValueUnMinus = nullptr;
+    ConstantMethodref* luaValueLen = nullptr;
 
     // Field descriptors
     DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
@@ -143,6 +149,46 @@ struct RuntimeRefs
             DescriptorMethod(
                 luaValueDescriptor,
                 {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.eq(LuaValue, LuaValue): LuaValue
+        luaValueEqual = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "eq",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.le(LuaValue, LuaValue): LuaValue
+        luaValueLessEqual = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "le",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.lt(LuaValue, LuaValue): LuaValue
+        luaValueLessThan = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "lt",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}, {luaValueDescriptor}}));
+
+        // LuaValue.unm(LuaValue, LuaValue): LuaValue
+        luaValueUnMinus = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "unm",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}}));
+
+        // LuaValue.len(LuaValue, LuaValue): LuaValue
+        luaValueLessThan = owner->getOrCreateMethodrefConstant(
+            "com/luajvm/LuaValue",
+            "len",
+            DescriptorMethod(
+                luaValueDescriptor,
+                {{luaValueDescriptor}}));
 
     }
 };

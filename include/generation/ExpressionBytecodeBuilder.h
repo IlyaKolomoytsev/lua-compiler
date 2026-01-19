@@ -15,12 +15,14 @@ public:
 private:
     void build(ExpressionNode* expression);
 
+    // Push on stack
     void pushInt(const ExpressionNode* expression) const;
     void pushFloat(const ExpressionNode* expression) const;
     void pushBool(const ExpressionNode* expression) const;
     void pushString(ExpressionNode* expression) const;
     void pushNull() const;
 
+    // Operations with two operands
     void sum() const;
     void sub() const;
     void mul() const;
@@ -29,8 +31,18 @@ private:
     void mod() const;
     void pow() const;
     void concat() const;
+    void equal() const;
+    void lessThan() const;
+    void lessEqual() const;
+    void greaterThan() const;
+    void greaterEqual() const;
 
-    void emitBinaryCall(ConstantMethodref* methodref) const;
+    // Operations with one operand
+    void unm() const;
+    void len() const;
+
+    // Helpers
+    void emitStaticCall(ConstantMethodref* methodref) const;
     ExpressionNodeList getChildren(ExpressionNode* expression);
 
     CodeGenContext* context_;
