@@ -6,12 +6,22 @@ void ExpressionBytecodeBuilder::buildExpression(ExpressionNode* expression)
 {
     auto children = getChildren(expression);
 
-    for (auto child : children)
+    if (expression->getType() == type::And)
     {
-        buildExpression(child);
+        buildAnd(expression->getLeftOperand(), expression->getRightOperand());
     }
-
-    build(expression);
+    else if (expression->getType() == type::Or)
+    {
+        buildOr(expression->getLeftOperand(), expression->getRightOperand());
+    }
+    else
+    {
+        for (auto child : children)
+        {
+            buildExpression(child);
+        }
+        build(expression);
+    }
 }
 
 void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
@@ -131,6 +141,46 @@ void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
     default:
         break;
     }
+}
+
+void ExpressionBytecodeBuilder::buildAnd(ExpressionNode* left, ExpressionNode* right)
+{
+    auto* code = context_->attributeCode_;
+    const auto rt = context_->runtime_;
+
+    auto* L_end   = code->CodeLabel();
+
+    buildExpression(left);  // ..., left
+    *code << code->Duplicate(); // ..., left, left
+    *code << code->PushInt(1);  // ..., left, left, 1
+    *code << code->InvokeVirtual(rt.luaValueGetBool);  // ..., left, bool
+    *code << code->If(Instruction::Compare::Equal, L_end); // ..., left
+
+    // true:
+    *code << code->PopOne(); // ...
+    buildExpression(right);  // ..., right
+
+    *code << L_end;
+}
+
+void ExpressionBytecodeBuilder::buildOr(ExpressionNode* left, ExpressionNode* right)
+{
+    auto* code = context_->attributeCode_;
+    auto rt = context_->runtime_;
+
+    auto* L_end    = code->CodeLabel();
+
+    buildExpression(left); // ..., left
+    *code << code->Duplicate(); // ..., left, left
+    *code << code->PushInt(1); // ..., left, left, 1
+    *code << code->InvokeVirtual(rt.luaValueGetBool); // ..., left, bool
+    *code << code->If(Instruction::Compare::NotEqual, L_end); // ..., left
+
+    // false
+    *code << code->PopOne(); // ...
+    buildExpression(right); // ..., right
+
+    *code << L_end;
 }
 
 void ExpressionBytecodeBuilder::pushInt(const ExpressionNode* expression) const
