@@ -44,14 +44,6 @@ StatementNode* StatementNode::FunctionDeclaration(IdExprNode* id, ExpressionNode
     return node;
 }
 
-
-StatementNode* StatementNode::FunctionCall(ExpressionNode* callExpr)
-{
-    StatementNode* node = new StatementNode(Type::FunctionCall);
-    node->value_.functionCall_v = callExpr;
-    return node;
-}
-
 StatementNode* StatementNode::BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock)
 {
     StatementNode* current = elseifChain;

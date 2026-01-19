@@ -110,7 +110,7 @@ block: stmt_list_em finish_stmt { $$ = parser::Block($1, $2); }
 
 stmt: stmt ';' { $$ = $1; }
     | variable_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Global, $1, $3); }
-    | function_call { $$ = StatementNode::FunctionCall($1); }
+    | function_call { $$ = new FunctionCallStmtNode($1); }
     | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
     | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(new IdExprNode($3), $5, $7); }
     | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }

@@ -150,8 +150,6 @@ public:
 
     static StatementNode* FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block);
 
-    static StatementNode* FunctionCall(ExpressionNode* exprCall);
-
     static StatementNode* BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock);
 
     static StatementNode* ForLoop(ExpressionNodeList* names, ExpressionNodeList* iterator, StatementNode* block);
