@@ -11,43 +11,6 @@ class StatementNode;
 
 using StatementNodeList = std::list<StatementNode*>;
 
-struct DottedNameStruct
-{
-    DottedNameStruct(const std::string& firstName)
-    {
-        names_.push_back(firstName);
-    }
-
-    DottedNameStruct* nextName(const std::string& name)
-    {
-        assert(!isMethod_);
-        names_.push_back(name);
-        return this;
-    }
-
-    DottedNameStruct* nextMethod(const std::string& name)
-    {
-        assert(!isMethod_);
-        isMethod_ = true;
-        names_.push_back(name);
-        return this;
-    }
-
-    [[nodiscard]] bool isMethod() const
-    {
-        return isMethod_;
-    }
-
-    [[nodiscard]] const std::list<std::string>& names() const
-    {
-        return names_;
-    }
-
-private:
-    std::list<std::string> names_;
-    bool isMethod_ = false;
-};
-
 enum class Scope
 {
     Global,
@@ -69,20 +32,6 @@ class StatementNode : public Node
     {
         Scope scope;
         ExpressionNodeList* names;
-    };
-
-    struct function_declaration_global_t
-    {
-        DottedNameStruct* funcName;
-        ExpressionNodeList* parList;
-        StatementNode* block;
-    };
-
-    struct function_declaration_local_t
-    {
-        IdExprNode* id;
-        ExpressionNodeList* parList;
-        StatementNode* block;
     };
 
     using function_call_t = ExpressionNode*;
@@ -110,8 +59,6 @@ class StatementNode : public Node
     {
         declaration_t declaration_v;
         assignment_t assignment_v;
-        function_declaration_global_t function_declaration_global_v;
-        function_declaration_local_t function_declaration_local_v;
         function_call_t functionCall_v;
         branching_t branching_v;
         while_loop_t whileLoop_v;
@@ -128,8 +75,6 @@ public:
     {
         Declaration,
         Assignment,
-        FunctionDeclarationGlobal,
-        FunctionDeclarationLocal,
         FunctionCall,
         Branching,
         ForLoopClassic,
@@ -145,10 +90,6 @@ public:
     };
 
     static StatementNode* Declaration(Scope scope, ExpressionNodeList* names);
-
-    static StatementNode* FunctionDeclaration(DottedNameStruct* funcName, ExpressionNodeList* parList, StatementNode* block);
-
-    static StatementNode* FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block);
 
     static StatementNode* BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock);
 

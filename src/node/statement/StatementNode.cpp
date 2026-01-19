@@ -18,32 +18,6 @@ StatementNode* StatementNode::Declaration(Scope scope, ExpressionNodeList* names
     return node;
 }
 
-StatementNode* StatementNode::FunctionDeclaration(DottedNameStruct* funcName, ExpressionNodeList* parList, StatementNode* block)
-{
-    StatementNode* node = new StatementNode(Type::FunctionDeclarationGlobal);
-    function_declaration_global_t* function_declaration = &node->value_.function_declaration_global_v;
-    function_declaration->funcName = funcName;
-
-    if (funcName->isMethod())
-    {
-        parList->push_front(new IdExprNode("self"));
-    }
-
-    function_declaration->parList = parList;
-    function_declaration->block = block;
-    return node;
-}
-
-StatementNode* StatementNode::FunctionDeclaration(IdExprNode* id, ExpressionNodeList* parList, StatementNode* block)
-{
-    StatementNode* node = new StatementNode(Type::FunctionDeclarationLocal);
-    function_declaration_local_t* function_declaration = &node->value_.function_declaration_local_v;
-    function_declaration->id = id;
-    function_declaration->parList = parList;
-    function_declaration->block = block;
-    return node;
-}
-
 StatementNode* StatementNode::BranchingChain(StatementNode* elseifChain, StatementNode* elseIfOrElseBlock)
 {
     StatementNode* current = elseifChain;
@@ -125,45 +99,6 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
     case Type::Declaration:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_) << "\n" << to_string(value_.declaration_v.scope));
         break;
-    case Type::FunctionDeclarationGlobal:
-        {
-            auto& fd = value_.function_declaration_global_v;
-
-            std::string fullName;
-            const auto& ns = fd.funcName->names();
-            size_t count = ns.size();
-
-            bool isMethod = fd.funcName->isMethod();
-
-            size_t i = 0;
-            for (const auto& name : ns)
-            {
-                fullName += name;
-                if (i + 1 < count)
-                {
-                    if (isMethod && i + 1 == count - 1)
-                        fullName += ":";
-                    else
-                        fullName += ".";
-                }
-
-                i++;
-            }
-
-            os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationGlobal\n" << fullName);
-            break;
-        }
-
-    case Type::FunctionDeclarationLocal:
-        {
-            auto& fd = value_.function_declaration_local_v;
-
-            std::string localName = "<fn>";
-            localName = fd.id->getValue();
-
-            os << DOT_NODE_THIS_WITH_LABEL("FunctionDeclarationLocal\n" << localName);
-            break;
-        }
     default:
         os << DOT_NODE_THIS_WITH_LABEL(to_string(type_));
     }
@@ -205,39 +140,6 @@ void StatementNode::writeNodeInfoToDot(std::ostream& os) const
             auto functionCall = value_.functionCall_v;
             os << DOT_ARC_THIS_OTHER_LABEL(functionCall, "expression");
             os << *functionCall;
-            break;
-        }
-    case Type::FunctionDeclarationGlobal:
-        {
-            auto functionDeclaration = value_.function_declaration_global_v;
-
-            int i = 0;
-            for (auto* p : *functionDeclaration.parList)
-            {
-                os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
-            }
-
-            os << DOT_ARC_THIS_OTHER_LABEL(functionDeclaration.block, "body");
-
-            for (auto* p : *functionDeclaration.parList) os << *p;
-            os << *functionDeclaration.block;
-            break;
-        }
-
-    case Type::FunctionDeclarationLocal:
-        {
-            auto& fd = value_.function_declaration_local_v;
-
-            int i = 0;
-            for (auto* p : *fd.parList)
-            {
-                os << DOT_ARC_THIS_OTHER_LABEL(p, "param " << i++);
-            }
-
-            os << DOT_ARC_THIS_OTHER_LABEL(fd.block, "body");
-
-            for (auto* p : *fd.parList) os << *p;
-            os << *fd.block;
             break;
         }
     case Type::Branching:
@@ -475,10 +377,6 @@ std::string to_string(StatementNode::Type type)
         return "Assignment";
     case StatementNode::Type::FunctionCall:
         return "FunctionCall";
-    case StatementNode::Type::FunctionDeclarationGlobal:
-        return "FunctionDeclarationGlobal";
-    case StatementNode::Type::FunctionDeclarationLocal:
-        return "FunctionDeclarationLocal";
     case StatementNode::Type::Branching:
         return "Branching";
     case StatementNode::Type::ForLoopClassic:

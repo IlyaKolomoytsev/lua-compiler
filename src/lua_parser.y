@@ -39,7 +39,6 @@ void yyerror(const char *s) {
     BranchingStmtNode* branchingStmtNode;
     ExpressionNodeList* expressionNodeList;
     StatementNodeList* statementNodeList;
-    DottedNameStruct* dottedNameStruct;
     ExpressionNode* variable;
     TableField* tableField;
     TableFieldList* tableFieldList;
@@ -91,8 +90,7 @@ void yyerror(const char *s) {
 %type <expressionNodeList> name_list;
 %type <expressionNodeList> par_list;
 %type <expressionNodeList> par_list_em;
-%type <dottedNameStruct> dotted_name;
-%type <dottedNameStruct> func_name;
+%type <expressionNode> dotted_name;
 %type <variable> variable;
 %type <tableField> field;
 %type <tableFieldList> field_list;
@@ -111,8 +109,9 @@ block: stmt_list_em finish_stmt { $$ = parser::Block($1, $2); }
 stmt: stmt ';' { $$ = $1; }
     | variable_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Global, $1, $3); }
     | function_call { $$ = new FunctionCallStmtNode($1); }
-    | FUNCTION func_name '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration($2, $4, $6); }
-    | LOCAL FUNCTION ID '(' par_list_em ')' block END { $$ = StatementNode::FunctionDeclaration(new IdExprNode($3), $5, $7); }
+    | FUNCTION dotted_name '(' par_list_em ')' block END { $$ = parser::FunctionDeclaration(Scope::Global, $2, $4, $6); }
+    | FUNCTION dotted_name ':' ID '(' par_list_em ')' block END { $$ = parser::MethodDeclaration($2, $4, $6, $8); }
+    | LOCAL FUNCTION ID '(' par_list_em ')' block END {  $$ = parser::FunctionDeclaration(Scope::Local, new IdExprNode($3), $5, $7); }
     | LOCAL name_list { $$ = StatementNode::Declaration(Scope::Local, $2); }
     | LOCAL name_list '=' expr_list { $$ = new AssignmentStmtNode(Scope::Local, $2, $4); }
     | if_stmt { $$ = $1; }
@@ -190,13 +189,9 @@ par_list_em: /* empty */ { $$ = new ExpressionNodeList(); }
            | par_list { $$ = $1; }
            ;
 
-dotted_name: ID { $$ = new DottedNameStruct(std::move(*$1)); delete $1; }
-           | dotted_name '.' ID { $$ = $1->nextName(std::move(*$3)); delete $3; }
+dotted_name: ID { $$ = new IdExprNode($1); }
+           | dotted_name '.' ID { $$ = new TableFieldExprNode($1, new IdExprNode($3)); }
            ;
-
-func_name: dotted_name { $$ = $1; }
-         | dotted_name ':' ID { $$ = $1->nextMethod(std::move(*$3)); delete $3; }
-         ;
 
 args: '(' expr_list_em ')' { $$ = $2; }
     | '{' field_list_em '}' { $$ = new ExpressionNodeList { new TableConstructorExprNode($2)}; }

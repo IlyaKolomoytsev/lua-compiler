@@ -39,6 +39,28 @@ namespace parser
         elseIfChain->appendElseToDeepestIf(newChain);
         return elseIfChain;
     }
+
+    inline AssignmentStmtNode* FunctionDeclaration(Scope scope,
+                                                   ExpressionNode* functionName,
+                                                   ExpressionNodeList* parameters,
+                                                   StatementNode* body)
+    {
+        auto inputValues = new ExpressionNodeList();
+        auto outputValues = new ExpressionNodeList();
+        inputValues->push_back(functionName);
+        outputValues->push_back(new FunctionExprNode(parameters, body));
+        return new AssignmentStmtNode(scope, inputValues, outputValues);
+    }
+
+    inline AssignmentStmtNode* MethodDeclaration(ExpressionNode* tableExpr,
+                                                 std::string* methodName,
+                                                 ExpressionNodeList* parameters,
+                                                 StatementNode* body)
+    {
+        auto functionName = new TableFieldExprNode(tableExpr, new IdExprNode(methodName));
+        parameters->push_front(new IdExprNode("self"));
+        return FunctionDeclaration(Scope::Global, functionName, parameters, body);
+    }
 } // parser
 
 #endif //LUA_COMPILER_PARSER_H
