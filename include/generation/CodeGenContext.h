@@ -55,10 +55,23 @@ public:
     ConstantMethodref* getHashMapConstructor();
     ConstantMethodref* getPutMethodFromHashMap();
     //endregion
+    //region LuaList
+    ConstantClass* getLuaListClass();
+    ConstantMethodref* getLuaListConstructor();
+    ConstantMethodref* getGetMethodFromLuaList();
+    ConstantMethodref* getSubListMethodFromLuaList();
+    ConstantMethodref* getFirstMethodFromList();
+    //endregion
     ConstantMethodref* getLuaValueByIdMethodFromContext();
 
     void setContextIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
     uint16_t getContextIndexInLocals() const { return contextIndexInLocals_; }
+
+    void setArgsIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
+    uint16_t getArgsIndexInLocals() const { return contextIndexInLocals_; }
+
+    void setStartIndexForVarargInListArgs(int32_t index) { startIndexForVarargInListArgs_ = index; }
+    int32_t getStartIndexForVarargInListArgs() const { return startIndexForVarargInListArgs_; }
 
 private:
     Class* class_;
@@ -69,6 +82,7 @@ private:
     // classes
     ConstantClass* luaValueClass = nullptr;
     ConstantClass* hashMapClass = nullptr;
+    ConstantClass* luaListClass = nullptr;
 
     // constructors
     ConstantMethodref* luaValueCtorNil = nullptr;
@@ -78,6 +92,7 @@ private:
     ConstantMethodref* luaValueCtorString = nullptr;
     ConstantMethodref* luaValueCtorTable = nullptr;
     ConstantMethodref* hashMapCtor = nullptr;
+    ConstantMethodref* luaListCtor = nullptr;
 
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
@@ -96,6 +111,9 @@ private:
     ConstantMethodref* luaValueGetBool = nullptr;
     ConstantMethodref* luaValueGetFieldByKey = nullptr;
     ConstantMethodref* hashMapPutMethod = nullptr;
+    ConstantMethodref* luaListSubList = nullptr;
+    ConstantMethodref* listGetFirstMethod = nullptr;
+    ConstantMethodref* listGetMethod = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;
@@ -103,6 +121,8 @@ private:
     ConstantMethodref* luaContextGetLuaValueById = nullptr;
 
     uint16_t contextIndexInLocals_ = 0;
+    uint16_t argsIndexInLocals_ = 0;
+    int32_t startIndexForVarargInListArgs_ = 0;
 };
 
 #endif //LUA_COMPILER_CODEGEN_CONTEXT_H

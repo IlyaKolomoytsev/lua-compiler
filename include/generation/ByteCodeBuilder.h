@@ -51,6 +51,8 @@ public:
     //endregion
     //region Others
     void tableConstructor(TableFieldList* fieldList) const;
+    void pushVararg() const;
+    void pushVarargList() const;
     //endregion
 
 private:

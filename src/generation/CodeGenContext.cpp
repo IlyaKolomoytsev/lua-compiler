@@ -5,10 +5,12 @@
 #include "jvm/descriptor-field.h"
 #include "jvm/descriptor-method.h"
 #define LUA_VALUE "com/luajvm/LuaValue"
+#define LUA_LIST "com/luajvm/LuaValue"
 
 #define HASH_MAP "java/util/HashMap"
 #define OBJECT "java/lang/Object"
 #define STRING "java/lang/String"
+#define LIST "java/util/List"
 
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
@@ -448,6 +450,76 @@ ConstantMethodref* CodeGenContext::getPutMethodFromHashMap()
         );
     }
     return hashMapPutMethod;
+}
+
+ConstantClass* CodeGenContext::getLuaListClass()
+{
+    if (luaListClass == nullptr)
+    {
+        luaListClass = getClass()->getOrCreateClassConstant(LUA_LIST);
+    }
+    return luaListClass;
+}
+
+ConstantMethodref* CodeGenContext::getLuaListConstructor()
+{
+    if (luaListCtor == nullptr)
+    {
+        luaListCtor = getClass()->getOrCreateMethodrefConstant(
+            LUA_LIST,
+            "<init>",
+            DescriptorMethod(std::nullopt, {})
+        );
+    }
+    return luaListCtor;
+}
+
+ConstantMethodref* CodeGenContext::getGetMethodFromLuaList()
+{
+    if (listGetMethod == nullptr)
+    {
+        listGetMethod = getClass()->getOrCreateMethodrefConstant(
+            LIST,
+            "get",
+            DescriptorMethod(
+                DescriptorField(OBJECT),
+                {{Descriptor::Int}}
+            )
+        );
+    }
+    return listGetMethod;
+}
+
+ConstantMethodref* CodeGenContext::getSubListMethodFromLuaList()
+{
+    if (luaListSubList == nullptr)
+    {
+        luaListSubList = getClass()->getOrCreateMethodrefConstant(
+            LUA_LIST,
+            "subList",
+            DescriptorMethod(
+                DescriptorField(LUA_LIST),
+                {{Descriptor::Int}}
+            )
+        );
+    }
+    return luaListSubList;
+}
+
+ConstantMethodref* CodeGenContext::getFirstMethodFromList()
+{
+    if (listGetFirstMethod == nullptr)
+    {
+        listGetFirstMethod = getClass()->getOrCreateMethodrefConstant(
+            LIST,
+            "getFirst",
+            DescriptorMethod(
+                DescriptorField(OBJECT),
+                {}
+            )
+        );
+    }
+    return listGetFirstMethod;
 }
 
 ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()

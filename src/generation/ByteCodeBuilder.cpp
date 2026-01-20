@@ -235,6 +235,24 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList) const
     *code << code->InvokeVirtual(context_->getTableConstructorForLuaValue()); // ..., ref(LuaValue)
 }
 
+void ByteCodeBuilder::pushVararg() const
+{
+    auto code = context_->getAttributeCode();
+    *code
+        << code->LoadReference(context_->getArgsIndexInLocals()) // ..., ref(List of args)
+        << code->PushInt(context_->getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
+        << code->InvokeVirtual(context_->getGetMethodFromLuaList()); // ..., ref(LuaValue)
+}
+
+void ByteCodeBuilder::pushVarargList() const
+{
+    auto code = context_->getAttributeCode();
+    *code
+        << code->LoadReference(context_->getArgsIndexInLocals()) // ..., ref(List of args)
+        << code->PushInt(context_->getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
+        << code->InvokeVirtual(context_->getSubListMethodFromLuaList()); // ..., ref(List of vararg)
+}
+
 void ByteCodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
 {
     auto* code = context_->getAttributeCode();
