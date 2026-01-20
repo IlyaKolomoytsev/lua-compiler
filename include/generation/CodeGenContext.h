@@ -1,7 +1,6 @@
 #ifndef LUA_COMPILER_CODEGEN_CONTEXT_H
 #define LUA_COMPILER_CODEGEN_CONTEXT_H
 
-#include "RuntimeRefs.h"
 #include "jvm/attribute-code.h"
 #include "jvm/class.h"
 #include "jvm/method.h"
