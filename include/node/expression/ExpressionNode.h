@@ -3,8 +3,9 @@
 #include <list>
 #include <string>
 #include <sys/types.h>
-
 #include "node/Node.h"
+
+class ExpressionBytecodeBuilder;
 
 class ExpressionNode;
 
@@ -60,12 +61,14 @@ public:
         UnaryMinuses,
     };
 
+    virtual void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const = 0;
 protected:
     explicit ExpressionNode(Type type);
 
     Type type_;
 };
 
+using exprType = ExpressionNode::Type;
 std::string to_string(ExpressionNode::Type type);
 
 #endif
