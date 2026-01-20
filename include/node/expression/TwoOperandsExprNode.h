@@ -4,7 +4,7 @@
 #include "FixedString.h"
 #include "node/DotMacros.h"
 
-template <ExpressionNode::Type T, fixed_string N>
+template <exprType T, fixed_string N>
 class TwoOperandsExprNode : public ExpressionNodeOf<T, N>
 {
 public:
@@ -23,6 +23,8 @@ public:
         os << *left_;
         os << *right_;
     }
+
+    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
 
 private:
     ExpressionNode* left_;
