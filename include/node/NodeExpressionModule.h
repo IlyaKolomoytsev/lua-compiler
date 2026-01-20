@@ -10,6 +10,13 @@
 #include "node/expression/TableConstructorExprNode.h"
 #include "node/expression/TableFieldExprNode.h"
 
+// Literal expression nodes
+using IdExprNode = LiteralExprNode<std::string, ExpressionNode::Type::Id>;
+using IntegerExprNode = LiteralExprNode<int64_t, ExpressionNode::Type::Integer>;
+using FloatExprNode = LiteralExprNode<double, ExpressionNode::Type::Float>;
+using StringExprNode = LiteralExprNode<std::string, ExpressionNode::Type::String>;
+using BoolExprNode = LiteralExprNode<bool, ExpressionNode::Type::Boolean>;
+
 // Nil and vararg expression nodes
 using NilExprNode = ExpressionNodeOf<ExpressionNode::Type::Nil, "Nil">;
 using VarargExprNode = ExpressionNodeOf<ExpressionNode::Type::Vararg, "Vararg">;

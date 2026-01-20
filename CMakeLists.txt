@@ -77,6 +77,7 @@ set(SOURCE_FILES
         src/node/Program.cpp
         src/node/generation/ExpressionBytecodeBuilder.cpp
         src/node/generation/CodeGenContext.cpp
+        src/node/expression/LiteralExprNode.cpp
 )
 
 # Add files to executable target
