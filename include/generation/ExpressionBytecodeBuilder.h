@@ -44,7 +44,7 @@ public:
     // Operations with one operand
     void unm() const;
     void len() const;
-    void Not() const;
+    void booleanNot() const;
 
 private:
 
