@@ -61,7 +61,6 @@ public:
         UnaryMinuses,
     };
 
-    virtual void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const = 0;
 protected:
     explicit ExpressionNode(Type type);
 

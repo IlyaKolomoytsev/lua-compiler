@@ -1,6 +1,6 @@
-#include "generation/ExpressionBytecodeBuilder.h"
+#include "generation/ByteCodeBuilder.h"
 
-void ExpressionBytecodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = context_->getAttributeCode();
 
@@ -18,7 +18,7 @@ void ExpressionBytecodeBuilder::buildAnd(const ExpressionNode* left, const Expre
     *code << L_end;
 }
 
-void ExpressionBytecodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = context_->getAttributeCode();
 
@@ -36,7 +36,7 @@ void ExpressionBytecodeBuilder::buildOr(const ExpressionNode* left, const Expres
     *code << L_end;
 }
 
-void ExpressionBytecodeBuilder::pushInt(int64_t value) const
+void ByteCodeBuilder::pushInt(int64_t value) const
 {
     auto* code = context_->getAttributeCode();
 
@@ -47,7 +47,7 @@ void ExpressionBytecodeBuilder::pushInt(int64_t value) const
         << code->InvokeSpecial(context_->getIntConstructorForLuaValue());
 }
 
-void ExpressionBytecodeBuilder::pushFloat(double value) const
+void ByteCodeBuilder::pushFloat(double value) const
 {
     auto* code = context_->getAttributeCode();
     *code
@@ -57,7 +57,7 @@ void ExpressionBytecodeBuilder::pushFloat(double value) const
         << code->InvokeSpecial(context_->getFloatConstructorForLuaValue());
 }
 
-void ExpressionBytecodeBuilder::pushBool(bool value) const
+void ByteCodeBuilder::pushBool(bool value) const
 {
     auto* code = context_->getAttributeCode();
 
@@ -68,7 +68,7 @@ void ExpressionBytecodeBuilder::pushBool(bool value) const
         << code->InvokeSpecial(context_->getBoolConstructorForLuaValue());
 }
 
-void ExpressionBytecodeBuilder::pushString(const std::string& value) const
+void ByteCodeBuilder::pushString(const std::string& value) const
 {
     auto* code = context_->getAttributeCode();
 
@@ -79,7 +79,7 @@ void ExpressionBytecodeBuilder::pushString(const std::string& value) const
         << code->InvokeSpecial(context_->getStringConstructorForLuaValue());
 }
 
-void ExpressionBytecodeBuilder::pushNull() const
+void ByteCodeBuilder::pushNull() const
 {
     auto* code = context_->getAttributeCode();
 
@@ -89,7 +89,7 @@ void ExpressionBytecodeBuilder::pushNull() const
         << code->InvokeSpecial(context_->getNilConstructorForLuaValue());
 }
 
-void ExpressionBytecodeBuilder::id(const std::string& value) const
+void ByteCodeBuilder::id(const std::string& value) const
 {
     auto* code = context_->getAttributeCode();
 
@@ -99,115 +99,115 @@ void ExpressionBytecodeBuilder::id(const std::string& value) const
         << code->InvokeVirtual(context_->getLuaValueByIdMethodFromContext());
 }
 
-void ExpressionBytecodeBuilder::sum() const
+void ByteCodeBuilder::sum() const
 {
     emitStaticCall(context_->getAddMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::sub() const
+void ByteCodeBuilder::sub() const
 {
     emitStaticCall(context_->getSubMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::mul() const
+void ByteCodeBuilder::mul() const
 {
     emitStaticCall(context_->getMulMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::div() const
+void ByteCodeBuilder::div() const
 {
     emitStaticCall(context_->getDivMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::idiv() const
+void ByteCodeBuilder::idiv() const
 {
     emitStaticCall(context_->getIntegerDivMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::mod() const
+void ByteCodeBuilder::mod() const
 {
     emitStaticCall(context_->getModMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::pow() const
+void ByteCodeBuilder::pow() const
 {
     emitStaticCall(context_->getPowMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::concat() const
+void ByteCodeBuilder::concat() const
 {
     emitStaticCall(context_->getConcatMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::equal() const
+void ByteCodeBuilder::equal() const
 {
     emitStaticCall(context_->getEqualMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::notEqual() const
+void ByteCodeBuilder::notEqual() const
 {
     equal();
     booleanNot();
 }
 
-void ExpressionBytecodeBuilder::lessThan() const
+void ByteCodeBuilder::lessThan() const
 {
     emitStaticCall(context_->getLessThenMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::lessEqual() const
+void ByteCodeBuilder::lessEqual() const
 {
     emitStaticCall(context_->getLessEqualMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::greaterThan() const
+void ByteCodeBuilder::greaterThan() const
 {
     auto* code = context_->getAttributeCode();
     *code << code->Swap();
     emitStaticCall(context_->getLessThenMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::greaterEqual() const
+void ByteCodeBuilder::greaterEqual() const
 {
     auto* code = context_->getAttributeCode();
     *code << code->Swap();
     emitStaticCall(context_->getLessEqualMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::getFieldByKey() const
+void ByteCodeBuilder::getFieldByKey() const
 {
     auto* code = context_->getAttributeCode();
     *code
         << code->InvokeVirtual(context_->getFieldByKeyMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::setFieldByKey() const
+void ByteCodeBuilder::setFieldByKey() const
 {
     // TODO реализовать метод setFieldByKey
 }
 
-void ExpressionBytecodeBuilder::tableConstructor() const
+void ByteCodeBuilder::tableConstructor() const
 {
     // TODO реализовать метод tableConstructor
 }
 
-void ExpressionBytecodeBuilder::unm() const
+void ByteCodeBuilder::unm() const
 {
     emitStaticCall(context_->getUnMinusMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::len() const
+void ByteCodeBuilder::len() const
 {
     emitStaticCall(context_->getLengthMethodFromLuaValue());
 }
 
-void ExpressionBytecodeBuilder::booleanNot() const
+void ByteCodeBuilder::booleanNot() const
 {
     emitStaticCall(context_->getNotMethodFromLuaValue());
 }
 
 
-void ExpressionBytecodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
+void ByteCodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
 {
     auto* code = context_->getAttributeCode();
     *code << code->InvokeStatic(methodref);

@@ -75,7 +75,7 @@ set(SOURCE_FILES
         src/node/statement/LabelStmtNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
-        src/generation/ExpressionBytecodeBuilder.cpp
+        src/generation/ByteCodeBuilder.cpp
         src/generation/CodeGenContext.cpp
 )
 

@@ -17,8 +17,6 @@ public:
     {
         os << DOT_NODE_THIS_WITH_LABEL(N.value);
     }
-
-    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
 };
 
 #endif //LUA_COMPILER_EXPRESSION_NODE_OF_H

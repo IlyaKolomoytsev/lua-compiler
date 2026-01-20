@@ -24,8 +24,6 @@ public:
         os << *right_;
     }
 
-    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
-
 private:
     ExpressionNode* left_;
     ExpressionNode* right_;

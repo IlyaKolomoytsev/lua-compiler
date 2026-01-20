@@ -15,8 +15,6 @@ public:
 
     void writeNodeInfoToDot(std::ostream& os) const override;
 
-    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
-
 private:
     TableFieldList* fields_;
 };

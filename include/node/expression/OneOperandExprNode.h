@@ -19,8 +19,6 @@ public:
         os << *operand_;
     }
 
-    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
-
 private:
     ExpressionNode* operand_;
 };
