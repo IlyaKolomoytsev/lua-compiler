@@ -15,14 +15,9 @@
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
 
-CodeGenContext::CodeGenContext(Class* currentClass) : class_(currentClass)
+CodeGenContext::CodeGenContext(Class* currentClass, Method* currentMethod): class_(currentClass), currentMethod_(currentMethod)
 {
-}
-
-void CodeGenContext::setMethod(Method* method)
-{
-    currentMethod_ = method;
-    currentAttributeCode_ = method->getCodeAttribute();
+    currentAttributeCode_ = currentMethod_->getCodeAttribute();
 }
 
 ConstantClass* CodeGenContext::getLuaValueClass()

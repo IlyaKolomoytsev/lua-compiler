@@ -10,9 +10,7 @@ using namespace jvm;
 class CodeGenContext
 {
 public:
-    CodeGenContext(Class* currentClass);
-
-    void setMethod(Method* method);
+    CodeGenContext(Class* currentClass, Method* currentMethod);
 
     [[nodiscard]] Class* getClass() const { return class_; }
     [[nodiscard]] Method* getMethod() const { return currentMethod_; }
