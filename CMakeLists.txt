@@ -79,6 +79,7 @@ set(SOURCE_FILES
         src/node/generation/CodeGenContext.cpp
         src/node/expression/LiteralExprNode.cpp
         src/node/expression/TwoOperandsExprNode.cpp
+        src/node/expression/ExpressionNodeOf.cpp
 )
 
 # Add files to executable target

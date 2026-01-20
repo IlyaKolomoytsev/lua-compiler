@@ -3,9 +3,9 @@
 #include "node/DotMacros.h"
 #include "node/Node.h"
 #include "FixedString.h"
-#include "node/expression/ExpressionNode.h"
+#include "ExpressionNode.h"
 
-template <ExpressionNode::Type T, fixed_string N>
+template <exprType T, fixed_string N>
 class ExpressionNodeOf : public ExpressionNode
 {
 public:
@@ -17,6 +17,8 @@ public:
     {
         os << DOT_NODE_THIS_WITH_LABEL(N.value);
     }
+
+    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
 };
 
 #endif //LUA_COMPILER_EXPRESSION_NODE_OF_H
