@@ -1,6 +1,15 @@
 #include "generation/CodeGenContext.h"
+
+#include <optional>
+
+#include "jvm/descriptor-field.h"
+#include "jvm/descriptor-method.h"
 #define LUA_VALUE "com/luajvm/LuaValue"
-#
+
+#define HASH_MAP "java/util/HashMap"
+#define OBJECT "java/lang/Object"
+#define STRING "java/lang/String"
+
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
 
@@ -82,10 +91,25 @@ ConstantMethodref* CodeGenContext::getStringConstructorForLuaValue()
         luaValueCtorString = getClass()->getOrCreateMethodrefConstant(
             LUA_VALUE,
             "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorField("java/lang/String")})
+            DescriptorMethod(std::nullopt, {DescriptorField(STRING)})
         );
     }
     return luaValueCtorString;
+}
+
+ConstantMethodref* CodeGenContext::getTableConstructorForLuaValue()
+{
+    if (luaValueCtorTable == nullptr)
+    {
+        luaValueCtorTable = getClass()->getOrCreateMethodrefConstant(
+            LUA_VALUE,
+            "<init>",
+            DescriptorMethod(
+                std::nullopt, {DescriptorField(HASH_MAP)}
+            )
+        );
+    }
+    return luaValueCtorTable;
 }
 
 ConstantMethodref* CodeGenContext::getAddMethodFromLuaValue()
@@ -385,6 +409,47 @@ ConstantMethodref* CodeGenContext::getLengthMethodFromLuaValue()
     return luaValueLen;
 }
 
+ConstantClass* CodeGenContext::getHashMapClass()
+{
+    if (hashMapClass == nullptr)
+    {
+        hashMapClass = getClass()->getOrCreateClassConstant(HASH_MAP);
+    }
+    return hashMapClass;
+}
+
+ConstantMethodref* CodeGenContext::getHashMapConstructor()
+{
+    if (hashMapCtor == nullptr)
+    {
+        hashMapCtor = getClass()->getOrCreateMethodrefConstant(
+            HASH_MAP,
+            "<init>",
+            DescriptorMethod(std::nullopt, {})
+        );
+    }
+    return hashMapCtor;
+}
+
+ConstantMethodref* CodeGenContext::getPutMethodFromHashMap()
+{
+    if (hashMapPutMethod == nullptr)
+    {
+        hashMapPutMethod = getClass()->getOrCreateMethodrefConstant(
+            HASH_MAP,
+            "put",
+            DescriptorMethod(
+                DescriptorField(OBJECT),
+                {
+                    {OBJECT},
+                    {OBJECT}
+                }
+            )
+        );
+    }
+    return hashMapPutMethod;
+}
+
 ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()
 {
     if (luaContextGetLuaValueById == nullptr)
@@ -395,7 +460,7 @@ ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()
             DescriptorMethod(
                 DescriptorField(LUA_VALUE),
                 {
-                    {"java/lang/String"}
+                    {STRING}
                 }
             )
         );

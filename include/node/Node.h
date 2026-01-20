@@ -21,7 +21,7 @@ public:
 
     virtual void writeNodeInfoToDot(std::ostream& os) const = 0;
 
-    virtual void makeBytecode(ByteCodeBuilder& builder) const = 0;
+    virtual void makeBytecode(const ByteCodeBuilder& builder) const = 0;
 
 private:
     const node_id_t id;

@@ -1,6 +1,6 @@
 #include "node/expression/TableFieldExprNode.h"
 
-#include "generation/ExpressionBytecodeBuilder.h"
+#include "generation/ByteCodeBuilder.h"
 #include "node/DotMacros.h"
 
 void TableFieldExprNode::writeNodeInfoToDot(std::ostream& os) const
@@ -15,10 +15,11 @@ void TableFieldExprNode::writeNodeInfoToDot(std::ostream& os) const
     os << *key_;
 }
 
-void TableFieldExprNode::makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const
+void TableFieldExprNode::makeBytecode(const ByteCodeBuilder& builder) const
 {
-    table_->makeBytecode(bytecodeBuilder);
-    key_->makeBytecode(bytecodeBuilder);
+    table_->makeBytecode(builder);
+    key_->makeBytecode(builder);
 
-    bytecodeBuilder.getFieldByKey();
+    builder.getFieldByKey();
 }
+

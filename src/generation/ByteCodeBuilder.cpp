@@ -1,19 +1,26 @@
 #include "generation/ByteCodeBuilder.h"
 
+#include <optional>
+
+#include "node/NodeExpressionModule.h"
+
+
+#include "jvm/descriptor-method.h"
+
 void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = context_->getAttributeCode();
 
-    auto* L_end   = code->CodeLabel();
+    auto* L_end = code->CodeLabel();
 
-    left->makeBytecode(*this);  // ..., left
+    left->makeBytecode(*this); // ..., left
     *code << code->Duplicate(); // ..., left, left
-    *code << code->InvokeVirtual(context_->getBoolValueFromLuaValue());  // ..., left, bool
+    *code << code->InvokeVirtual(context_->getBoolValueFromLuaValue()); // ..., left, bool
     *code << code->If(Instruction::Compare::Equal, L_end); // ..., left
 
     // true:
     *code << code->PopOne(); // ...
-    right->makeBytecode(*this);  // ..., right
+    right->makeBytecode(*this); // ..., right
 
     *code << L_end;
 }
@@ -22,7 +29,7 @@ void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* 
 {
     auto* code = context_->getAttributeCode();
 
-    auto* L_end    = code->CodeLabel();
+    auto* L_end = code->CodeLabel();
 
     left->makeBytecode(*this); // ..., left
     *code << code->Duplicate(); // ..., left, left
@@ -94,7 +101,7 @@ void ByteCodeBuilder::id(const std::string& value) const
     auto* code = context_->getAttributeCode();
 
     *code
-        << code-> LoadReference(context_->getContextIndexInLocals())
+        << code->LoadReference(context_->getContextIndexInLocals())
         << code->PushString(value)
         << code->InvokeVirtual(context_->getLuaValueByIdMethodFromContext());
 }
@@ -181,16 +188,6 @@ void ByteCodeBuilder::getFieldByKey() const
         << code->InvokeVirtual(context_->getFieldByKeyMethodFromLuaValue());
 }
 
-void ByteCodeBuilder::setFieldByKey() const
-{
-    // TODO реализовать метод setFieldByKey
-}
-
-void ByteCodeBuilder::tableConstructor() const
-{
-    // TODO реализовать метод tableConstructor
-}
-
 void ByteCodeBuilder::unm() const
 {
     emitStaticCall(context_->getUnMinusMethodFromLuaValue());
@@ -206,9 +203,50 @@ void ByteCodeBuilder::booleanNot() const
     emitStaticCall(context_->getNotMethodFromLuaValue());
 }
 
+void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList) const
+{
+    auto code = context_->getAttributeCode();
+    int64_t index = 0;
+
+    *code
+        << code->New(context_->getLuaValueClass()) // ..., ref(LuaValue)
+        << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue)
+
+    createHashMap(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
+    for (auto field : *fieldList)
+    {
+        *code << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap)
+        if (field.name != nullptr)
+        {
+            field.name->makeBytecode(*this);
+            // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
+        }
+        else
+        {
+            pushInt(++index); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
+        }
+        field.value->makeBytecode(*this);
+        // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
+
+        *code << code->InvokeVirtual(context_->getPutMethodFromHashMap());
+        // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
+    }
+
+    *code << code->InvokeVirtual(context_->getTableConstructorForLuaValue()); // ..., ref(LuaValue)
+}
 
 void ByteCodeBuilder::emitStaticCall(ConstantMethodref* methodref) const
 {
     auto* code = context_->getAttributeCode();
     *code << code->InvokeStatic(methodref);
+}
+
+void ByteCodeBuilder::createHashMap() const
+{
+    auto* code = context_->getAttributeCode();
+
+    *code
+        << code->New(context_->getHashMapClass()) // ..., objectref(HashMap)
+        << code->Duplicate() // ..., objectref, objectref
+        << code->InvokeSpecial(context_->getHashMapConstructor()); // ..., objectref
 }

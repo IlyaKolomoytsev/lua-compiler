@@ -2,7 +2,7 @@
 #define LUA_COMPILER_BYTE_CODE_BUILDER_H
 
 #include "generation/CodeGenContext.h"
-#include "node/NodeExpressionModule.h"
+#include "node/expression/ExpressionNode.h"
 
 class ByteCodeBuilder
 {
@@ -43,18 +43,20 @@ public:
     void greaterThan() const;
     void greaterEqual() const;
     void getFieldByKey() const;
-    void setFieldByKey() const;
-    void tableConstructor() const;
     //endregion
     //region Operations with one operand
     void unm() const;
     void len() const;
     void booleanNot() const;
     //endregion
+    //region Others
+    void tableConstructor(TableFieldList* fieldList) const;
+    //endregion
 
 private:
     //region Helpers
     void emitStaticCall(ConstantMethodref* methodref) const;
+    void createHashMap() const;
     //endregion
 
     CodeGenContext* context_;

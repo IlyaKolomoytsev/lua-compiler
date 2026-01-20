@@ -30,6 +30,7 @@ public:
     ConstantMethodref* getFloatConstructorForLuaValue();
     ConstantMethodref* getBoolConstructorForLuaValue();
     ConstantMethodref* getStringConstructorForLuaValue();
+    ConstantMethodref* getTableConstructorForLuaValue();
 
     // methods
     ConstantMethodref* getAddMethodFromLuaValue();
@@ -49,7 +50,11 @@ public:
     ConstantMethodref* getUnMinusMethodFromLuaValue();
     ConstantMethodref* getLengthMethodFromLuaValue();
     //endregion
-
+    //region HashMap
+    ConstantClass* getHashMapClass();
+    ConstantMethodref* getHashMapConstructor();
+    ConstantMethodref* getPutMethodFromHashMap();
+    //endregion
     ConstantMethodref* getLuaValueByIdMethodFromContext();
 
     void setContextIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
@@ -63,6 +68,7 @@ private:
 
     // classes
     ConstantClass* luaValueClass = nullptr;
+    ConstantClass* hashMapClass = nullptr;
 
     // constructors
     ConstantMethodref* luaValueCtorNil = nullptr;
@@ -70,6 +76,8 @@ private:
     ConstantMethodref* luaValueCtorFloat = nullptr;
     ConstantMethodref* luaValueCtorBool = nullptr;
     ConstantMethodref* luaValueCtorString = nullptr;
+    ConstantMethodref* luaValueCtorTable = nullptr;
+    ConstantMethodref* hashMapCtor = nullptr;
 
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
@@ -87,6 +95,7 @@ private:
     ConstantMethodref* luaValueNot = nullptr;
     ConstantMethodref* luaValueGetBool = nullptr;
     ConstantMethodref* luaValueGetFieldByKey = nullptr;
+    ConstantMethodref* hashMapPutMethod = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;

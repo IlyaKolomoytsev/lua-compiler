@@ -19,3 +19,7 @@ void FunctionExprNode::writeNodeInfoToDot(std::ostream& os) const
     os << DOT_ARC_THIS_OTHER_LABEL(body_, "body");
     os << *body_;
 }
+
+void FunctionExprNode::makeBytecode(const ByteCodeBuilder& builder) const
+{
+}

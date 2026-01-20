@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include "node/Node.h"
 
-class ExpressionBytecodeBuilder;
 
 class ExpressionNode;
 
