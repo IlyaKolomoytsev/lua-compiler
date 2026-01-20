@@ -2,7 +2,7 @@
 #define LUA_COMPILER_ONE_OPERAND_EXPRESSION_NODE_H
 #include "ExpressionNodeOf.h"
 
-template <ExpressionNode::Type T, fixed_string N>
+template <exprType T, fixed_string N>
 class OneOperandExprNode : public ExpressionNodeOf<T, N>
 {
 public:
@@ -18,6 +18,8 @@ public:
         os << DOT_ARC_THIS_OTHER_LABEL(operand_, "operand");
         os << *operand_;
     }
+
+    void makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const override;
 
 private:
     ExpressionNode* operand_;

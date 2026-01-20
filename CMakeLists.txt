@@ -80,6 +80,7 @@ set(SOURCE_FILES
         src/node/expression/LiteralExprNode.cpp
         src/node/expression/TwoOperandsExprNode.cpp
         src/node/expression/ExpressionNodeOf.cpp
+        src/node/expression/OneOperandExprNode.cpp
 )
 
 # Add files to executable target
