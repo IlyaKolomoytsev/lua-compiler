@@ -194,6 +194,16 @@ void ExpressionBytecodeBuilder::getFieldByKey() const
         << code->InvokeVirtual(rt.luaValueGetFieldByKey);
 }
 
+void ExpressionBytecodeBuilder::setFieldByKey() const
+{
+    // TODO реализовать метод setFieldByKey
+}
+
+void ExpressionBytecodeBuilder::tableConstructor() const
+{
+    // TODO реализовать метод tableConstructor
+}
+
 void ExpressionBytecodeBuilder::unm() const
 {
     emitStaticCall(context_->runtime_.luaValueUnMinus);

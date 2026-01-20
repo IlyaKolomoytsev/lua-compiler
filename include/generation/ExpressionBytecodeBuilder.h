@@ -38,6 +38,8 @@ public:
     void greaterThan() const;
     void greaterEqual() const;
     void getFieldByKey() const;
+    void setFieldByKey() const;
+    void tableConstructor() const;
 
     // Operations with one operand
     void unm() const;

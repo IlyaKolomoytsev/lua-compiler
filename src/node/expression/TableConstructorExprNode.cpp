@@ -1,4 +1,8 @@
 #include "node/expression/TableConstructorExprNode.h"
+
+#include <bits/locale_facets_nonio.h>
+
+#include "generation/ExpressionBytecodeBuilder.h"
 #include "node/DotMacros.h"
 
 void TableConstructorExprNode::writeNodeInfoToDot(std::ostream& os) const
@@ -25,4 +29,20 @@ void TableConstructorExprNode::writeNodeInfoToDot(std::ostream& os) const
         os << *field.value;
     }
 
+}
+
+void TableConstructorExprNode::makeBytecode(ExpressionBytecodeBuilder& bytecodeBuilder) const
+{
+    for (auto field : *fields_)
+    {
+        if (field.name != nullptr)
+        {
+            field.name->makeBytecode(bytecodeBuilder);
+        }
+        field.value->makeBytecode(bytecodeBuilder);
+
+        bytecodeBuilder.setFieldByKey();
+    }
+
+    bytecodeBuilder.tableConstructor();
 }
