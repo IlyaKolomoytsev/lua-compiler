@@ -8,7 +8,6 @@ void ExpressionBytecodeBuilder::buildAnd(const ExpressionNode* left, const Expre
 
     left->makeBytecode(*this);  // ..., left
     *code << code->Duplicate(); // ..., left, left
-    *code << code->PushInt(1);  // ..., left, left, 1
     *code << code->InvokeVirtual(context_->getBoolValueFromLuaValue());  // ..., left, bool
     *code << code->If(Instruction::Compare::Equal, L_end); // ..., left
 
@@ -27,7 +26,6 @@ void ExpressionBytecodeBuilder::buildOr(const ExpressionNode* left, const Expres
 
     left->makeBytecode(*this); // ..., left
     *code << code->Duplicate(); // ..., left, left
-    *code << code->PushInt(1); // ..., left, left, 1
     *code << code->InvokeVirtual(context_->getBoolValueFromLuaValue()); // ..., left, bool
     *code << code->If(Instruction::Compare::NotEqual, L_end); // ..., left
 
