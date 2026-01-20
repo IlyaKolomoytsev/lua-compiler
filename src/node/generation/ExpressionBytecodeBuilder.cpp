@@ -1,167 +1,13 @@
 #include "generation/ExpressionBytecodeBuilder.h"
 
-using type = ExpressionNode::Type;
-
-void ExpressionBytecodeBuilder::buildExpression(ExpressionNode* expression)
-{
-    auto children = getChildren(expression);
-
-    if (expression->getType() == type::And)
-    {
-        buildAnd(expression->getLeftOperand(), expression->getRightOperand());
-    }
-    else if (expression->getType() == type::Or)
-    {
-        buildOr(expression->getLeftOperand(), expression->getRightOperand());
-    }
-    else
-    {
-        for (auto child : children)
-        {
-            buildExpression(child);
-        }
-        build(expression);
-    }
-}
-
-void ExpressionBytecodeBuilder::build(ExpressionNode* expression)
-{
-    switch (expression->getType())
-    {
-    case type::Integer:
-        {
-            pushInt(expression);
-            break;
-        }
-    case type::Float:
-        {
-            pushFloat(expression);
-            break;
-        }
-    case type::Boolean:
-        {
-            pushBool(expression);
-            break;
-        }
-    case type::String:
-        {
-            pushString(expression);
-            break;
-        }
-    case type::Nil:
-        {
-            pushNull();
-            break;
-        }
-    case type::Summation:
-        {
-            sum();
-            break;
-        }
-    case type::Subtraction:
-        {
-            sub();
-            break;
-        }
-    case type::Multiplication:
-        {
-            mul();
-            break;
-        }
-    case type::Division:
-        {
-            div();
-            break;
-        }
-    case type::IntegerDivision:
-        {
-            idiv();
-            break;
-        }
-    case type::Modulo:
-        {
-            mod();
-            break;
-        }
-    case type::Exponentiation:
-        {
-            pow();
-            break;
-        }
-    case type::Concatenation:
-        {
-            concat();
-            break;
-        }
-    case type::Equality:
-        {
-            equal();
-            break;
-        }
-    case type::Greater:
-        {
-            greaterThan();
-            break;
-        }
-    case type::GreaterEqual:
-        {
-            greaterEqual();
-            break;
-        }
-    case type::Less:
-        {
-            lessThan();
-            break;
-        }
-    case type::LessEqual:
-        {
-            lessEqual();
-            break;
-        }
-    case type::Length:
-        {
-            len();
-            break;
-        }
-    case type::UnaryMinuses:
-        {
-            unm();
-            break;
-        }
-    case type::Id:
-        {
-            id(expression);
-            break;
-        }
-    case type::TableField:
-    case type::TableFieldByIndex:
-        {
-            getFieldByKey();
-            break;
-        }
-    case type::Unequality:
-        {
-            notEqual();
-            break;
-        }
-    case type::Negation:
-        {
-            Not();
-            break;
-        }
-    default:
-        break;
-    }
-}
-
-void ExpressionBytecodeBuilder::buildAnd(ExpressionNode* left, ExpressionNode* right)
+void ExpressionBytecodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = context_->attributeCode_;
     const auto rt = context_->runtime_;
 
     auto* L_end   = code->CodeLabel();
 
-    buildExpression(left);  // ..., left
+    left->makeBytecode(*this);  // ..., left
     *code << code->Duplicate(); // ..., left, left
     *code << code->PushInt(1);  // ..., left, left, 1
     *code << code->InvokeVirtual(rt.luaValueGetBool);  // ..., left, bool
@@ -169,19 +15,19 @@ void ExpressionBytecodeBuilder::buildAnd(ExpressionNode* left, ExpressionNode* r
 
     // true:
     *code << code->PopOne(); // ...
-    buildExpression(right);  // ..., right
+    right->makeBytecode(*this);  // ..., right
 
     *code << L_end;
 }
 
-void ExpressionBytecodeBuilder::buildOr(ExpressionNode* left, ExpressionNode* right)
+void ExpressionBytecodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = context_->attributeCode_;
     auto rt = context_->runtime_;
 
     auto* L_end    = code->CodeLabel();
 
-    buildExpression(left); // ..., left
+    left->makeBytecode(*this); // ..., left
     *code << code->Duplicate(); // ..., left, left
     *code << code->PushInt(1); // ..., left, left, 1
     *code << code->InvokeVirtual(rt.luaValueGetBool); // ..., left, bool
@@ -189,12 +35,12 @@ void ExpressionBytecodeBuilder::buildOr(ExpressionNode* left, ExpressionNode* ri
 
     // false
     *code << code->PopOne(); // ...
-    buildExpression(right); // ..., right
+    right->makeBytecode(*this); // ..., right
 
     *code << L_end;
 }
 
-void ExpressionBytecodeBuilder::pushInt(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushInt(int64_t value) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -202,11 +48,11 @@ void ExpressionBytecodeBuilder::pushInt(const ExpressionNode* expression) const
     *code
         << code->New(runtimeRefs.luaValueClass)
         << code->Duplicate()
-        << code->PushInt(static_cast<int32_t>(expression->getInteger()))
+        << code->PushInt(static_cast<int32_t>(value))
         << code->InvokeSpecial(runtimeRefs.luaValueCtorInt);
 }
 
-void ExpressionBytecodeBuilder::pushFloat(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushFloat(double value) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -214,11 +60,11 @@ void ExpressionBytecodeBuilder::pushFloat(const ExpressionNode* expression) cons
     *code
         << code->New(runtimeRefs.luaValueClass)
         << code->Duplicate()
-        << code->PushFloat(static_cast<float>(expression->getFloat()))
+        << code->PushFloat(static_cast<float>(value))
         << code->InvokeSpecial(runtimeRefs.luaValueCtorFloat);
 }
 
-void ExpressionBytecodeBuilder::pushBool(const ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushBool(bool value) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -226,11 +72,11 @@ void ExpressionBytecodeBuilder::pushBool(const ExpressionNode* expression) const
     *code
         << code->New(runtimeRefs.luaValueClass)
         << code->Duplicate()
-        << code->PushInt(expression->getBool() ? 1 : 0)
+        << code->PushInt(value)
         << code->InvokeSpecial(runtimeRefs.luaValueCtorBool);
 }
 
-void ExpressionBytecodeBuilder::pushString(ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::pushString(const std::string& value) const
 {
     auto* code = context_->attributeCode_;
     auto runtimeRefs = context_->runtime_;
@@ -238,7 +84,7 @@ void ExpressionBytecodeBuilder::pushString(ExpressionNode* expression) const
     *code
         << code->New(runtimeRefs.luaValueClass)
         << code->Duplicate()
-        << code->PushString(*expression->getString())
+        << code->PushString(value)
         << code->InvokeSpecial(runtimeRefs.luaValueCtorString);
 }
 
@@ -253,7 +99,7 @@ void ExpressionBytecodeBuilder::pushNull() const
         << code->InvokeSpecial(runtimeRefs.luaValueCtorNil);
 }
 
-void ExpressionBytecodeBuilder::id(ExpressionNode* expression) const
+void ExpressionBytecodeBuilder::id(const std::string& value) const
 {
     // TODO Разобраться с тем, что мы храним контекст в 0 слоте локалов
     auto* code = context_->attributeCode_;
@@ -261,7 +107,7 @@ void ExpressionBytecodeBuilder::id(ExpressionNode* expression) const
 
     *code
         << code-> LoadReference(0)
-        << code->PushString(*expression->getString())
+        << code->PushString(value)
         << code->InvokeVirtual(runtimeRefs.luaContextGetLuaValueById);
 }
 
@@ -368,73 +214,4 @@ void ExpressionBytecodeBuilder::emitStaticCall(ConstantMethodref* methodref) con
 {
     auto* code = context_->attributeCode_;
     *code << code->InvokeStatic(methodref);
-}
-
-
-ExpressionNodeList ExpressionBytecodeBuilder::getChildren(ExpressionNode* expression)
-{
-    ExpressionNodeList children;
-
-    switch (expression->getType())
-    {
-    case ExpressionNode::Type::TableConstructor:
-        {
-            for (const auto& field : *expression->getTableConstructor())
-            {
-                if (field.name) children.push_back(field.name);
-                if (field.value) children.push_back(field.value);
-            }
-            break;
-        }
-
-    case ExpressionNode::Type::TableField:
-        {
-            children.push_back(expression->getTableId());
-            children.push_back(expression->getTableFieldKey());
-            break;
-        }
-
-    case ExpressionNode::Type::FunctionCall:
-        {
-            children.push_back(expression->getFunctionId());
-            for (auto* arg : *expression->getFunctionArguments())
-                children.push_back(arg);
-            break;
-        }
-
-    case ExpressionNode::Type::Length:
-    case ExpressionNode::Type::Negation:
-    case ExpressionNode::Type::UnaryMinuses:
-        {
-            children.push_back(expression->getOperand());
-            break;
-        }
-
-    case ExpressionNode::Type::Summation:
-    case ExpressionNode::Type::Subtraction:
-    case ExpressionNode::Type::Multiplication:
-    case ExpressionNode::Type::Division:
-    case ExpressionNode::Type::Modulo:
-    case ExpressionNode::Type::IntegerDivision:
-    case ExpressionNode::Type::Exponentiation:
-    case ExpressionNode::Type::Less:
-    case ExpressionNode::Type::Greater:
-    case ExpressionNode::Type::Equality:
-    case ExpressionNode::Type::Unequality:
-    case ExpressionNode::Type::LessEqual:
-    case ExpressionNode::Type::GreaterEqual:
-    case ExpressionNode::Type::Or:
-    case ExpressionNode::Type::And:
-    case ExpressionNode::Type::Concatenation:
-        {
-            children.push_back(expression->getLeftOperand());
-            children.push_back(expression->getRightOperand());
-            break;
-        }
-
-    default:
-        break;
-    }
-
-    return children;
 }

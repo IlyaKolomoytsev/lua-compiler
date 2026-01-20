@@ -1,30 +1,26 @@
 #ifndef LUA_COMPILER_EXPRESSION_BYTECODE_BUILDER_H
 #define LUA_COMPILER_EXPRESSION_BYTECODE_BUILDER_H
 
-#include "ExpressionNode.h"
+#include "ByteCodeBuilder.h"
 #include "CodeGenContext.h"
+#include "node/NodeExpressionModule.h"
 
-class ExpressionBytecodeBuilder
+class ExpressionBytecodeBuilder : public ByteCodeBuilder
 {
 public:
-    ExpressionBytecodeBuilder(CodeGenContext* context)
-        : context_(context){}
+    ExpressionBytecodeBuilder(CodeGenContext* context) : ByteCodeBuilder(context) {}
 
-    void buildExpression(ExpressionNode* expression);
-
-private:
-    void build(ExpressionNode* expression);
-    void buildAnd(ExpressionNode* left, ExpressionNode* right);
-    void buildOr(ExpressionNode* left, ExpressionNode* right);
+    void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
+    void buildOr(const ExpressionNode* left, const ExpressionNode* right);
 
     // Push on stack
-    void pushInt(const ExpressionNode* expression) const;
-    void pushFloat(const ExpressionNode* expression) const;
-    void pushBool(const ExpressionNode* expression) const;
-    void pushString(ExpressionNode* expression) const;
+    void pushInt(int64_t value) const;
+    void pushFloat(double value) const;
+    void pushBool(bool value) const;
+    void pushString(const std::string& value) const;
     void pushNull() const;
 
-    void id(ExpressionNode* expression) const;
+    void id(const std::string& value) const;
 
     // Operations with two operands
     void sum() const;
@@ -48,11 +44,11 @@ private:
     void len() const;
     void Not() const;
 
+private:
+
     // Helpers
     void emitStaticCall(ConstantMethodref* methodref) const;
-    ExpressionNodeList getChildren(ExpressionNode* expression);
 
-    CodeGenContext* context_;
 };
 
 #endif //LUA_COMPILER_EXPRESSION_BYTECODE_BUILDER_H
