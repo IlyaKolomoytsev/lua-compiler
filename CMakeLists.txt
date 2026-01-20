@@ -75,12 +75,8 @@ set(SOURCE_FILES
         src/node/statement/LabelStmtNode.cpp
         src/lexer/LexerStringBuilder.cpp
         src/node/Program.cpp
-        src/node/generation/ExpressionBytecodeBuilder.cpp
-        src/node/generation/CodeGenContext.cpp
-        src/node/expression/LiteralExprNode.cpp
-        src/node/expression/TwoOperandsExprNode.cpp
-        src/node/expression/ExpressionNodeOf.cpp
-        src/node/expression/OneOperandExprNode.cpp
+        src/generation/ExpressionBytecodeBuilder.cpp
+        src/generation/CodeGenContext.cpp
 )
 
 # Add files to executable target
