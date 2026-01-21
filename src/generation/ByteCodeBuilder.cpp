@@ -188,6 +188,13 @@ void ByteCodeBuilder::getFieldByKey()
         << code->InvokeVirtual(getFieldByKeyMethodFromLuaValue());
 }
 
+void ByteCodeBuilder::call()
+{
+    auto* code = getAttributeCode();
+    *code
+        << code->InvokeVirtual(getCallMethodFromLuaValue());
+}
+
 void ByteCodeBuilder::unm()
 {
     emitStaticCall(getUnMinusMethodFromLuaValue());
@@ -267,4 +274,23 @@ void ByteCodeBuilder::createHashMap()
         << code->New(getHashMapClass()) // ..., objectref(HashMap)
         << code->Duplicate() // ..., objectref, objectref
         << code->InvokeSpecial(getHashMapConstructor()); // ..., objectref
+}
+
+void ByteCodeBuilder::createLuaList()
+{
+    auto* code = getAttributeCode();
+
+    *code
+        << code->New(getLuaListClass()) // ..., objectref(LuaList)
+        << code->Duplicate() // ..., objectref, objectref
+        << code->InvokeSpecial(getLuaListConstructor()); // ..., objectref
+}
+
+void ByteCodeBuilder::addToLuaList()
+{
+    auto* code = getAttributeCode();
+
+    *code
+        << code->InvokeVirtual(getAddMethodFromLuaList())
+        << code->PopOne(); // отбросить bool
 }

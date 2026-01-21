@@ -1,5 +1,8 @@
 #include "node/expression/FunctionCallExprNode.h"
+
+#include "generation/ByteCodeBuilder.h"
 #include "node/DotMacros.h"
+#include "node/expression/TableFieldExprNode.h"
 
 void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
 {
@@ -9,13 +12,13 @@ void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
     // Write children node info to dot file
     os << DOT_ARC_THIS_OTHER_LABEL(function_, "Function");
     int index = 0;
-    for (auto* arg: *arguments_)
+    for (auto* arg : *arguments_)
     {
         os << DOT_ARC_THIS_OTHER_LABEL(arg, "argument №" << index++);
     }
 
     os << *function_;
-    for (auto* arg: *arguments_)
+    for (auto* arg : *arguments_)
     {
         os << *arg;
     }
@@ -23,25 +26,34 @@ void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
 
 void FunctionCallExprNode::makeBytecode(ByteCodeBuilder& builder) const
 {
-    // обработать function_
-    // ..., ref(LuaValue)
+    auto* code = builder.getAttributeCode();
+
     if (withSelf_)
     {
-        // ..., ref(LuaValue), ref(LuaValue) "дублирование"
-        // ..., ref(LuaValue), ref(LuaValue), ref(LuaList) "инициализируешь"
-        // ..., ref(LuaValue), ref(LuaList), ref(LuaValue), ref(LuaList) "DuplicateBeforeOne"
-        // ..., ref(LuaValue), ref(LuaList), ref(LuaList), ref(LuaValue) "swap"
-        // ..., ref(LuaValue), ref(LuaList) "запись в контейнер (add)"
+        // The function is a table method, i.e. the self parameter exists only for TableField, so the static_cast is used.
+        auto tableFunc = static_cast<TableFieldExprNode*>(function_);
+        tableFunc->getTable()->makeBytecode(builder); // ..., self
+        *code << code->Duplicate(); // ..., self, self
+        tableFunc->getKey()->makeBytecode(builder); // ..., self, self, key
+        builder.getFieldByKey(); // ..., self, LuaValue
+
+        *code << code->Swap(); // ..., LuaValue, self
+        builder.createLuaList(); // ..., LuaValue, self, LuaList
+        *code
+            << code->DuplicateBeforeOne() // ..., LuaValue, LuaList, self, LuaList
+            << code->Swap(); // .., LuaValue, LuaList, LuaList, self
+        builder.addToLuaList(); // ..., LuaValue, LuaList
     }
     else
     {
-        // ..., ref(LuaValue), ref(LuaList) "инициализируешь"
+        function_->makeBytecode(builder); // ..., LuaValue
+        builder.createLuaList(); // ..., LuaValue, LuaList
     }
-    for (auto arg: *arguments_)
+    for (auto arg : *arguments_)
     {
-        // ..., ref(LuaValue), ref(LuaList), ref(LuaList) "дублирование"
-        arg->makeBytecode(builder); // ..., ref(LuaValue), ref(LuaList), ref(LuaList), ref (LuaValue) "запись в контейнер"
-        // ..., ref(LuaValue), ref(LuaList)
+        *code << code->Duplicate(); // ..., LuaValue, LuaList, LuaList
+        arg->makeBytecode(builder); // ..., LuaValue, LuaList, LuaList, LuaValue
+        builder.addToLuaList(); // ..., LuaValue, LuaList
     }
-    // ..., ref(LuaList) // "вызов метаметода call()"
+    builder.call(); // ..., LuaList
 }

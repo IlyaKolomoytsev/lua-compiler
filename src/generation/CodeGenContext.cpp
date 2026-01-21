@@ -370,6 +370,24 @@ ConstantMethodref* CodeGenContext::getFieldByKeyMethodFromLuaValue()
     return luaValueGetFieldByKey;
 }
 
+ConstantMethodref* CodeGenContext::getCallMethodFromLuaValue()
+{
+    if (luaValueCall == nullptr)
+    {
+        luaValueCall = getClass()->getOrCreateMethodrefConstant(
+            LUA_VALUE,
+            "call",
+            DescriptorMethod(
+                DescriptorField(LIST),
+                {
+                    {LIST}
+                }
+            )
+        );
+    }
+    return luaValueCall;
+}
+
 ConstantMethodref* CodeGenContext::getUnMinusMethodFromLuaValue()
 {
     if (luaValueUnMinus == nullptr)
@@ -515,6 +533,22 @@ ConstantMethodref* CodeGenContext::getFirstMethodFromList()
         );
     }
     return listGetFirstMethod;
+}
+
+ConstantMethodref* CodeGenContext::getAddMethodFromLuaList()
+{
+    if (luaListAddMethod == nullptr)
+    {
+        luaListAddMethod = getClass()->getOrCreateMethodrefConstant(
+            LUA_LIST,
+            "add",
+            DescriptorMethod(
+                Descriptor::Boolean,
+                {{OBJECT}}
+            )
+        );
+    }
+    return luaListAddMethod;
 }
 
 ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()

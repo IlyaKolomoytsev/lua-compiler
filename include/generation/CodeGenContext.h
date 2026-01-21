@@ -44,6 +44,7 @@ public:
     ConstantMethodref* getNotMethodFromLuaValue();
     ConstantMethodref* getBoolValueFromLuaValue();
     ConstantMethodref* getFieldByKeyMethodFromLuaValue();
+    ConstantMethodref* getCallMethodFromLuaValue();
     ConstantMethodref* getUnMinusMethodFromLuaValue();
     ConstantMethodref* getLengthMethodFromLuaValue();
     //endregion
@@ -58,6 +59,7 @@ public:
     ConstantMethodref* getGetMethodFromLuaList();
     ConstantMethodref* getSubListMethodFromLuaList();
     ConstantMethodref* getFirstMethodFromList();
+    ConstantMethodref* getAddMethodFromLuaList();
     //endregion
     ConstantMethodref* getLuaValueByIdMethodFromContext();
 
@@ -107,10 +109,12 @@ private:
     ConstantMethodref* luaValueNot = nullptr;
     ConstantMethodref* luaValueGetBool = nullptr;
     ConstantMethodref* luaValueGetFieldByKey = nullptr;
+    ConstantMethodref* luaValueCall = nullptr;
     ConstantMethodref* hashMapPutMethod = nullptr;
     ConstantMethodref* luaListSubList = nullptr;
     ConstantMethodref* listGetFirstMethod = nullptr;
     ConstantMethodref* listGetMethod = nullptr;
+    ConstantMethodref* luaListAddMethod = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;

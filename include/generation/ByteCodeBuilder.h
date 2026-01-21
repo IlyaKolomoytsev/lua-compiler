@@ -43,6 +43,7 @@ public:
     void greaterThan();
     void greaterEqual();
     void getFieldByKey();
+    void call();
     //endregion
     //region Operations with one operand
     void unm();
@@ -54,6 +55,9 @@ public:
     void pushVararg();
     void pushVarargList();
     //endregion
+
+    void createLuaList();
+    void addToLuaList();
 
 private:
     //region Helpers
