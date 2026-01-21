@@ -18,7 +18,7 @@ public:
     void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
     void buildOr(const ExpressionNode* left, const ExpressionNode* right);
     //endregion
-    //region Push on stack
+    //region Push LuaValue primitive on stack
     void pushInt(int64_t value) const;
     void pushFloat(double value) const;
     void pushBool(bool value) const;
