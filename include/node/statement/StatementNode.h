@@ -37,9 +37,12 @@ public:
         Return,
     };
 
+    Type getType() const { return type_; }
+
 protected:
     explicit StatementNode(Type type);
 
+private:
     Type type_;
 };
 
