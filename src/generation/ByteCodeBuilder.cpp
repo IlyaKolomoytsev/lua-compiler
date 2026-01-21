@@ -239,7 +239,7 @@ void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* 
 
     auto* L_end = code->CodeLabel();
 
-    buildBytecode(left);  // ..., left
+    buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
     *code << code->InvokeVirtual(getBoolValueFromLuaValue()); // ..., left, bool
     *code << code->If(Instruction::Compare::NotEqual, L_end); // ..., left
@@ -433,8 +433,7 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         *code << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap)
         if (field.name != nullptr)
         {
-            buildBytecode(field.name);
-          // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
+            buildBytecode(field.name); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
         }
         else
         {
