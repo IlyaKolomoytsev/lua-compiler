@@ -15,8 +15,8 @@ public:
     [[nodiscard]] const CodeGenContext* getContext() const { return context_; }
 
     //region Bool operation
-    void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
-    void buildOr(const ExpressionNode* left, const ExpressionNode* right);
+    void buildAnd(const ExpressionNode* left, const ExpressionNode* right) const;
+    void buildOr(const ExpressionNode* left, const ExpressionNode* right) const;
     //endregion
     //region Push LuaValue primitive on stack
     void pushInt(int64_t value) const;

@@ -7,7 +7,7 @@
 
 #include "jvm/descriptor-method.h"
 
-void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right) const
 {
     auto* code = context_->getAttributeCode();
 
@@ -25,7 +25,7 @@ void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode*
     *code << L_end;
 }
 
-void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right) const
 {
     auto* code = context_->getAttributeCode();
 
