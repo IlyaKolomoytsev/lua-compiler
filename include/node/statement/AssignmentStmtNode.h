@@ -1,5 +1,6 @@
 #ifndef LUA_COMPILER_ASSIGNMENT_STMT_NODE_H
 #define LUA_COMPILER_ASSIGNMENT_STMT_NODE_H
+#include "node/expression/ExpressionNode.h"
 #include "node/statement/StatementNode.h"
 
 class AssignmentStmtNode : public StatementNode

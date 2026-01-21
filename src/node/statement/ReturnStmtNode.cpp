@@ -1,5 +1,7 @@
 #include "node/statement/ReturnStmtNode.h"
 
+#include "node/DotMacros.h"
+
 ReturnStmtNode::ReturnStmtNode(ExpressionNodeList* returnExprList) : StatementNode(Type::Return),
                                                                      returnExprList_(returnExprList)
 {

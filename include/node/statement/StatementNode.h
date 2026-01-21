@@ -1,11 +1,8 @@
 #ifndef LUA_COMPILER_STATEMENT_NODE_H
 #define LUA_COMPILER_STATEMENT_NODE_H
-#include <cassert>
-#include <functional>
-#include <vector>
+#include <list>
 
-#include "node/expression/ExpressionNode.h"
-#include "node/NodeExpressionModule.h"
+#include "node/Node.h"
 
 class StatementNode;
 

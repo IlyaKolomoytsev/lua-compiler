@@ -1,5 +1,7 @@
 #include "node/statement/DeclarationStmtNode.h"
 
+#include "node/DotMacros.h"
+
 DeclarationStmtNode::DeclarationStmtNode(ExpressionNodeList* names) : StatementNode(Type::Declaration), names_(names)
 {
 }
@@ -16,9 +18,4 @@ void DeclarationStmtNode::writeNodeInfoToDot(std::ostream& os) const
         os << DOT_ARC_THIS_OTHER_LABEL(name, "declare №" << indexVariables++);
         os << *name;
     }
-}
-
-void DeclarationStmtNode::makeBytecode(ByteCodeBuilder& builder) const
-{
-    builder.declareIds(names_);
 }

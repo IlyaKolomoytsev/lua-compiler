@@ -1,5 +1,7 @@
 #include "node/statement/FunctionCallStmtNode.h"
 
+#include "node/DotMacros.h"
+
 FunctionCallStmtNode::FunctionCallStmtNode(ExpressionNode* functionCall): StatementNode(Type::FunctionCall), functionCall_(functionCall)
 {
 }

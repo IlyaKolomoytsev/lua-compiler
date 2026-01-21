@@ -4,11 +4,13 @@
 
 #include "jvm/descriptor-field.h"
 #include "jvm/descriptor-method.h"
+#include "jvm/method.h"
 #define LUA_VALUE "com/luajvm/LuaValue"
 #define LUA_LIST "com/luajvm/LuaList"
 #define LUA_CONTEXT "com/luajvm/LuaContext"
 
 #define HASH_MAP "java/util/HashMap"
+#define MAP "java/util/Map"
 #define OBJECT "java/lang/Object"
 #define STRING "java/lang/String"
 #define LIST "java/util/List"
@@ -61,7 +63,7 @@ ConstantMethodref* CodeGenContext::getIntConstructorForLuaValue()
         luaValueCtorInt = getClass()->getOrCreateMethodrefConstant(
             LUA_VALUE,
             "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorMethod::Int})
+            DescriptorMethod(std::nullopt, {DescriptorMethod::Long})
         );
     }
     return luaValueCtorInt;
@@ -74,7 +76,7 @@ ConstantMethodref* CodeGenContext::getFloatConstructorForLuaValue()
         luaValueCtorFloat = getClass()->getOrCreateMethodrefConstant(
             LUA_VALUE,
             "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorMethod::Float})
+            DescriptorMethod(std::nullopt, {DescriptorMethod::Double})
         );
     }
     return luaValueCtorFloat;
@@ -114,7 +116,7 @@ ConstantMethodref* CodeGenContext::getTableConstructorForLuaValue()
             LUA_VALUE,
             "<init>",
             DescriptorMethod(
-                std::nullopt, {DescriptorField(HASH_MAP)}
+                std::nullopt, {DescriptorField(MAP)}
             )
         );
     }
@@ -134,6 +136,21 @@ ConstantMethodref* CodeGenContext::getConstructorForLuaContext()
         );
     }
     return luaContextCtor;
+}
+
+ConstantMethodref* CodeGenContext::getConstructorForLuaContextWithParent()
+{
+    if (luaContextWithParentCtor == nullptr)
+    {
+        luaContextWithParentCtor = getClass()->getOrCreateMethodrefConstant(
+            LUA_CONTEXT,
+            "<init>",
+            DescriptorMethod(
+                std::nullopt, {{LUA_CONTEXT}}
+            )
+        );
+    }
+    return luaContextWithParentCtor;
 }
 
 ConstantMethodref* CodeGenContext::getAddMethodFromLuaValue()
@@ -533,12 +550,12 @@ ConstantMethodref* CodeGenContext::getLuaListConstructor()
     return luaListCtor;
 }
 
-ConstantMethodref* CodeGenContext::getGetMethodFromList()
+ConstantMethodref* CodeGenContext::getGetMethodFromLuaList()
 {
     if (listGetMethod == nullptr)
     {
         listGetMethod = getClass()->getOrCreateMethodrefConstant(
-            LIST,
+            LUA_LIST,
             "get",
             DescriptorMethod(
                 DescriptorField(OBJECT),
@@ -565,12 +582,12 @@ ConstantMethodref* CodeGenContext::getSubListMethodFromLuaList()
     return luaListSubList;
 }
 
-ConstantMethodref* CodeGenContext::getFirstMethodFromList()
+ConstantMethodref* CodeGenContext::getFirstMethodFromLuaList()
 {
     if (listGetFirstMethod == nullptr)
     {
         listGetFirstMethod = getClass()->getOrCreateMethodrefConstant(
-            LIST,
+            LUA_LIST,
             "getFirst",
             DescriptorMethod(
                 DescriptorField(OBJECT),
@@ -581,12 +598,12 @@ ConstantMethodref* CodeGenContext::getFirstMethodFromList()
     return listGetFirstMethod;
 }
 
-ConstantMethodref* CodeGenContext::getAddMethodFromList()
+ConstantMethodref* CodeGenContext::getAddMethodFromLuaList()
 {
     if (luaListAddMethod == nullptr)
     {
         luaListAddMethod = getClass()->getOrCreateMethodrefConstant(
-            LIST,
+            LUA_LIST,
             "add",
             DescriptorMethod(
                 Descriptor::Boolean,
@@ -597,12 +614,12 @@ ConstantMethodref* CodeGenContext::getAddMethodFromList()
     return luaListAddMethod;
 }
 
-ConstantMethodref* CodeGenContext::getAddAllMethodFromList()
+ConstantMethodref* CodeGenContext::getAddAllMethodFromLuaList()
 {
     if (listAddAllMethod == nullptr)
     {
         listAddAllMethod = getClass()->getOrCreateMethodrefConstant(
-            LIST,
+            LUA_LIST,
             "addAll",
             DescriptorMethod(
                 Descriptor::Boolean,
@@ -611,6 +628,51 @@ ConstantMethodref* CodeGenContext::getAddAllMethodFromList()
         );
     }
     return listAddAllMethod;
+}
+
+void CodeGenContext::setContextIndexInLocals(uint16_t index)
+{
+    contextIndexInLocals_ = index;
+    contextIndexIsInitialized_ = true;
+}
+
+uint16_t CodeGenContext::getContextIndexInLocals() const
+{
+    if (!contextIndexIsInitialized_)
+    {
+        throw std::logic_error("Index of context instance not initialized");
+    }
+    return contextIndexInLocals_;
+}
+
+void CodeGenContext::setArgsIndexInLocals(uint16_t index)
+{
+    argsIndexInLocals_ = index;
+    argsIndexIsInitialized_ = true;
+}
+
+uint16_t CodeGenContext::getArgsIndexInLocals() const
+{
+    if (!argsIndexIsInitialized_)
+    {
+        throw std::logic_error("Index of args list not initialized");
+    }
+    return contextIndexInLocals_;
+}
+
+void CodeGenContext::setStartIndexForVarargInListArgs(int32_t index)
+{
+    startIndexForVarargInListArgs_ = index;
+    startIndexForVarargIsInitialized_ = true;
+}
+
+int32_t CodeGenContext::getStartIndexForVarargInListArgs() const
+{
+    if (!startIndexForVarargIsInitialized_)
+    {
+        throw std::logic_error("Index of vararg start index not initialized");
+    }
+    return startIndexForVarargInListArgs_;
 }
 
 ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()

@@ -1,5 +1,7 @@
 #include "node/statement/GotoStmtNode.h"
 
+#include "node/DotMacros.h"
+
 GotoStmtNode::GotoStmtNode(std::string* labelName) : StatementNode(Type::GoTo), labelName_(labelName)
 {
 }

@@ -41,8 +41,6 @@ std::string to_string(StatementNode::Type type)
         return "RepeatLoop";
     case StatementNode::Type::Block:
         return "Block";
-    case StatementNode::Type::DoBlock:
-        return "DoBlock";
     case StatementNode::Type::GoTo:
         return "GoTo";
     case StatementNode::Type::Label:

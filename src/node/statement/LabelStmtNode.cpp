@@ -1,5 +1,7 @@
 #include "node/statement/LabelStmtNode.h"
 
+#include "node/DotMacros.h"
+
 LabelStmtNode::LabelStmtNode(std::string* name) : StatementNode(Type::Label), name_(name)
 {
 }

@@ -1,6 +1,7 @@
 #ifndef LUA_COMPILER_FUNCTION_CALL_STATEMENT_NODE_H
 #define LUA_COMPILER_FUNCTION_CALL_STATEMENT_NODE_H
 #include "StatementNode.h"
+#include "node/expression/ExpressionNode.h"
 
 class FunctionCallStmtNode : public StatementNode
 {

@@ -2,6 +2,7 @@
 #define LUA_COMPILER_WHILE_REPEAT_LOOP_STMT_NODE_H
 #include "StatementNode.h"
 #include "BlockStmtNode.h"
+#include "node/expression/ExpressionNode.h"
 
 class WhileRepeatLoopStmtNode : public StatementNode
 {

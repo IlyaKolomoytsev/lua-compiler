@@ -1,5 +1,7 @@
 #include "node/statement/WhileRepeatLoopStmtNode.h"
 
+#include "node/DotMacros.h"
+
 WhileRepeatLoopStmtNode::WhileRepeatLoopStmtNode(Type type, ExpressionNode* condition, BlockStmtNode* block) :
     StatementNode(type), condition_(condition), block_(block)
 {

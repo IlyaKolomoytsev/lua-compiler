@@ -5,6 +5,8 @@
 #include "node/Program.h"
 #include <filesystem>
 
+#include "generation/ClassRegistry.h"
+
 yyFlexLexer* lexer;
 
 namespace fs = std::filesystem;
@@ -26,7 +28,7 @@ void print_usage(const char* exe) {
 
 static bool parse_args(int argc, char* argv[], Config& cfg) {
     // default output dir - current directory
-    cfg.outputDir = fs::current_path();
+    cfg.outputDir = fs::current_path() / "target";
 
     // for each parameter
     for (int i = 1; i < argc; ++i) {
@@ -133,6 +135,24 @@ int generate_outputs(const Config& cfg) {
 
         int rc = run_graphviz_dot(dotPath, svgPath);
         if (rc != 0) return 1;
+
+        ClassRegistry registry(cfg.outputDir);
+        registry.build(static_cast<BlockStmtNode*>(*it));
+    }
+    return 0;
+}
+
+int compile_project(const Config& cfg)
+{
+    auto chunks = Program::getChunks();
+    if (!chunks) {
+        std::cerr << "Error: Program::getChunks() вернул nullptr\n";
+        return 1;
+    }
+
+    int chunkNumber = 0;
+    for (auto it = chunks->begin(); it != chunks->end(); ++it, ++chunkNumber) {
+
     }
     return 0;
 }

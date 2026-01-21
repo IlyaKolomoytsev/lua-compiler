@@ -1,9 +1,7 @@
 #ifndef LUA_COMPILER_CODEGEN_CONTEXT_H
 #define LUA_COMPILER_CODEGEN_CONTEXT_H
-
-#include "jvm/attribute-code.h"
 #include "jvm/class.h"
-#include "jvm/method.h"
+#include "jvm/attribute-code.h"
 
 using namespace jvm;
 
@@ -57,6 +55,7 @@ public:
     //region LuaContext
     ConstantClass* getLuaContextClass();
     ConstantMethodref* getConstructorForLuaContext();
+    ConstantMethodref* getConstructorForLuaContextWithParent();
     ConstantMethodref* getLuaValueByIdMethodFromContext();
     ConstantMethodref* setLuaValueByIdMethodFromContext();
     ConstantMethodref* getDeclareLocalByIdMethodFromContext();
@@ -64,21 +63,21 @@ public:
     //region LuaList
     ConstantClass* getLuaListClass();
     ConstantMethodref* getLuaListConstructor();
-    ConstantMethodref* getGetMethodFromList();
+    ConstantMethodref* getGetMethodFromLuaList();
     ConstantMethodref* getSubListMethodFromLuaList();
-    ConstantMethodref* getFirstMethodFromList();
-    ConstantMethodref* getAddMethodFromList();
-    ConstantMethodref* getAddAllMethodFromList();
+    ConstantMethodref* getFirstMethodFromLuaList();
+    ConstantMethodref* getAddMethodFromLuaList();
+    ConstantMethodref* getAddAllMethodFromLuaList();
     //endregion
 
-    void setContextIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
-    uint16_t getContextIndexInLocals() const { return contextIndexInLocals_; }
+    void setContextIndexInLocals(uint16_t index);
+    uint16_t getContextIndexInLocals() const;
 
-    void setArgsIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
-    uint16_t getArgsIndexInLocals() const { return contextIndexInLocals_; }
+    void setArgsIndexInLocals(uint16_t index);
+    uint16_t getArgsIndexInLocals() const;
 
-    void setStartIndexForVarargInListArgs(int32_t index) { startIndexForVarargInListArgs_ = index; }
-    int32_t getStartIndexForVarargInListArgs() const { return startIndexForVarargInListArgs_; }
+    void setStartIndexForVarargInListArgs(int32_t index);
+    int32_t getStartIndexForVarargInListArgs() const;
 
 private:
     Class* class_;
@@ -102,6 +101,7 @@ private:
     ConstantMethodref* hashMapCtor = nullptr;
     ConstantMethodref* luaListCtor = nullptr;
     ConstantMethodref* luaContextCtor = nullptr;
+    ConstantMethodref* luaContextWithParentCtor = nullptr;
 
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
@@ -136,8 +136,11 @@ private:
     ConstantMethodref* luaContextDeclareLocalById = nullptr;
 
     uint16_t contextIndexInLocals_ = 0;
+    bool contextIndexIsInitialized_ = false;
     uint16_t argsIndexInLocals_ = 0;
+    bool argsIndexIsInitialized_ = false;
     int32_t startIndexForVarargInListArgs_ = 0;
+    bool startIndexForVarargIsInitialized_ = false;
 };
 
 #endif //LUA_COMPILER_CODEGEN_CONTEXT_H

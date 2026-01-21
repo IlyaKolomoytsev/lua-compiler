@@ -1,5 +1,7 @@
 #include "node/statement/BreakStmtNode.h"
 
+#include "node/DotMacros.h"
+
 BreakStmtNode::BreakStmtNode() : StatementNode(Type::Break)
 {
 }

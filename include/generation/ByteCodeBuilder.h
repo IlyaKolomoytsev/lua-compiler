@@ -1,11 +1,18 @@
 #ifndef LUA_COMPILER_BYTE_CODE_BUILDER_H
 #define LUA_COMPILER_BYTE_CODE_BUILDER_H
+#include "CodeGenContext.h"
+#include "jvm/class.h"
+#include "jvm/method.h"
+#include "node/expression/ExpressionNode.h"
+#include "node/expression/FunctionCallExprNode.h"
+#include "node/statement/AssignmentStmtNode.h"
+#include "node/statement/BlockStmtNode.h"
+#include "node/statement/FunctionCallStmtNode.h"
 
-#include "generation/CodeGenContext.h"
-#include "node/NodeExpressionModule.h"
-#include "node/NodeStatementModule.h"
 
 class ClassRegistry;
+
+using namespace jvm;
 
 class ByteCodeBuilder : public CodeGenContext
 {
@@ -14,11 +21,12 @@ public:
         CodeGenContext(currentClass, currentMethod), classRegistry_(registry)
     {
     }
+    void build(const BlockStmtNode& node);
 
+private:
     void buildBytecode(const ExpressionNode* node);
     void buildBytecode(const StatementNode* node);
 
-private:
     //region Bool operation
     void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
     void buildOr(const ExpressionNode* left, const ExpressionNode* right);

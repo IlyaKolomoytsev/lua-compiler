@@ -1,5 +1,7 @@
 #include "node/statement/AssignmentStmtNode.h"
 
+#include "node/DotMacros.h"
+
 AssignmentStmtNode::AssignmentStmtNode(Scope scope, ExpressionNodeList* names, ExpressionNodeList* values) :
     StatementNode(Type::Assignment), scope_(scope), names_(names), values_(values)
 {

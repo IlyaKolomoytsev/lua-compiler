@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "node/DotMacros.h"
+
 BranchingStmtNode::BranchingStmtNode(ExpressionNode* condition,
                                      BlockStmtNode* successBlock,
                                      StatementNode* failureBlock) :

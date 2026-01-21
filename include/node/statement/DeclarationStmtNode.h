@@ -1,6 +1,7 @@
 #ifndef LUA_COMPILER_DECLARATION_STMT_NODE_H
 #define LUA_COMPILER_DECLARATION_STMT_NODE_H
-#include "node/statement/StatementNode.h"
+#include "StatementNode.h"
+#include "node/expression/ExpressionNode.h"
 
 class DeclarationStmtNode : public StatementNode
 {

@@ -28,16 +28,12 @@ std::string to_string(ExpressionNode::Type type)
         return "Vararg";
     case ExpressionNode::Type::TableField:
         return "TableField";
-    case ExpressionNode::Type::TableFieldByIndex:
-        return "TableFieldByIndex";
     case ExpressionNode::Type::TableConstructor:
         return "TableConstructor";
     case ExpressionNode::Type::FunctionCall:
         return "FunctionCall";
     case ExpressionNode::Type::FunctionLiteral:
         return "FunctionLiteral";
-    case ExpressionNode::Type::ExpressionList:
-        return "ExpressionList";
     case ExpressionNode::Type::Summation:
         return "Summation";
     case ExpressionNode::Type::Subtraction:

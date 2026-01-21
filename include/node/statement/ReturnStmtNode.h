@@ -1,6 +1,7 @@
 #ifndef LUA_COMPILER_RETURN_STMT_NODE_H
 #define LUA_COMPILER_RETURN_STMT_NODE_H
 #include "StatementNode.h"
+#include "node/expression/ExpressionNode.h"
 
 
 class ReturnStmtNode : public StatementNode

@@ -3,6 +3,7 @@
 
 #include "StatementNode.h"
 #include "BlockStmtNode.h"
+#include "node/expression/ExpressionNode.h"
 
 class ForLoopIteratorStmtNode : public StatementNode
 {

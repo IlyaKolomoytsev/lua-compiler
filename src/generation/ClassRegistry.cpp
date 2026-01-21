@@ -2,6 +2,17 @@
 
 #include "jvm/descriptor-method.h"
 
+ClassRegistry::ClassRegistry(std::filesystem::path targetDirectory) : targetDirectory_(std::move(targetDirectory))
+{
+}
+
+void ClassRegistry::build(BlockStmtNode* blockNode)
+{
+    auto builder = getBuilderForMain();
+    builder->build(*blockNode);
+    builder->getClass()->writeToProject(targetDirectory_);
+}
+
 ByteCodeBuilder* ClassRegistry::getBuilderForMain()
 {
     if (mainBuilder_ == nullptr)
@@ -9,7 +20,10 @@ ByteCodeBuilder* ClassRegistry::getBuilderForMain()
         auto* functionClass = new Class("Main", "java/lang/Object");
         auto* method = functionClass->getOrCreateMethod(
             "main",
-            {std::nullopt, {}}
+            {
+                std::nullopt,
+                {{"java/lang/String", 1}}
+            }
         );
         method->addFlag(Method::ACC_PUBLIC);
         method->addFlag(Method::ACC_STATIC);
