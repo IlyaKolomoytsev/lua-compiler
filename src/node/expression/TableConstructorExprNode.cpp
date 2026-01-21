@@ -31,8 +31,3 @@ void TableConstructorExprNode::writeNodeInfoToDot(std::ostream& os) const
 
 }
 
-void TableConstructorExprNode::makeBytecode(ByteCodeBuilder& builder) const
-{
-    builder.tableConstructor(fields_);
-}
-

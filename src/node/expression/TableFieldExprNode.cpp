@@ -15,11 +15,4 @@ void TableFieldExprNode::writeNodeInfoToDot(std::ostream& os) const
     os << *key_;
 }
 
-void TableFieldExprNode::makeBytecode(ByteCodeBuilder& builder) const
-{
-    table_->makeBytecode(builder); // ..., table
-    key_->makeBytecode(builder); // ..., table, key
-
-    builder.getFieldByKey(); // ..., LuaValue
-}
 

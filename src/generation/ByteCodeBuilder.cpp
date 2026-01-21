@@ -7,20 +7,228 @@
 
 #include "jvm/descriptor-method.h"
 
+void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
+{
+    switch (node->getType())
+    {
+    case ExpressionNode::Type::Integer:
+        {
+            auto castNode = static_cast<const IntegerExprNode*>(node);
+            pushInt(castNode->getValue());
+            break;
+        }
+    case ExpressionNode::Type::Float:
+        {
+            auto castNode = static_cast<const FloatExprNode*>(node);
+            pushFloat(castNode->getValue());
+            break;
+        }
+    case ExpressionNode::Type::String:
+        {
+            auto castNode = static_cast<const StringExprNode*>(node);
+            pushString(castNode->getValue());
+            break;
+        }
+    case ExpressionNode::Type::Boolean:
+        {
+            auto castNode = static_cast<const BoolExprNode*>(node);
+            pushBool(castNode->getValue());
+            break;
+        }
+    case ExpressionNode::Type::Nil:
+        pushNull();
+        break;
+    case ExpressionNode::Type::Vararg:
+        // ToDo
+        break;
+    case ExpressionNode::Type::Id:
+        {
+            auto castNode = static_cast<const IdExprNode*>(node);
+            id(castNode->getValue());
+            break;
+        }
+    case ExpressionNode::Type::TableField:
+        {
+            auto castField = static_cast<const TableFieldExprNode*>(node);
+            buildBytecode(castField->getTable());
+            buildBytecode(castField->getKey());
+            getFieldByKey();
+            break;
+        }
+    case ExpressionNode::Type::TableConstructor:
+        {
+            auto* castValue = static_cast<const TableConstructorExprNode*>(node);
+            tableConstructor(castValue->getTableFields());
+            break;
+        }
+    case ExpressionNode::Type::FunctionCall:
+        functionCall(*static_cast<const FunctionCallExprNode*>(node));
+        break;
+    case ExpressionNode::Type::FunctionLiteral:
+        // ToDo
+        break;
+    case ExpressionNode::Type::Summation:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            sum();
+            break;
+        }
+    case ExpressionNode::Type::Subtraction:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            sub();
+            break;
+        }
+    case ExpressionNode::Type::Multiplication:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            sum();
+            break;
+        }
+    case ExpressionNode::Type::Division:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            div();
+            break;
+        }
+    case ExpressionNode::Type::Modulo:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            mod();
+            break;
+        }
+    case ExpressionNode::Type::IntegerDivision:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            idiv();
+            break;
+        }
+    case ExpressionNode::Type::Exponentiation:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            idiv();
+            break;
+        }
+    case ExpressionNode::Type::Less:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            lessThan();
+            break;
+        }
+    case ExpressionNode::Type::Greater:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            greaterThan();
+            break;
+        }
+    case ExpressionNode::Type::Equality:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            equal();
+            break;
+        }
+    case ExpressionNode::Type::Unequality:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            notEqual();
+            break;
+        }
+    case ExpressionNode::Type::LessEqual:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            lessEqual();
+            break;
+        }
+    case ExpressionNode::Type::GreaterEqual:
+        {
+            auto* castValue = static_cast<const SummationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            greaterEqual();
+            break;
+        }
+    case ExpressionNode::Type::Or:
+        {
+            auto* castValue = static_cast<const OrExprNode*>(node);
+            buildOr(castValue->getLeft(), castValue->getRight());
+            break;
+        }
+    case ExpressionNode::Type::And:
+        {
+            auto* castValue = static_cast<const AndExprNode*>(node);
+            buildAnd(castValue->getLeft(), castValue->getRight());
+            break;
+        }
+    case ExpressionNode::Type::Concatenation:
+        {
+            auto* castValue = static_cast<const ConcatenationExprNode*>(node);
+            buildBytecode(castValue->getLeft());
+            buildBytecode(castValue->getRight());
+            concat();
+            break;
+        }
+    case ExpressionNode::Type::Length:
+        {
+            auto* castValue = static_cast<const LengthExprNode*>(node);
+            buildBytecode(castValue->getOperand());
+            len();
+            break;
+        }
+    case ExpressionNode::Type::Negation:
+        {
+            auto* castValue = static_cast<const NegationExprNode*>(node);
+            buildBytecode(castValue->getOperand());
+            booleanNot();
+            break;
+        }
+    case ExpressionNode::Type::UnaryMinuses:
+        {
+            auto* castValue = static_cast<const UnaryMinusExprNode*>(node);
+            buildBytecode(castValue->getOperand());
+            unm();
+            break;
+        }
+    }
+}
+
 void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = getAttributeCode();
 
     auto* L_end = code->CodeLabel();
 
-    left->makeBytecode(*this); // ..., left
+    buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
     *code << code->InvokeVirtual(getBoolValueFromLuaValue()); // ..., left, bool
     *code << code->If(Instruction::Compare::Equal, L_end); // ..., left
 
     // true:
     *code << code->PopOne(); // ...
-    right->makeBytecode(*this); // ..., right
+    buildBytecode(right); // ..., right
 
     *code << L_end;
 }
@@ -31,14 +239,14 @@ void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* 
 
     auto* L_end = code->CodeLabel();
 
-    left->makeBytecode(*this); // ..., left
+    buildBytecode(left);  // ..., left
     *code << code->Duplicate(); // ..., left, left
     *code << code->InvokeVirtual(getBoolValueFromLuaValue()); // ..., left, bool
     *code << code->If(Instruction::Compare::NotEqual, L_end); // ..., left
 
     // false
     *code << code->PopOne(); // ...
-    right->makeBytecode(*this); // ..., right
+    buildBytecode(right); // ..., right
 
     *code << L_end;
 }
@@ -50,7 +258,7 @@ void ByteCodeBuilder::pushInt(int64_t value)
     *code
         << code->New(getLuaValueClass())
         << code->Duplicate()
-        << code->PushDouble(value)
+        << code->PushLong(value)
         << code->InvokeSpecial(getIntConstructorForLuaValue());
 }
 
@@ -225,14 +433,14 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         *code << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap)
         if (field.name != nullptr)
         {
-            field.name->makeBytecode(*this);
-            // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
+            buildBytecode(field.name);
+          // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
         }
         else
         {
             pushInt(++index); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
         }
-        field.value->makeBytecode(*this);
+        buildBytecode(field.value);
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
 
         *code << code->InvokeVirtual(getPutMethodFromHashMap());
@@ -276,6 +484,40 @@ void ByteCodeBuilder::createHashMap()
         << code->InvokeSpecial(getHashMapConstructor()); // ..., objectref
 }
 
+void ByteCodeBuilder::functionCall(const FunctionCallExprNode& node)
+{
+    auto* code = getAttributeCode();
+
+    if (node.getWithSelf())
+    {
+        // The function is a table method, i.e. the self parameter exists only for TableField, so the static_cast is used.
+        auto tableFunc = static_cast<TableFieldExprNode*>(node.getFunctionExpression());
+        buildBytecode(tableFunc->getTable()); // ..., self
+        *code << code->Duplicate(); // ..., self, self
+        buildBytecode(tableFunc->getKey()); // ..., self, self, key
+        getFieldByKey(); // ..., self, LuaValue
+
+        *code << code->Swap(); // ..., LuaValue, self
+        createLuaList(); // ..., LuaValue, self, LuaList
+        *code
+            << code->DuplicateBeforeOne() // ..., LuaValue, LuaList, self, LuaList
+            << code->Swap(); // .., LuaValue, LuaList, LuaList, self
+        addToLuaList(); // ..., LuaValue, LuaList
+    }
+    else
+    {
+        buildBytecode(node.getFunctionExpression()); // ..., LuaValue
+        createLuaList(); // ..., LuaValue, LuaList
+    }
+    for (auto arg : node.getFunctionArguments())
+    {
+        *code << code->Duplicate(); // ..., LuaValue, LuaList, LuaList
+        buildBytecode(arg); // ..., LuaValue, LuaList, LuaList, LuaValue
+        addToLuaList(); // ..., LuaValue, LuaList
+    }
+    call(); // ..., LuaList
+}
+
 void ByteCodeBuilder::createLuaList()
 {
     auto* code = getAttributeCode();
@@ -301,7 +543,7 @@ void ByteCodeBuilder::declareIds(ExpressionNodeList* ids)
     for (auto id : *ids)
     {
         *code << code->LoadReference(getContextIndexInLocals());
-        id->makeBytecode(*this);
+        buildBytecode(id);
         *code << code->InvokeVirtual(getDeclareLocalByIdMethodFromContext());
     }
 }

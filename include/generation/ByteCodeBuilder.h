@@ -2,7 +2,7 @@
 #define LUA_COMPILER_BYTE_CODE_BUILDER_H
 
 #include "generation/CodeGenContext.h"
-#include "node/expression/ExpressionNode.h"
+#include "node/NodeExpressionModule.h"
 
 class ClassRegistry;
 
@@ -14,6 +14,9 @@ public:
     {
     }
 
+    void buildBytecode(const ExpressionNode* node);
+
+private:
     //region Bool operation
     void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
     void buildOr(const ExpressionNode* left, const ExpressionNode* right);
@@ -61,11 +64,12 @@ public:
 
     void declareIds(ExpressionNodeList* ids);
 
-private:
     //region Helpers
     void emitStaticCall(ConstantMethodref* methodref);
     void createHashMap();
     //endregion
+
+    void functionCall(const FunctionCallExprNode& node);
 
     ClassRegistry* classRegistry_;
 };

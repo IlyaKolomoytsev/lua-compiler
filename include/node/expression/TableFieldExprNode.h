@@ -16,7 +16,6 @@ public:
     /* Overridden methods */
 
     void writeNodeInfoToDot(std::ostream& os) const override;
-    void makeBytecode(ByteCodeBuilder& builder) const override;
 
 private:
     ExpressionNode* table_;
