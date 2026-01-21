@@ -58,9 +58,12 @@ public:
         UnaryMinuses,
     };
 
+    Type getType() const { return type_; }
+
 protected:
     explicit ExpressionNode(Type type);
 
+private:
     Type type_;
 };
 
