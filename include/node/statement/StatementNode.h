@@ -31,7 +31,6 @@ public:
         WhileLoop,
         RepeatLoop,
         Block,
-        DoBlock,
         GoTo,
         Label,
         Break,
