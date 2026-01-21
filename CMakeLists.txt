@@ -77,6 +77,7 @@ set(SOURCE_FILES
         src/node/Program.cpp
         src/generation/ByteCodeBuilder.cpp
         src/generation/CodeGenContext.cpp
+        src/generation/ClassRegistry.cpp
 )
 
 # Add files to executable target
