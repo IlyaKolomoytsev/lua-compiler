@@ -59,6 +59,8 @@ public:
     void createLuaList();
     void addToLuaList();
 
+    void declareIds(ExpressionNodeList* ids);
+
 private:
     //region Helpers
     void emitStaticCall(ConstantMethodref* methodref);

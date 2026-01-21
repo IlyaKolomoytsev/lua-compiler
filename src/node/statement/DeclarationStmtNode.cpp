@@ -17,3 +17,8 @@ void DeclarationStmtNode::writeNodeInfoToDot(std::ostream& os) const
         os << *name;
     }
 }
+
+void DeclarationStmtNode::makeBytecode(ByteCodeBuilder& builder) const
+{
+    builder.declareIds(names_);
+}

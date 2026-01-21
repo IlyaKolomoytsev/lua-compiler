@@ -294,3 +294,14 @@ void ByteCodeBuilder::addToLuaList()
         << code->InvokeVirtual(getAddMethodFromLuaList())
         << code->PopOne(); // отбросить bool
 }
+
+void ByteCodeBuilder::declareIds(ExpressionNodeList* ids)
+{
+    auto* code = getAttributeCode();
+    for (auto id : *ids)
+    {
+        *code << code->LoadReference(getContextIndexInLocals());
+        id->makeBytecode(*this);
+        *code << code->InvokeVirtual(getDeclareLocalByIdMethodFromContext());
+    }
+}

@@ -47,11 +47,20 @@ public:
     ConstantMethodref* getCallMethodFromLuaValue();
     ConstantMethodref* getUnMinusMethodFromLuaValue();
     ConstantMethodref* getLengthMethodFromLuaValue();
+    ConstantMethodref* getAssignmentMethodFromLuaValue();
     //endregion
     //region HashMap
     ConstantClass* getHashMapClass();
     ConstantMethodref* getHashMapConstructor();
     ConstantMethodref* getPutMethodFromHashMap();
+    //endregion
+    //region LuaContext
+    ConstantClass* getLuaContextClass();
+    ConstantMethodref* getConstructorForLuaContext();
+    ConstantMethodref* getLuaValueByIdMethodFromContext();
+    ConstantMethodref* setLuaValueByIdMethodFromContext();
+    ConstantMethodref* getDeclareLocalByIdMethodFromContext();
+    ConstantMethodref* getDeclareLocalByIdAndLuaValueMethodFromContext();
     //endregion
     //region LuaList
     ConstantClass* getLuaListClass();
@@ -61,7 +70,6 @@ public:
     ConstantMethodref* getFirstMethodFromList();
     ConstantMethodref* getAddMethodFromLuaList();
     //endregion
-    ConstantMethodref* getLuaValueByIdMethodFromContext();
 
     void setContextIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
     uint16_t getContextIndexInLocals() const { return contextIndexInLocals_; }
@@ -82,6 +90,7 @@ private:
     ConstantClass* luaValueClass = nullptr;
     ConstantClass* hashMapClass = nullptr;
     ConstantClass* luaListClass = nullptr;
+    ConstantClass* luaContextClass = nullptr;
 
     // constructors
     ConstantMethodref* luaValueCtorNil = nullptr;
@@ -92,6 +101,7 @@ private:
     ConstantMethodref* luaValueCtorTable = nullptr;
     ConstantMethodref* hashMapCtor = nullptr;
     ConstantMethodref* luaListCtor = nullptr;
+    ConstantMethodref* luaContextCtor = nullptr;
 
     // methods
     ConstantMethodref* luaValueCreate = nullptr;
@@ -115,11 +125,15 @@ private:
     ConstantMethodref* listGetFirstMethod = nullptr;
     ConstantMethodref* listGetMethod = nullptr;
     ConstantMethodref* luaListAddMethod = nullptr;
+    ConstantMethodref* luaAssignmentMethod = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;
 
     ConstantMethodref* luaContextGetLuaValueById = nullptr;
+    ConstantMethodref* luaContextSetLuaValueById = nullptr;
+    ConstantMethodref* luaContextDeclareLocalById = nullptr;
+    ConstantMethodref* luaContextDeclareLocalByIdAndLuaValue = nullptr;
 
     uint16_t contextIndexInLocals_ = 0;
     uint16_t argsIndexInLocals_ = 0;
