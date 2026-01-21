@@ -19,11 +19,11 @@ public:
         os << DOT_NODE_THIS_WITH_LABEL(N.value);
     }
 
-    void makeBytecode(const ByteCodeBuilder& builder) const override;
+    void makeBytecode(ByteCodeBuilder& builder) const override;
 };
 
 template <exprType T, fixed_string N>
-void ExpressionNodeOf<T, N>::makeBytecode(const ByteCodeBuilder& builder) const
+void ExpressionNodeOf<T, N>::makeBytecode(ByteCodeBuilder& builder) const
 {
     if constexpr (T == exprType::Nil)
     {

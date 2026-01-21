@@ -20,6 +20,6 @@ void FunctionExprNode::writeNodeInfoToDot(std::ostream& os) const
     os << *body_;
 }
 
-void FunctionExprNode::makeBytecode(const ByteCodeBuilder& builder) const
+void FunctionExprNode::makeBytecode(ByteCodeBuilder& builder) const
 {
 }

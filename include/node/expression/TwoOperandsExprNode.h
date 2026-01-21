@@ -24,7 +24,7 @@ public:
         os << *right_;
     }
 
-    void makeBytecode(const ByteCodeBuilder& builder) const override;
+    void makeBytecode(ByteCodeBuilder& builder) const override;
 
 private:
     ExpressionNode* left_;
@@ -32,7 +32,7 @@ private:
 };
 
 template <exprType T, fixed_string N>
-void TwoOperandsExprNode<T, N>::makeBytecode(const ByteCodeBuilder& builder) const
+void TwoOperandsExprNode<T, N>::makeBytecode(ByteCodeBuilder& builder) const
 {
     if constexpr (T != exprType::And && T != exprType::Or)
         {

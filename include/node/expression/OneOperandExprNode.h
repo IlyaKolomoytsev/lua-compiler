@@ -19,14 +19,14 @@ public:
         os << *operand_;
     }
 
-    void makeBytecode(const ByteCodeBuilder& builder) const override;
+    void makeBytecode(ByteCodeBuilder& builder) const override;
 
 private:
     ExpressionNode* operand_;
 };
 
 template <exprType T, fixed_string N>
-void OneOperandExprNode<T, N>::makeBytecode(const ByteCodeBuilder& builder) const
+void OneOperandExprNode<T, N>::makeBytecode(ByteCodeBuilder& builder) const
 {
     operand_->makeBytecode(builder);
     if constexpr (T == exprType::Length)

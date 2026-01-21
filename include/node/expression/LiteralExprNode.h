@@ -24,14 +24,14 @@ public:
         os << DOT_NODE_THIS_WITH_LABEL(value_);
     }
 
-    void makeBytecode(const ByteCodeBuilder& builder) const override;
+    void makeBytecode(ByteCodeBuilder& builder) const override;
 
 private:
     V value_;
 };
 
 template <typename V, ExpressionNode::Type T>
-void LiteralExprNode<V, T>::makeBytecode(const ByteCodeBuilder& builder) const
+void LiteralExprNode<V, T>::makeBytecode(ByteCodeBuilder& builder) const
 {
     if constexpr (T == exprType::Integer)
     {

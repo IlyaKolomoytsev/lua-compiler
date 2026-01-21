@@ -21,7 +21,7 @@ void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
     }
 }
 
-void FunctionCallExprNode::makeBytecode(const ByteCodeBuilder& builder) const
+void FunctionCallExprNode::makeBytecode(ByteCodeBuilder& builder) const
 {
     // обработать function_
     // ..., ref(LuaValue)
