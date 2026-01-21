@@ -5,7 +5,7 @@
 #include "jvm/descriptor-field.h"
 #include "jvm/descriptor-method.h"
 #define LUA_VALUE "com/luajvm/LuaValue"
-#define LUA_LIST "com/luajvm/LuaValue"
+#define LUA_LIST "com/luajvm/LuaList"
 
 #define HASH_MAP "java/util/HashMap"
 #define OBJECT "java/lang/Object"
