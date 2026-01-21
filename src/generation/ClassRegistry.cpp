@@ -14,7 +14,7 @@ ByteCodeBuilder* ClassRegistry::getBuilderForMain()
         method->addFlag(Method::ACC_PUBLIC);
         method->addFlag(Method::ACC_STATIC);
 
-        mainBuilder_ = new ByteCodeBuilder(functionClass, method);
+        mainBuilder_ = new ByteCodeBuilder(functionClass, method, this);
     }
     return mainBuilder_;
 }
@@ -31,7 +31,7 @@ ByteCodeBuilder* ClassRegistry::createNewFunction()
     );
     method->addFlag(Method::ACC_PUBLIC);
 
-    return new ByteCodeBuilder(functionClass, method);
+    return new ByteCodeBuilder(functionClass, method, this);
 }
 
 std::string ClassRegistry::newFunctionClassName()

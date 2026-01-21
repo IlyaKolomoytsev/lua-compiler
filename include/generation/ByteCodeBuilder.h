@@ -4,10 +4,13 @@
 #include "generation/CodeGenContext.h"
 #include "node/expression/ExpressionNode.h"
 
-class ByteCodeBuilder: public CodeGenContext
+class ClassRegistry;
+
+class ByteCodeBuilder : public CodeGenContext
 {
 public:
-    ByteCodeBuilder(Class* currentClass, Method* currentMethod) : CodeGenContext(currentClass, currentMethod)
+    ByteCodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry) :
+        CodeGenContext(currentClass, currentMethod), classRegistry_(registry)
     {
     }
 
@@ -57,6 +60,8 @@ private:
     void emitStaticCall(ConstantMethodref* methodref);
     void createHashMap();
     //endregion
+
+    ClassRegistry* classRegistry_;
 };
 
 #endif //LUA_COMPILER_BYTE_CODE_BUILDER_H
