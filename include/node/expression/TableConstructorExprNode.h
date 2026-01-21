@@ -9,7 +9,7 @@ public:
     {
     }
 
-    [[nodiscard]] const TableFieldList& tableFields() const { return *fields_; }
+    [[nodiscard]] TableFieldList* getTableFields() const { return fields_; }
 
     /* Overridden methods */
 
