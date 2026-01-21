@@ -23,4 +23,25 @@ void FunctionCallExprNode::writeNodeInfoToDot(std::ostream& os) const
 
 void FunctionCallExprNode::makeBytecode(const ByteCodeBuilder& builder) const
 {
+    // обработать function_
+    // ..., ref(LuaValue)
+    if (withSelf_)
+    {
+        // ..., ref(LuaValue), ref(LuaValue) "дублирование"
+        // ..., ref(LuaValue), ref(LuaValue), ref(LuaList) "инициализируешь"
+        // ..., ref(LuaValue), ref(LuaList), ref(LuaValue), ref(LuaList) "DuplicateBeforeOne"
+        // ..., ref(LuaValue), ref(LuaList), ref(LuaList), ref(LuaValue) "swap"
+        // ..., ref(LuaValue), ref(LuaList) "запись в контейнер (add)"
+    }
+    else
+    {
+        // ..., ref(LuaValue), ref(LuaList) "инициализируешь"
+    }
+    for (auto arg: *arguments_)
+    {
+        // ..., ref(LuaValue), ref(LuaList), ref(LuaList) "дублирование"
+        arg->makeBytecode(builder); // ..., ref(LuaValue), ref(LuaList), ref(LuaList), ref (LuaValue) "запись в контейнер"
+        // ..., ref(LuaValue), ref(LuaList)
+    }
+    // ..., ref(LuaList) // "вызов метаметода call()"
 }
