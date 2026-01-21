@@ -3,6 +3,7 @@
 
 #include "generation/CodeGenContext.h"
 #include "node/NodeExpressionModule.h"
+#include "node/NodeStatementModule.h"
 
 class ClassRegistry;
 
@@ -15,6 +16,7 @@ public:
     }
 
     void buildBytecode(const ExpressionNode* node);
+    void buildBytecode(const StatementNode* node);
 
 private:
     //region Bool operation
@@ -61,6 +63,7 @@ private:
 
     void createLuaList();
     void addToLuaList();
+    void addAllToList();
 
     void declareIds(ExpressionNodeList* ids);
 
@@ -69,8 +72,11 @@ private:
     void createHashMap();
     //endregion
 
-    void functionCall(const FunctionCallExprNode& node);
-
+    void functionCallExpr(const FunctionCallExprNode& node);
+    void functionCallExprList(const FunctionCallExprNode& node);
+    void functionCallStmt(const FunctionCallStmtNode& node);
+    void assigment(const AssignmentStmtNode& node);
+    void pushArgumentsList(const ExpressionNodeList& nodes, bool createListBeforeSet = true);
     ClassRegistry* classRegistry_;
 };
 

@@ -60,15 +60,15 @@ public:
     ConstantMethodref* getLuaValueByIdMethodFromContext();
     ConstantMethodref* setLuaValueByIdMethodFromContext();
     ConstantMethodref* getDeclareLocalByIdMethodFromContext();
-    ConstantMethodref* getDeclareLocalByIdAndLuaValueMethodFromContext();
     //endregion
     //region LuaList
     ConstantClass* getLuaListClass();
     ConstantMethodref* getLuaListConstructor();
-    ConstantMethodref* getGetMethodFromLuaList();
+    ConstantMethodref* getGetMethodFromList();
     ConstantMethodref* getSubListMethodFromLuaList();
     ConstantMethodref* getFirstMethodFromList();
-    ConstantMethodref* getAddMethodFromLuaList();
+    ConstantMethodref* getAddMethodFromList();
+    ConstantMethodref* getAddAllMethodFromList();
     //endregion
 
     void setContextIndexInLocals(uint16_t index) { contextIndexInLocals_ = index; }
@@ -126,6 +126,7 @@ private:
     ConstantMethodref* listGetMethod = nullptr;
     ConstantMethodref* luaListAddMethod = nullptr;
     ConstantMethodref* luaAssignmentMethod = nullptr;
+    ConstantMethodref* listAddAllMethod = nullptr;
 
     ConstantMethodref* luaValueUnMinus = nullptr;
     ConstantMethodref* luaValueLen = nullptr;
@@ -133,7 +134,6 @@ private:
     ConstantMethodref* luaContextGetLuaValueById = nullptr;
     ConstantMethodref* luaContextSetLuaValueById = nullptr;
     ConstantMethodref* luaContextDeclareLocalById = nullptr;
-    ConstantMethodref* luaContextDeclareLocalByIdAndLuaValue = nullptr;
 
     uint16_t contextIndexInLocals_ = 0;
     uint16_t argsIndexInLocals_ = 0;

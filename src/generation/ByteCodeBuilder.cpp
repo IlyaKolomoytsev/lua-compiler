@@ -6,6 +6,9 @@
 
 
 #include "jvm/descriptor-method.h"
+#include "node/statement/AssignmentStmtNode.h"
+#include "node/statement/DeclarationStmtNode.h"
+#include "node/statement/StatementNode.h"
 
 void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
 {
@@ -39,7 +42,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
         pushNull();
         break;
     case ExpressionNode::Type::Vararg:
-        // ToDo
+        pushVararg();
         break;
     case ExpressionNode::Type::Id:
         {
@@ -62,7 +65,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             break;
         }
     case ExpressionNode::Type::FunctionCall:
-        functionCall(*static_cast<const FunctionCallExprNode*>(node));
+        functionCallExpr(*static_cast<const FunctionCallExprNode*>(node));
         break;
     case ExpressionNode::Type::FunctionLiteral:
         // ToDo
@@ -212,6 +215,54 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             unm();
             break;
         }
+    }
+}
+
+void ByteCodeBuilder::buildBytecode(const StatementNode* node)
+{
+    switch (node->getType())
+    {
+    case StatementNode::Type::Declaration:
+        {
+            auto* castNode = static_cast<const DeclarationStmtNode*>(node);
+            declareIds(castNode->getNames());
+            break;
+        }
+    case StatementNode::Type::Assignment:
+        assigment(*static_cast<const AssignmentStmtNode*>(node));
+        break;
+    case StatementNode::Type::FunctionCall:
+        {
+            functionCallStmt(*static_cast<const FunctionCallStmtNode*>(node));
+        }
+        break;
+    case StatementNode::Type::Branching:
+        break;
+    case StatementNode::Type::ForLoopClassic:
+        break;
+    case StatementNode::Type::ForLoopIterator:
+        break;
+    case StatementNode::Type::WhileLoop:
+        break;
+    case StatementNode::Type::RepeatLoop:
+        break;
+    case StatementNode::Type::Block:
+        {
+            auto* castValue = static_cast<const BlockStmtNode*>(node);
+            for (auto* stmt : *castValue->getList())
+            {
+                buildBytecode(stmt);
+            }
+            break;
+        }
+    case StatementNode::Type::GoTo:
+        break;
+    case StatementNode::Type::Label:
+        break;
+    case StatementNode::Type::Break:
+        break;
+    case StatementNode::Type::Return:
+        break;
     }
 }
 
@@ -455,7 +506,7 @@ void ByteCodeBuilder::pushVararg()
     *code
         << code->LoadReference(getArgsIndexInLocals()) // ..., ref(List of args)
         << code->PushInt(getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
-        << code->InvokeVirtual(getGetMethodFromLuaList()); // ..., ref(LuaValue)
+        << code->InvokeVirtual(getGetMethodFromList()); // ..., ref(LuaValue)
 }
 
 void ByteCodeBuilder::pushVarargList()
@@ -483,7 +534,18 @@ void ByteCodeBuilder::createHashMap()
         << code->InvokeSpecial(getHashMapConstructor()); // ..., objectref
 }
 
-void ByteCodeBuilder::functionCall(const FunctionCallExprNode& node)
+void ByteCodeBuilder::functionCallExpr(const FunctionCallExprNode& node)
+{
+    auto* code = getAttributeCode();
+
+    functionCallExprList(node);
+    *code
+        << code->PushInt(0)
+        << code->InvokeVirtual(getGetMethodFromList());
+}
+
+
+void ByteCodeBuilder::functionCallExprList(const FunctionCallExprNode& node)
 {
     auto* code = getAttributeCode();
 
@@ -508,13 +570,94 @@ void ByteCodeBuilder::functionCall(const FunctionCallExprNode& node)
         buildBytecode(node.getFunctionExpression()); // ..., LuaValue
         createLuaList(); // ..., LuaValue, LuaList
     }
-    for (auto arg : node.getFunctionArguments())
-    {
-        *code << code->Duplicate(); // ..., LuaValue, LuaList, LuaList
-        buildBytecode(arg); // ..., LuaValue, LuaList, LuaList, LuaValue
-        addToLuaList(); // ..., LuaValue, LuaList
-    }
+
+    pushArgumentsList(node.getFunctionArguments(), false);
+
     call(); // ..., LuaList
+}
+
+void ByteCodeBuilder::functionCallStmt(const FunctionCallStmtNode& node)
+{
+    auto* code = getAttributeCode();
+    buildBytecode(node.getExpression());
+    *code << code->PopOne();
+}
+
+void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
+{
+    auto* code = getAttributeCode();
+
+    createLuaList(); // ..., LuaList
+
+    if (node.getScope() == Scope::Global)
+    {
+        for (auto* exprNode : node.getNameList())
+        {
+            *code << code->Duplicate(); // ..., LuaList, LuaList
+            buildBytecode(exprNode); // ..., LuaList, LuaList, LuaValue
+            addToLuaList(); // ..., LuaList
+        }
+    }
+    else
+    {
+        for (auto* exprNode : node.getNameList())
+        {
+            *code << code->Duplicate(); // ..., LuaList, LuaList
+
+            assert(exprNode->getType() == ExpressionNode::Type::Id);
+            auto* idExprNode = static_cast<IdExprNode*>(exprNode);
+            *code
+                << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
+                << code->PushString(idExprNode->getValue()) // ..., LuaList, LuaList, LuaContext, string
+                << code->InvokeVirtual(getDeclareLocalByIdMethodFromContext()); // ..., LuaList, LuaList, LuaValue
+
+            addToLuaList(); // ..., LuaList
+        }
+    }
+
+    createLuaList(); // ..., LuaList, LuaList
+    pushArgumentsList(node.getValues()); // ..., LuaList, LuaList
+
+    *code << code->InvokeStatic(getAssignmentMethodFromLuaValue()); // ...
+}
+
+void ByteCodeBuilder::pushArgumentsList(const ExpressionNodeList& nodes, bool createListBeforeSet)
+{
+    auto* code = getAttributeCode();
+
+    if (createListBeforeSet)
+    {
+        createLuaList();
+    }
+    // ..., LuaList
+
+    auto it = nodes.begin();
+    while (it != nodes.end())
+    {
+        *code << code->Duplicate(); // ..., LuaList, LuaList
+        if (std::next(it) == nodes.end())
+        {
+            switch ((*it)->getType())
+            {
+            case ExpressionNode::Type::Vararg:
+                pushVarargList(); // ..., LuaList, LuaList, LuaList
+                addAllToList();
+                break;
+            case ExpressionNode::Type::FunctionCall:
+                functionCallExprList(*static_cast<FunctionCallExprNode*>(*it)); // ..., LuaList, LuaList, LuaList
+                addAllToList();
+                break;
+            default:
+                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
+                addToLuaList(); // ..., LuaList
+            }
+        }
+        else
+        {
+            buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
+            addToLuaList(); // ..., LuaList
+        }
+    }
 }
 
 void ByteCodeBuilder::createLuaList()
@@ -532,8 +675,17 @@ void ByteCodeBuilder::addToLuaList()
     auto* code = getAttributeCode();
 
     *code
-        << code->InvokeVirtual(getAddMethodFromLuaList())
+        << code->InvokeVirtual(getAddMethodFromList())
         << code->PopOne(); // отбросить bool
+}
+
+void ByteCodeBuilder::addAllToList()
+{
+    auto* code = getAttributeCode();
+
+    *code
+        << code->InvokeVirtual(getAddAllMethodFromList())
+        << code->PopOne();
 }
 
 void ByteCodeBuilder::declareIds(ExpressionNodeList* ids)

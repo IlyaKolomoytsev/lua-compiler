@@ -12,6 +12,7 @@
 #define OBJECT "java/lang/Object"
 #define STRING "java/lang/String"
 #define LIST "java/util/List"
+#define COLLECTION "java/util/Collection"
 
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
@@ -532,7 +533,7 @@ ConstantMethodref* CodeGenContext::getLuaListConstructor()
     return luaListCtor;
 }
 
-ConstantMethodref* CodeGenContext::getGetMethodFromLuaList()
+ConstantMethodref* CodeGenContext::getGetMethodFromList()
 {
     if (listGetMethod == nullptr)
     {
@@ -580,12 +581,12 @@ ConstantMethodref* CodeGenContext::getFirstMethodFromList()
     return listGetFirstMethod;
 }
 
-ConstantMethodref* CodeGenContext::getAddMethodFromLuaList()
+ConstantMethodref* CodeGenContext::getAddMethodFromList()
 {
     if (luaListAddMethod == nullptr)
     {
         luaListAddMethod = getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
+            LIST,
             "add",
             DescriptorMethod(
                 Descriptor::Boolean,
@@ -594,6 +595,22 @@ ConstantMethodref* CodeGenContext::getAddMethodFromLuaList()
         );
     }
     return luaListAddMethod;
+}
+
+ConstantMethodref* CodeGenContext::getAddAllMethodFromList()
+{
+    if (listAddAllMethod == nullptr)
+    {
+        listAddAllMethod = getClass()->getOrCreateMethodrefConstant(
+            LIST,
+            "addAll",
+            DescriptorMethod(
+                Descriptor::Boolean,
+                {{COLLECTION}}
+            )
+        );
+    }
+    return listAddAllMethod;
 }
 
 ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()
@@ -641,29 +658,10 @@ ConstantMethodref* CodeGenContext::getDeclareLocalByIdMethodFromContext()
             LUA_CONTEXT,
             "declareLocal",
             DescriptorMethod(
-                std::nullopt,
+                DescriptorField(LUA_VALUE),
                 {{STRING}}
             )
         );
     }
     return luaContextDeclareLocalById;
-}
-
-ConstantMethodref* CodeGenContext::getDeclareLocalByIdAndLuaValueMethodFromContext()
-{
-    if (luaContextDeclareLocalByIdAndLuaValue == nullptr)
-    {
-        luaContextDeclareLocalByIdAndLuaValue = getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "declareLocal",
-            DescriptorMethod(
-                std::nullopt,
-                {
-                    {STRING},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaContextDeclareLocalByIdAndLuaValue;
 }
