@@ -237,7 +237,31 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
         }
         break;
     case StatementNode::Type::Branching:
-        break;
+        {
+            auto* code = getAttributeCode();
+            auto* castNode = static_cast<const BranchingStmtNode*>(node);
+            auto* L_else = code->CodeLabel();
+            auto* L_end = code->CodeLabel();
+
+            buildBytecode(castNode->getCondition()); // ..., LuaValue
+            *code
+                << code->InvokeVirtual(getBoolValueFromLuaValue()) // ..., bool
+                << code->If(Instruction::Compare::Equal, L_else); // if 0 -> L_else
+
+            buildBytecode(castNode->getSuccessBlock());
+            *code << code->GoTo(L_end);
+
+            *code << L_else;
+            auto* fail = castNode->getFailureBlock();
+            if (fail != nullptr)
+            {
+                buildBytecode(fail);
+            }
+
+            *code << L_end;
+
+            break;
+        }
     case StatementNode::Type::ForLoopClassic:
         break;
     case StatementNode::Type::ForLoopIterator:
