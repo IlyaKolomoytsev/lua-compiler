@@ -267,9 +267,42 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
     case StatementNode::Type::ForLoopIterator:
         break;
     case StatementNode::Type::WhileLoop:
-        break;
+        {
+            auto* code = getAttributeCode();
+            auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
+            auto* L_cond = code->CodeLabel();
+            auto* L_end = code->CodeLabel();
+
+            *code << L_cond;
+            buildBytecode(castNode->getCondition()); // ..., LuaValue
+            *code
+                << code->InvokeVirtual(getBoolValueFromLuaValue()) // ..., bool
+                << code->If(Instruction::Compare::Equal, L_end); // if 0 -> L_end
+
+            buildBytecode(castNode->getBlock());
+            *code << code->GoTo(L_cond);
+
+            *code << L_end;
+            break;
+        }
     case StatementNode::Type::RepeatLoop:
-        break;
+        {
+            auto* code = getAttributeCode();
+            auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
+            auto* L_body = code->CodeLabel();
+            auto* L_end = code->CodeLabel();
+
+            *code << L_body;
+            buildBytecode(castNode->getBlock());
+
+            buildBytecode(castNode->getCondition()); // ..., LuaValue
+            *code
+                << code->InvokeVirtual(getBoolValueFromLuaValue()) // ..., bool
+                << code->If(Instruction::Compare::Equal, L_body); // if 0 -> L_body
+
+            *code << L_end;
+            break;
+        }
     case StatementNode::Type::Block:
         {
             auto* castValue = static_cast<const BlockStmtNode*>(node);
