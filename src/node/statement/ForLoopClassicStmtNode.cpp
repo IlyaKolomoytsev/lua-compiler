@@ -1,7 +1,7 @@
 #include "node/statement/ForLoopClassicStmtNode.h"
 #include "node/DotMacros.h"
 
-ForLoopClassicStmtNode::ForLoopClassicStmtNode(ExpressionNode* iteratorVariableId,
+ForLoopClassicStmtNode::ForLoopClassicStmtNode(IdExprNode* iteratorVariableId,
                                                ForRangeStruct range,
                                                BlockStmtNode* block) :
     StatementNode(Type::ForLoopClassic), iteratorVariableId_(iteratorVariableId), range_(range), block_(block)

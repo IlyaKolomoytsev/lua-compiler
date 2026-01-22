@@ -2,6 +2,7 @@
 #define LUA_COMPILER_FOR_LOOP_CLASSIC_STMT_NODE_H
 #include "StatementNode.h"
 #include "BlockStmtNode.h"
+#include "node/NodeExpressionModule.h"
 #include "node/expression/ExpressionNode.h"
 
 struct ForRangeStruct
@@ -14,9 +15,9 @@ struct ForRangeStruct
 class ForLoopClassicStmtNode : public StatementNode
 {
 public:
-    ForLoopClassicStmtNode(ExpressionNode* iteratorVariableId, ForRangeStruct range, BlockStmtNode* block);
+    ForLoopClassicStmtNode(IdExprNode* iteratorVariableId, ForRangeStruct range, BlockStmtNode* block);
 
-    [[nodiscard]] const ExpressionNode* getIteratorVariableId_() const { return iteratorVariableId_; }
+    [[nodiscard]] IdExprNode* getIteratorVariableId() const { return iteratorVariableId_; }
     [[nodiscard]] ForRangeStruct getRange() const { return range_; }
     [[nodiscard]] const BlockStmtNode* getBlock() const { return block_; }
 
@@ -24,7 +25,7 @@ public:
     void writeNodeInfoToDot(std::ostream& os) const override;
 
 private:
-    ExpressionNode* iteratorVariableId_;
+    IdExprNode* iteratorVariableId_;
     ForRangeStruct range_;
     BlockStmtNode* block_;
 };
