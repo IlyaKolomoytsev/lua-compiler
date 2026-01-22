@@ -3,10 +3,44 @@
 #include "jvm/class.h"
 #include "jvm/attribute-code.h"
 
+
+#define ONE_TIME_INIT_VALUE_METHOD(pointerType, method) \
+public:                                                 \
+    pointerType* method()                               \
+    {                                                   \
+        if (method##_ == nullptr)                       \
+        {                                               \
+            method##_ = method##_impl();                \
+        }                                               \
+        return method##_;                               \
+    }                                                   \
+private:                                                \
+    pointerType* method##_impl();                       \
+    pointerType* method##_ = nullptr ;
+
+#define METHODREF_CONSTANT_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(ConstantMethodref, method)
+#define CLASS_CONSTANT_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(ConstantClass, method)
+
+
 using namespace jvm;
 
 class CodeGenContext
 {
+    struct ContextProvider
+    {
+    protected:
+        explicit ContextProvider(CodeGenContext* context) : context_(context)
+        {
+        }
+
+        [[nodiscard]] Class* getClass() const { return context_->getClass(); }
+        [[nodiscard]] Method* getMethod() const { return context_->getMethod(); }
+        [[nodiscard]] AttributeCode* getAttributeCode() const { return context_->getAttributeCode(); }
+
+    private:
+        CodeGenContext* context_;
+    };
+
 public:
     CodeGenContext(Class* currentClass, Method* currentMethod);
 
@@ -14,282 +48,122 @@ public:
     [[nodiscard]] Method* getMethod() const { return currentMethod_; }
     [[nodiscard]] AttributeCode* getAttributeCode() const { return currentAttributeCode_; }
 
-    //region LuaValue
-    struct LuaValue_base
+    struct LuaValue_ : ContextProvider
     {
-        explicit LuaValue_base(CodeGenContext* currentOwner)
-            : owner(currentOwner), constructor(this), method(this)
+        explicit LuaValue_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
         {
-        }
+            explicit Constructors_(CodeGenContext* context);
 
-        [[nodiscard]] CodeGenContext* getContext() { return owner; }
-
-        ConstantClass* getLuaValueClass();
-
-        struct Constructors_base
-        {
-            explicit Constructors_base(LuaValue_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
-
-            [[nodiscard]] LuaValue_base* getLuaValue() { return outer; }
-
-            ConstantMethodref* getNilConstructorForLuaValue();
-            ConstantMethodref* getIntConstructorForLuaValue();
-            ConstantMethodref* getFloatConstructorForLuaValue();
-            ConstantMethodref* getBoolConstructorForLuaValue();
-            ConstantMethodref* getStringConstructorForLuaValue();
-            ConstantMethodref* getTableConstructorForLuaValue();
-
-        private:
-            LuaValue_base* outer;
-
-            ConstantMethodref* luaValueCtorNil = nullptr;
-            ConstantMethodref* luaValueCtorInt = nullptr;
-            ConstantMethodref* luaValueCtorFloat = nullptr;
-            ConstantMethodref* luaValueCtorBool = nullptr;
-            ConstantMethodref* luaValueCtorString = nullptr;
-            ConstantMethodref* luaValueCtorTable = nullptr;
+            METHODREF_CONSTANT_METHOD(nil)
+            METHODREF_CONSTANT_METHOD(integer)
+            METHODREF_CONSTANT_METHOD(floatNumber)
+            METHODREF_CONSTANT_METHOD(boolean)
+            METHODREF_CONSTANT_METHOD(string)
+            METHODREF_CONSTANT_METHOD(table)
         } constructor;
 
-        struct Methods_base
+        struct Methods_ : ContextProvider
         {
-            explicit Methods_base(LuaValue_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
+            explicit Methods_(CodeGenContext* context);
 
-            [[nodiscard]] LuaValue_base* getLuaValue() { return outer; }
-
-            ConstantMethodref* getAddMethodFromLuaValue();
-            ConstantMethodref* getSubMethodFromLuaValue();
-            ConstantMethodref* getMulMethodFromLuaValue();
-            ConstantMethodref* getDivMethodFromLuaValue();
-            ConstantMethodref* getIntegerDivMethodFromLuaValue();
-            ConstantMethodref* getModMethodFromLuaValue();
-            ConstantMethodref* getPowMethodFromLuaValue();
-            ConstantMethodref* getConcatMethodFromLuaValue();
-            ConstantMethodref* getEqualMethodFromLuaValue();
-            ConstantMethodref* getLessThenMethodFromLuaValue();
-            ConstantMethodref* getLessEqualMethodFromLuaValue();
-            ConstantMethodref* getNotMethodFromLuaValue();
-            ConstantMethodref* getBoolValueFromLuaValue();
-            ConstantMethodref* getFieldByKeyMethodFromLuaValue();
-            ConstantMethodref* getCallMethodFromLuaValue();
-            ConstantMethodref* getUnMinusMethodFromLuaValue();
-            ConstantMethodref* getLengthMethodFromLuaValue();
-            ConstantMethodref* getAssignmentMethodFromLuaValue();
-
-        private:
-            LuaValue_base* outer;
-
-            ConstantMethodref* luaValueCreate = nullptr;
-            ConstantMethodref* luaValueAdd = nullptr;
-            ConstantMethodref* luaValueSub = nullptr;
-            ConstantMethodref* luaValueMul = nullptr;
-            ConstantMethodref* luaValueDiv = nullptr;
-            ConstantMethodref* luaValueIntegerDiv = nullptr;
-            ConstantMethodref* luaValueMod = nullptr;
-            ConstantMethodref* luaValuePow = nullptr;
-            ConstantMethodref* luaValueConcat = nullptr;
-            ConstantMethodref* luaValueEqual = nullptr;
-            ConstantMethodref* luaValueLessThan = nullptr;
-            ConstantMethodref* luaValueLessEqual = nullptr;
-            ConstantMethodref* luaValueNot = nullptr;
-            ConstantMethodref* luaValueGetBool = nullptr;
-            ConstantMethodref* luaValueGetFieldByKey = nullptr;
-            ConstantMethodref* luaValueCall = nullptr;
-            ConstantMethodref* luaValueUnMinus = nullptr;
-            ConstantMethodref* luaValueLen = nullptr;
-            ConstantMethodref* luaValueAssignmentMethod = nullptr;
+            METHODREF_CONSTANT_METHOD(add)
+            METHODREF_CONSTANT_METHOD(sub)
+            METHODREF_CONSTANT_METHOD(mul)
+            METHODREF_CONSTANT_METHOD(div)
+            METHODREF_CONSTANT_METHOD(idiv)
+            METHODREF_CONSTANT_METHOD(mod)
+            METHODREF_CONSTANT_METHOD(pow)
+            METHODREF_CONSTANT_METHOD(concat)
+            METHODREF_CONSTANT_METHOD(equal)
+            METHODREF_CONSTANT_METHOD(lessThan)
+            METHODREF_CONSTANT_METHOD(lessEqual)
+            METHODREF_CONSTANT_METHOD(boolNot)
+            METHODREF_CONSTANT_METHOD(toBool)
+            METHODREF_CONSTANT_METHOD(fieldByKey)
+            METHODREF_CONSTANT_METHOD(call)
+            METHODREF_CONSTANT_METHOD(unMinus)
+            METHODREF_CONSTANT_METHOD(length)
+            METHODREF_CONSTANT_METHOD(assigment)
         } method;
 
-    private:
-        CodeGenContext* owner;
+        CLASS_CONSTANT_METHOD(classConstant)
+    } luaValue;
 
-        // Class
-        ConstantClass* luaValueClass = nullptr;
-    } LuaValue;
-
-    //endregion
-    //region LuaContext
-    struct LuaContext_base
+    struct LuaContext_ : ContextProvider
     {
-        explicit LuaContext_base(CodeGenContext* currentOwner)
-            : owner(currentOwner), constructor(this), method(this)
+        explicit LuaContext_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
         {
-        }
+            explicit Constructors_(CodeGenContext* context);
 
-        [[nodiscard]] CodeGenContext* getContext() { return owner; }
-
-        ConstantClass* getLuaContextClass();
-
-        struct Constructors_base
-        {
-            explicit Constructors_base(LuaContext_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
-
-            [[nodiscard]] LuaContext_base* getLuaContext() { return outer; }
-
-            ConstantMethodref* getConstructorForLuaContext();
-            ConstantMethodref* getConstructorForLuaContextWithParent();
-
-        private:
-            LuaContext_base* outer;
-
-            ConstantMethodref* luaContextCtor = nullptr;
-            ConstantMethodref* luaContextWithParentCtor = nullptr;
+            METHODREF_CONSTANT_METHOD(root)
+            METHODREF_CONSTANT_METHOD(withParent)
         } constructor;
 
-        struct Methods_base
+        struct Methods_ : ContextProvider
         {
-            explicit Methods_base(LuaContext_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
+            explicit Methods_(CodeGenContext* context);
 
-            [[nodiscard]] LuaContext_base* getLuaContext() { return outer; }
-
-            ConstantMethodref* getParentContextMethodFromContext();
-            ConstantMethodref* getLuaValueByIdMethodFromContext();
-            ConstantMethodref* getLuaValueByIdOrCreateNewMethodFromContext();
-            ConstantMethodref* setLuaValueByIdMethodFromContext();
-            ConstantMethodref* getDeclareLocalByIdMethodFromContext();
-
-        private:
-            LuaContext_base* outer;
-
-            ConstantMethodref* luaContextGetLuaValueById = nullptr;
-            ConstantMethodref* luaContextGetParent = nullptr;
-            ConstantMethodref* luaContextGetLuaValueByIdOrCreateNew = nullptr;
-            ConstantMethodref* luaContextSetLuaValueById = nullptr;
-            ConstantMethodref* luaContextDeclareLocalById = nullptr;
+            METHODREF_CONSTANT_METHOD(getParent)
+            METHODREF_CONSTANT_METHOD(getById)
+            METHODREF_CONSTANT_METHOD(getByIdOrCreateNewGlobal)
+            METHODREF_CONSTANT_METHOD(setValue)
+            METHODREF_CONSTANT_METHOD(declareLocalId)
         } method;
 
-    private:
-        CodeGenContext* owner;
+        CLASS_CONSTANT_METHOD(classConstant)
+    } luaContext;
 
-        // Class
-        ConstantClass* luaContextClass = nullptr;
-    } LuaContext;
-
-    //endregion
-    //region LuaList
-    struct LuaList_base
+    struct LuaList_ : ContextProvider
     {
-        explicit LuaList_base(CodeGenContext* currentOwner)
-            : owner(currentOwner), constructor(this), method(this)
+        explicit LuaList_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
         {
-        }
+            explicit Constructors_(CodeGenContext* context);
 
-        [[nodiscard]] CodeGenContext* getContext() { return owner; }
-
-        ConstantClass* getLuaListClass();
-
-        struct Constructors_base
-        {
-            explicit Constructors_base(LuaList_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
-
-            [[nodiscard]] LuaList_base* getLuaList() { return outer; }
-
-            ConstantMethodref* getLuaListConstructor();
-
-        private:
-            LuaList_base* outer;
-
-            ConstantMethodref* luaListCtor = nullptr;
+            METHODREF_CONSTANT_METHOD(base)
         } constructor;
 
-        struct Methods_base
+        struct Methods_ : ContextProvider
         {
-            explicit Methods_base(LuaList_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
+            explicit Methods_(CodeGenContext* context);
 
-            [[nodiscard]] LuaList_base* getLuaList() { return outer; }
-
-            ConstantMethodref* getGetMethodFromLuaList();
-            ConstantMethodref* getSubListMethodFromLuaList();
-            ConstantMethodref* getFirstMethodFromLuaList();
-            ConstantMethodref* getAddMethodFromLuaList();
-            ConstantMethodref* getAddAllMethodFromLuaList();
-
-        private:
-            LuaList_base* outer;
-
-            ConstantMethodref* luaListSubList = nullptr;
-            ConstantMethodref* luaListGetFirstMethod = nullptr;
-            ConstantMethodref* luaListGetMethod = nullptr;
-            ConstantMethodref* luaListAddMethod = nullptr;
-            ConstantMethodref* luaListAddAllMethod = nullptr;
+            METHODREF_CONSTANT_METHOD(get)
+            METHODREF_CONSTANT_METHOD(subList)
+            METHODREF_CONSTANT_METHOD(getFirst)
+            METHODREF_CONSTANT_METHOD(add)
+            METHODREF_CONSTANT_METHOD(addAll)
         } method;
 
-    private:
-        CodeGenContext* owner;
-
-        // Class
-        ConstantClass* luaListClass = nullptr;
-    } LuaList;
+        CLASS_CONSTANT_METHOD(classConstant)
+    } luaList;
 
     //endregion
     //region HashMap
-    struct HashMap_base
+    struct HashMap_ : ContextProvider
     {
-        explicit HashMap_base(CodeGenContext* currentOwner)
-            : owner(currentOwner), constructor(this), method(this)
+        explicit HashMap_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
         {
-        }
+            explicit Constructors_(CodeGenContext* context);
 
-        [[nodiscard]] CodeGenContext* getContext() { return owner; }
-
-        ConstantClass* getHashMapClass();
-
-        struct Constructors_base
-        {
-            explicit Constructors_base(HashMap_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
-
-            [[nodiscard]] HashMap_base* getHashMap() { return outer; }
-
-            ConstantMethodref* getHashMapConstructor();
-
-        private:
-            HashMap_base* outer;
-
-            ConstantMethodref* hashMapCtor = nullptr;
+            METHODREF_CONSTANT_METHOD(base);
         } constructor;
 
-        struct Methods_base
+        struct Methods_ : ContextProvider
         {
-            explicit Methods_base(HashMap_base* currentOuter)
-                : outer(currentOuter)
-            {
-            }
+            explicit Methods_(CodeGenContext* context);
 
-            [[nodiscard]] HashMap_base* getHashMap() { return outer; }
-
-            ConstantMethodref* getPutMethodFromHashMap();
-
-        private:
-            HashMap_base* outer;
-
-            ConstantMethodref* hashMapPutMethod = nullptr;
+            METHODREF_CONSTANT_METHOD(put);
         } method;
 
-    private:
-        CodeGenContext* owner;
-
-        ConstantClass* hashMapClass = nullptr;
-    } HashMap;
+        CLASS_CONSTANT_METHOD(classConstant)
+    } hashMap;
 
     //endregion
 

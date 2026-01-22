@@ -21,9 +21,9 @@ void ByteCodeBuilder::build(const BlockStmtNode& node)
 
     // create new context
     *code
-        << code->New(LuaContext.getLuaContextClass())
+        << code->New(luaContext.classConstant())
         << code->Duplicate()
-        << code->InvokeSpecial(LuaContext.constructor.getConstructorForLuaContext())
+        << code->InvokeSpecial(luaContext.constructor.root())
         << code->StoreReference(contextIndex);
     setContextIndexInLocals(contextIndex);
 
@@ -271,7 +271,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
 
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(LuaValue.method.getBoolValueFromLuaValue()) // ..., bool
+                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
                 << code->If(Instruction::Compare::Equal, L_else); // if 0 -> L_else
 
             buildBytecode(castNode->getSuccessBlock());
@@ -302,7 +302,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code << L_cond;
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(LuaValue.method.getBoolValueFromLuaValue()) // ..., bool
+                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
                 << code->If(Instruction::Compare::Equal, L_end); // if 0 -> L_end
 
             buildBytecode(castNode->getBlock());
@@ -323,7 +323,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
 
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(LuaValue.method.getBoolValueFromLuaValue()) // ..., bool
+                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
                 << code->If(Instruction::Compare::Equal, L_body); // if 0 -> L_body
 
             *code << L_end;
@@ -361,7 +361,7 @@ void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode*
 
     buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
-    *code << code->InvokeVirtual(LuaValue.method.getBoolValueFromLuaValue()); // ..., left, bool
+    *code << code->InvokeVirtual(luaValue.method.toBool()); // ..., left, bool
     *code << code->If(Instruction::Compare::Equal, L_end); // ..., left
 
     // true:
@@ -379,7 +379,7 @@ void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* 
 
     buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
-    *code << code->InvokeVirtual(LuaValue.method.getBoolValueFromLuaValue()); // ..., left, bool
+    *code << code->InvokeVirtual(luaValue.method.toBool()); // ..., left, bool
     *code << code->If(Instruction::Compare::NotEqual, L_end); // ..., left
 
     // false
@@ -394,20 +394,20 @@ void ByteCodeBuilder::pushInt(int64_t value)
     auto* code = getAttributeCode();
 
     *code
-        << code->New(LuaValue.getLuaValueClass())
+        << code->New(luaValue.classConstant())
         << code->Duplicate()
         << code->PushLong(value)
-        << code->InvokeSpecial(LuaValue.constructor.getIntConstructorForLuaValue());
+        << code->InvokeSpecial(luaValue.constructor.integer());
 }
 
 void ByteCodeBuilder::pushFloat(double value)
 {
     auto* code = getAttributeCode();
     *code
-        << code->New(LuaValue.getLuaValueClass())
+        << code->New(luaValue.classConstant())
         << code->Duplicate()
         << code->PushDouble(value)
-        << code->InvokeSpecial(LuaValue.constructor.getFloatConstructorForLuaValue());
+        << code->InvokeSpecial(luaValue.constructor.floatNumber());
 }
 
 void ByteCodeBuilder::pushBool(bool value)
@@ -415,10 +415,10 @@ void ByteCodeBuilder::pushBool(bool value)
     auto* code = getAttributeCode();
 
     *code
-        << code->New(LuaValue.getLuaValueClass())
+        << code->New(luaValue.classConstant())
         << code->Duplicate()
         << code->PushInt(value)
-        << code->InvokeSpecial(LuaValue.constructor.getBoolConstructorForLuaValue());
+        << code->InvokeSpecial(luaValue.constructor.boolean());
 }
 
 void ByteCodeBuilder::pushString(const std::string& value)
@@ -426,10 +426,10 @@ void ByteCodeBuilder::pushString(const std::string& value)
     auto* code = getAttributeCode();
 
     *code
-        << code->New(LuaValue.getLuaValueClass())
+        << code->New(luaValue.classConstant())
         << code->Duplicate()
         << code->PushString(value)
-        << code->InvokeSpecial(LuaValue.constructor.getStringConstructorForLuaValue());
+        << code->InvokeSpecial(luaValue.constructor.string());
 }
 
 void ByteCodeBuilder::pushNull()
@@ -437,9 +437,9 @@ void ByteCodeBuilder::pushNull()
     auto* code = getAttributeCode();
 
     *code
-        << code->New(LuaValue.getLuaValueClass())
+        << code->New(luaValue.classConstant())
         << code->Duplicate()
-        << code->InvokeSpecial(LuaValue.constructor.getNilConstructorForLuaValue());
+        << code->InvokeSpecial(luaValue.constructor.nil());
 }
 
 void ByteCodeBuilder::id(const std::string& value)
@@ -449,52 +449,52 @@ void ByteCodeBuilder::id(const std::string& value)
     *code
         << code->LoadReference(getContextIndexInLocals())
         << code->PushString(value)
-        << code->InvokeVirtual(LuaContext.method.getLuaValueByIdMethodFromContext());
+        << code->InvokeVirtual(luaContext.method.getById());
 }
 
 void ByteCodeBuilder::sum()
 {
-    emitStaticCall(LuaValue.method.getAddMethodFromLuaValue());
+    emitStaticCall(luaValue.method.add());
 }
 
 void ByteCodeBuilder::sub()
 {
-    emitStaticCall(LuaValue.method.getSubMethodFromLuaValue());
+    emitStaticCall(luaValue.method.sub());
 }
 
 void ByteCodeBuilder::mul()
 {
-    emitStaticCall(LuaValue.method.getMulMethodFromLuaValue());
+    emitStaticCall(luaValue.method.mul());
 }
 
 void ByteCodeBuilder::div()
 {
-    emitStaticCall(LuaValue.method.getDivMethodFromLuaValue());
+    emitStaticCall(luaValue.method.div());
 }
 
 void ByteCodeBuilder::idiv()
 {
-    emitStaticCall(LuaValue.method.getIntegerDivMethodFromLuaValue());
+    emitStaticCall(luaValue.method.idiv());
 }
 
 void ByteCodeBuilder::mod()
 {
-    emitStaticCall(LuaValue.method.getModMethodFromLuaValue());
+    emitStaticCall(luaValue.method.mod());
 }
 
 void ByteCodeBuilder::pow()
 {
-    emitStaticCall(LuaValue.method.getPowMethodFromLuaValue());
+    emitStaticCall(luaValue.method.pow());
 }
 
 void ByteCodeBuilder::concat()
 {
-    emitStaticCall(LuaValue.method.getConcatMethodFromLuaValue());
+    emitStaticCall(luaValue.method.concat());
 }
 
 void ByteCodeBuilder::equal()
 {
-    emitStaticCall(LuaValue.method.getEqualMethodFromLuaValue());
+    emitStaticCall(luaValue.method.equal());
 }
 
 void ByteCodeBuilder::notEqual()
@@ -505,55 +505,55 @@ void ByteCodeBuilder::notEqual()
 
 void ByteCodeBuilder::lessThan()
 {
-    emitStaticCall(LuaValue.method.getLessThenMethodFromLuaValue());
+    emitStaticCall(luaValue.method.lessThan());
 }
 
 void ByteCodeBuilder::lessEqual()
 {
-    emitStaticCall(LuaValue.method.getLessEqualMethodFromLuaValue());
+    emitStaticCall(luaValue.method.lessEqual());
 }
 
 void ByteCodeBuilder::greaterThan()
 {
     auto* code = getAttributeCode();
     *code << code->Swap();
-    emitStaticCall(LuaValue.method.getLessThenMethodFromLuaValue());
+    emitStaticCall(luaValue.method.lessThan());
 }
 
 void ByteCodeBuilder::greaterEqual()
 {
     auto* code = getAttributeCode();
     *code << code->Swap();
-    emitStaticCall(LuaValue.method.getLessEqualMethodFromLuaValue());
+    emitStaticCall(luaValue.method.lessEqual());
 }
 
 void ByteCodeBuilder::getFieldByKey()
 {
     auto* code = getAttributeCode();
     *code
-        << code->InvokeVirtual(LuaValue.method.getFieldByKeyMethodFromLuaValue());
+        << code->InvokeVirtual(luaValue.method.fieldByKey());
 }
 
 void ByteCodeBuilder::call()
 {
     auto* code = getAttributeCode();
     *code
-        << code->InvokeVirtual(LuaValue.method.getCallMethodFromLuaValue());
+        << code->InvokeVirtual(luaValue.method.call());
 }
 
 void ByteCodeBuilder::unm()
 {
-    emitStaticCall(LuaValue.method.getUnMinusMethodFromLuaValue());
+    emitStaticCall(luaValue.method.unMinus());
 }
 
 void ByteCodeBuilder::len()
 {
-    emitStaticCall(LuaValue.method.getLengthMethodFromLuaValue());
+    emitStaticCall(luaValue.method.length());
 }
 
 void ByteCodeBuilder::booleanNot()
 {
-    emitStaticCall(LuaValue.method.getNotMethodFromLuaValue());
+    emitStaticCall(luaValue.method.boolNot());
 }
 
 void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
@@ -562,7 +562,7 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
     int64_t index = 0;
 
     *code
-        << code->New(LuaValue.getLuaValueClass()) // ..., ref(LuaValue)
+        << code->New(luaValue.classConstant()) // ..., ref(LuaValue)
         << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue)
 
     createHashMap(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
@@ -580,11 +580,11 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         buildBytecode(field.value);
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
 
-        *code << code->InvokeVirtual(HashMap.method.getPutMethodFromHashMap());
+        *code << code->InvokeVirtual(hashMap.method.put());
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
     }
 
-    *code << code->InvokeSpecial(LuaValue.constructor.getTableConstructorForLuaValue()); // ..., ref(LuaValue)
+    *code << code->InvokeSpecial(luaValue.constructor.table()); // ..., ref(LuaValue)
 }
 
 void ByteCodeBuilder::pushVararg()
@@ -593,7 +593,7 @@ void ByteCodeBuilder::pushVararg()
     *code
         << code->LoadReference(getArgsIndexInLocals()) // ..., ref(List of args)
         << code->PushInt(getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
-        << code->InvokeVirtual(LuaList.method.getGetMethodFromLuaList()); // ..., ref(LuaValue)
+        << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
 
 void ByteCodeBuilder::pushVarargList()
@@ -602,7 +602,7 @@ void ByteCodeBuilder::pushVarargList()
     *code
         << code->LoadReference(getArgsIndexInLocals()) // ..., ref(List of args)
         << code->PushInt(getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
-        << code->InvokeVirtual(LuaList.method.getSubListMethodFromLuaList()); // ..., ref(List of vararg)
+        << code->InvokeVirtual(luaList.method.subList()); // ..., ref(List of vararg)
 }
 
 void ByteCodeBuilder::emitStaticCall(ConstantMethodref* methodref)
@@ -616,9 +616,9 @@ void ByteCodeBuilder::createHashMap()
     auto* code = getAttributeCode();
 
     *code
-        << code->New(HashMap.getHashMapClass()) // ..., objectref(HashMap)
+        << code->New(hashMap.classConstant()) // ..., objectref(HashMap)
         << code->Duplicate() // ..., objectref, objectref
-        << code->InvokeSpecial(HashMap.constructor.getHashMapConstructor()); // ..., objectref
+        << code->InvokeSpecial(hashMap.constructor.base()); // ..., objectref
 }
 
 void ByteCodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewContext, bool needSetParentContextAfter)
@@ -642,10 +642,10 @@ void ByteCodeBuilder::createChildrenContext()
     auto code = getAttributeCode();
     const auto contextIndex = getContextIndexInLocals();
     *code
-        << code->New(LuaContext.getLuaContextClass()) // ..., LuaContext
+        << code->New(luaContext.classConstant()) // ..., LuaContext
         << code->Duplicate() // ..., LuaContext, LuaContext
         << code->LoadReference(contextIndex) // ..., LuaContext, LuaContext, LuaContext
-        << code->InvokeSpecial(LuaContext.constructor.getConstructorForLuaContextWithParent()) // ..., LuaContext
+        << code->InvokeSpecial(luaContext.constructor.withParent()) // ..., LuaContext
         << code->StoreReference(contextIndex); // ...
 }
 
@@ -655,7 +655,7 @@ void ByteCodeBuilder::getParentContext()
     const auto contextIndex = getContextIndexInLocals();
     *code
         << code->LoadReference(contextIndex) // ..., LuaContext
-        << code->InvokeVirtual(LuaContext.method.getParentContextMethodFromContext()) // ..., LuaContext
+        << code->InvokeVirtual(luaContext.method.getParent()) // ..., LuaContext
         << code->StoreReference(contextIndex); // ...
 }
 
@@ -666,7 +666,7 @@ void ByteCodeBuilder::functionCallExpr(const FunctionCallExprNode& node)
     functionCallExprList(node);
     *code
         << code->PushInt(0)
-        << code->InvokeVirtual(LuaList.method.getGetMethodFromLuaList());
+        << code->InvokeVirtual(luaList.method.get());
 }
 
 
@@ -725,7 +725,7 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
                 *code
                     << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
                     << code->PushString(castExpr->getValue()) // ..., LuaList, LuaList, LuaContext, StringId
-                    << code->InvokeVirtual(LuaContext.method.getLuaValueByIdOrCreateNewMethodFromContext());
+                    << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal());
                 // ..., LuaList, LuaList, LuaValue
             }
             else
@@ -746,7 +746,7 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
             *code
                 << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
                 << code->PushString(idExprNode->getValue()) // ..., LuaList, LuaList, LuaContext, string
-                << code->InvokeVirtual(LuaContext.method.getDeclareLocalByIdMethodFromContext()); // ..., LuaList, LuaList, LuaValue
+                << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaList, LuaList, LuaValue
 
             addToLuaList(); // ..., LuaList
         }
@@ -754,7 +754,7 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
 
     pushArgumentsList(node.getValues()); // ..., LuaList, LuaList
 
-    *code << code->InvokeStatic(LuaValue.method.getAssignmentMethodFromLuaValue()); // ...
+    *code << code->InvokeStatic(luaValue.method.assigment()); // ...
 }
 
 void ByteCodeBuilder::pushArgumentsList(const ExpressionNodeList& nodes, bool createListBeforeSet)
@@ -803,9 +803,9 @@ void ByteCodeBuilder::createLuaList()
     auto* code = getAttributeCode();
 
     *code
-        << code->New(LuaList.getLuaListClass()) // ..., objectref(LuaList)
+        << code->New(luaList.classConstant()) // ..., objectref(LuaList)
         << code->Duplicate() // ..., objectref, objectref
-        << code->InvokeSpecial(LuaList.constructor.getLuaListConstructor()); // ..., objectref
+        << code->InvokeSpecial(luaList.constructor.base()); // ..., objectref
 }
 
 void ByteCodeBuilder::addToLuaList()
@@ -813,7 +813,7 @@ void ByteCodeBuilder::addToLuaList()
     auto* code = getAttributeCode();
 
     *code
-        << code->InvokeVirtual(LuaList.method.getAddMethodFromLuaList())
+        << code->InvokeVirtual(luaList.method.add())
         << code->PopOne(); // отбросить bool
 }
 
@@ -822,7 +822,7 @@ void ByteCodeBuilder::addAllToList()
     auto* code = getAttributeCode();
 
     *code
-        << code->InvokeVirtual(LuaList.method.getAddAllMethodFromLuaList())
+        << code->InvokeVirtual(luaList.method.addAll())
         << code->PopOne();
 }
 
@@ -833,6 +833,6 @@ void ByteCodeBuilder::declareIds(ExpressionNodeList* ids)
     {
         *code << code->LoadReference(getContextIndexInLocals());
         buildBytecode(id);
-        *code << code->InvokeVirtual(LuaContext.method.getDeclareLocalByIdMethodFromContext());
+        *code << code->InvokeVirtual(luaContext.method.declareLocalId());
     }
 }

@@ -19,617 +19,585 @@
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
 
-CodeGenContext::CodeGenContext(Class* currentClass, Method* currentMethod) : LuaValue(this), LuaContext(this),
-                                                                             LuaList(this), HashMap(this),
+CodeGenContext::CodeGenContext(Class* currentClass, Method* currentMethod) : luaValue(this), luaContext(this),
+                                                                             luaList(this), hashMap(this),
                                                                              class_(currentClass),
                                                                              currentMethod_(currentMethod)
 {
     currentAttributeCode_ = currentMethod_->getCodeAttribute();
 }
 
-ConstantClass* CodeGenContext::LuaValue_base::getLuaValueClass()
+CodeGenContext::LuaValue_::LuaValue_(CodeGenContext* context) : ContextProvider(context), constructor(context),
+                                                                method(context)
 {
-    if (luaValueClass == nullptr)
-    {
-        luaValueClass = getContext()->getClass()->getOrCreateClassConstant(LUA_VALUE);
-    }
-    return luaValueClass;
 }
 
-ConstantClass* CodeGenContext::LuaContext_base::getLuaContextClass()
+CodeGenContext::LuaValue_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaContextClass == nullptr)
-    {
-        luaContextClass = getContext()->getClass()->getOrCreateClassConstant(LUA_CONTEXT);
-    }
-    return luaContextClass;
 }
 
-ConstantClass* CodeGenContext::LuaList_base::getLuaListClass()
+CodeGenContext::LuaValue_::Methods_::Methods_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaListClass == nullptr)
-    {
-        luaListClass = getContext()->getClass()->getOrCreateClassConstant(LUA_LIST);
-    }
-    return luaListClass;
 }
 
-ConstantClass* CodeGenContext::HashMap_base::getHashMapClass()
+CodeGenContext::LuaList_::LuaList_(CodeGenContext* context) : ContextProvider(context), constructor(context),
+                                                              method(context)
 {
-    if (hashMapClass == nullptr)
-    {
-        hashMapClass = getContext()->getClass()->getOrCreateClassConstant(HASH_MAP);
-    }
-    return hashMapClass;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getNilConstructorForLuaValue()
+CodeGenContext::LuaList_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaValueCtorNil == nullptr)
-    {
-        luaValueCtorNil = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(std::nullopt, {}) // ()V
-        );
-    }
-    return luaValueCtorNil;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getIntConstructorForLuaValue()
+CodeGenContext::LuaList_::Methods_::Methods_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaValueCtorInt == nullptr)
-    {
-        luaValueCtorInt = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorMethod::Long})
-        );
-    }
-    return luaValueCtorInt;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getFloatConstructorForLuaValue()
+CodeGenContext::LuaContext_::LuaContext_(CodeGenContext* context) : ContextProvider(context), constructor(context),
+                                                                    method(context)
 {
-    if (luaValueCtorFloat == nullptr)
-    {
-        luaValueCtorFloat = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorMethod::Double})
-        );
-    }
-    return luaValueCtorFloat;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getBoolConstructorForLuaValue()
+CodeGenContext::LuaContext_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaValueCtorBool == nullptr)
-    {
-        luaValueCtorBool = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorMethod::Boolean})
-        );
-    }
-    return luaValueCtorBool;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getStringConstructorForLuaValue()
+CodeGenContext::LuaContext_::Methods_::Methods_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaValueCtorString == nullptr)
-    {
-        luaValueCtorString = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(std::nullopt, {DescriptorField(STRING)})
-        );
-    }
-    return luaValueCtorString;
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Constructors_base::getTableConstructorForLuaValue()
+CodeGenContext::HashMap_::HashMap_(CodeGenContext* context) : ContextProvider(context), constructor(context),
+                                                              method(context)
 {
-    if (luaValueCtorTable == nullptr)
-    {
-        luaValueCtorTable = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "<init>",
-            DescriptorMethod(
-                std::nullopt, {DescriptorField(MAP)}
-            )
-        );
-    }
-    return luaValueCtorTable;
 }
 
-ConstantMethodref* CodeGenContext::LuaContext_base::Constructors_base::getConstructorForLuaContext()
+CodeGenContext::HashMap_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaContextCtor == nullptr)
-    {
-        luaContextCtor = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "<init>",
-            DescriptorMethod(
-                std::nullopt, {}
-            )
-        );
-    }
-    return luaContextCtor;
 }
 
-ConstantMethodref* CodeGenContext::LuaContext_base::Constructors_base::getConstructorForLuaContextWithParent()
+CodeGenContext::HashMap_::Methods_::Methods_(CodeGenContext* context) : ContextProvider(context)
 {
-    if (luaContextWithParentCtor == nullptr)
-    {
-        luaContextWithParentCtor = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "<init>",
-            DescriptorMethod(
-                std::nullopt, {{LUA_CONTEXT}}
-            )
-        );
-    }
-    return luaContextWithParentCtor;
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Constructors_base::getLuaListConstructor()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::nil_impl()
 {
-    if (luaListCtor == nullptr)
-    {
-        luaListCtor = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "<init>",
-            DescriptorMethod(std::nullopt, {})
-        );
-    }
-    return luaListCtor;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(std::nullopt, {}) // ()V
+    );
 }
 
-ConstantMethodref* CodeGenContext::HashMap_base::Constructors_base::getHashMapConstructor()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::integer_impl()
 {
-    if (hashMapCtor == nullptr)
-    {
-        hashMapCtor = getHashMap()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            HASH_MAP,
-            "<init>",
-            DescriptorMethod(std::nullopt, {})
-        );
-    }
-    return hashMapCtor;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(std::nullopt, {DescriptorMethod::Long})
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getAddMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::floatNumber_impl()
 {
-    if (luaValueAdd == nullptr)
-    {
-        luaValueAdd = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "add",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueAdd;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(std::nullopt, {DescriptorMethod::Double})
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getSubMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::boolean_impl()
 {
-    if (luaValueSub == nullptr)
-    {
-        luaValueSub = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "sub",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueSub;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(std::nullopt, {DescriptorMethod::Boolean})
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getMulMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::string_impl()
 {
-    if (luaValueMul == nullptr)
-    {
-        luaValueMul = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "mul",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueMul;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(std::nullopt, {DescriptorField(STRING)})
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getDivMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::table_impl()
 {
-    if (luaValueDiv == nullptr)
-    {
-        luaValueDiv = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "div",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueDiv;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt, {DescriptorField(MAP)}
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getIntegerDivMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::add_impl()
 {
-    if (luaValueIntegerDiv == nullptr)
-    {
-        luaValueIntegerDiv = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "idiv",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueIntegerDiv;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "add",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getModMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::sub_impl()
 {
-    if (luaValueMod == nullptr)
-    {
-        luaValueMod = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "mod",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueMod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "sub",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getPowMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::mul_impl()
 {
-    if (luaValuePow == nullptr)
-    {
-        luaValuePow = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "pow",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValuePow;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "mul",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getConcatMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::div_impl()
 {
-    if (luaValueConcat == nullptr)
-    {
-        luaValueConcat = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "concat",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueConcat;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "div",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getEqualMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::idiv_impl()
 {
-    if (luaValueEqual == nullptr)
-    {
-        luaValueEqual = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "eq",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueEqual;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "idiv",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getLessThenMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::mod_impl()
 {
-    if (luaValueLessThan == nullptr)
-    {
-        luaValueLessThan = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "lt",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueLessThan;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "mod",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getLessEqualMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::pow_impl()
 {
-    if (luaValueLessEqual == nullptr)
-    {
-        luaValueLessEqual = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "le",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueLessEqual;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "pow",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getNotMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::concat_impl()
 {
-    if (luaValueNot == nullptr)
-    {
-        luaValueNot = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "not",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueNot;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "concat",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getBoolValueFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::equal_impl()
 {
-    if (luaValueGetBool == nullptr)
-    {
-        luaValueGetBool = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "getBoolValueSave",
-            DescriptorMethod(
-                Descriptor::Boolean,
-                {}
-            )
-        );
-    }
-    return luaValueGetBool;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "eq",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getFieldByKeyMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::lessThan_impl()
 {
-    if (luaValueGetFieldByKey == nullptr)
-    {
-        luaValueGetFieldByKey = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "index",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueGetFieldByKey;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "lt",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getCallMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::lessEqual_impl()
 {
-    if (luaValueCall == nullptr)
-    {
-        luaValueCall = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "call",
-            DescriptorMethod(
-                DescriptorField(LUA_LIST),
-                {
-                    {LUA_LIST}
-                }
-            )
-        );
-    }
-    return luaValueCall;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "le",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getUnMinusMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::boolNot_impl()
 {
-    if (luaValueUnMinus == nullptr)
-    {
-        luaValueUnMinus = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "unm",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueUnMinus;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "not",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getLengthMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::toBool_impl()
 {
-    if (luaValueLen == nullptr)
-    {
-        luaValueLen = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "len",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaValueLen;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "getBoolValueSave",
+        DescriptorMethod(
+            Descriptor::Boolean,
+            {}
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getAssignmentMethodFromLuaValue()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::fieldByKey_impl()
 {
-    if (luaValueAssignmentMethod == nullptr)
-    {
-        luaValueAssignmentMethod = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_VALUE,
-            "assignment",
-            DescriptorMethod(
-                std::nullopt,
-                {
-                    {LUA_LIST},
-                    {LUA_LIST}
-                }
-            )
-        );
-    }
-    return luaValueAssignmentMethod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "index",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Methods_base::getGetMethodFromLuaList()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::call_impl()
 {
-    if (luaListGetMethod == nullptr)
-    {
-        luaListGetMethod = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "get",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {{Descriptor::Int}}
-            )
-        );
-    }
-    return luaListGetMethod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "call",
+        DescriptorMethod(
+            DescriptorField(LUA_LIST),
+            {
+                {LUA_LIST}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Methods_base::getSubListMethodFromLuaList()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::unMinus_impl()
 {
-    if (luaListSubList == nullptr)
-    {
-        luaListSubList = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "subList",
-            DescriptorMethod(
-                DescriptorField(LUA_LIST),
-                {{Descriptor::Int}}
-            )
-        );
-    }
-    return luaListSubList;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "unm",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Methods_base::getFirstMethodFromLuaList()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::length_impl()
 {
-    if (luaListGetFirstMethod == nullptr)
-    {
-        luaListGetFirstMethod = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "getFirst",
-            DescriptorMethod(
-                DescriptorField(OBJECT),
-                {}
-            )
-        );
-    }
-    return luaListGetFirstMethod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "len",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {LUA_VALUE}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Methods_base::getAddMethodFromLuaList()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::assigment_impl()
 {
-    if (luaListAddMethod == nullptr)
-    {
-        luaListAddMethod = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "add",
-            DescriptorMethod(
-                Descriptor::Boolean,
-                {{OBJECT}}
-            )
-        );
-    }
-    return luaListAddMethod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "assignment",
+        DescriptorMethod(
+            std::nullopt,
+            {
+                {LUA_LIST},
+                {LUA_LIST}
+            }
+        )
+    );
 }
 
-ConstantMethodref* CodeGenContext::LuaList_base::Methods_base::getAddAllMethodFromLuaList()
+ConstantClass* CodeGenContext::LuaValue_::classConstant_impl()
 {
-    if (luaListAddAllMethod == nullptr)
-    {
-        luaListAddAllMethod = getLuaList()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_LIST,
-            "addAll",
-            DescriptorMethod(
-                Descriptor::Boolean,
-                {{COLLECTION}}
-            )
-        );
-    }
-    return luaListAddAllMethod;
+    return getClass()->getOrCreateClassConstant(LUA_VALUE);
 }
 
-ConstantMethodref* CodeGenContext::HashMap_base::Methods_base::getPutMethodFromHashMap()
+ConstantMethodref* CodeGenContext::LuaContext_::Constructors_::root_impl()
 {
-    if (hashMapPutMethod == nullptr)
-    {
-        hashMapPutMethod = getHashMap()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            HASH_MAP,
-            "put",
-            DescriptorMethod(
-                DescriptorField(OBJECT),
-                {
-                    {OBJECT},
-                    {OBJECT}
-                }
-            )
-        );
-    }
-    return hashMapPutMethod;
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt, {}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Constructors_::withParent_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt, {{LUA_CONTEXT}}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::getParent_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "getParent",
+        DescriptorMethod(
+            DescriptorField(LUA_CONTEXT),
+            {}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::getById_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "get",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {STRING}
+            }
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::getByIdOrCreateNewGlobal_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "getOrCreateGlobal",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {
+                {STRING}
+            }
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::setValue_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "set",
+        DescriptorMethod(
+            std::nullopt,
+            {
+                {STRING},
+                {LUA_VALUE}
+            }
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::declareLocalId_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "declareLocal",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {{STRING}}
+        )
+    );
+}
+
+ConstantClass* CodeGenContext::LuaContext_::classConstant_impl()
+{
+    return getClass()->getOrCreateClassConstant(LUA_CONTEXT);
+}
+
+ConstantMethodref* CodeGenContext::LuaList_::Constructors_::base_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "<init>",
+        DescriptorMethod(std::nullopt, {})
+    );
+}
+
+
+ConstantMethodref* CodeGenContext::LuaList_::Methods_::get_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "get",
+        DescriptorMethod(
+            DescriptorField(LUA_VALUE),
+            {{Descriptor::Int}}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaList_::Methods_::subList_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "subList",
+        DescriptorMethod(
+            DescriptorField(LUA_LIST),
+            {{Descriptor::Int}}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaList_::Methods_::getFirst_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "getFirst",
+        DescriptorMethod(
+            DescriptorField(OBJECT),
+            {}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaList_::Methods_::add_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "add",
+        DescriptorMethod(
+            Descriptor::Boolean,
+            {{OBJECT}}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaList_::Methods_::addAll_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_LIST,
+        "addAll",
+        DescriptorMethod(
+            Descriptor::Boolean,
+            {{COLLECTION}}
+        )
+    );
+}
+
+ConstantClass* CodeGenContext::LuaList_::classConstant_impl()
+{
+    return getClass()->getOrCreateClassConstant(LUA_LIST);
+}
+
+ConstantMethodref* CodeGenContext::HashMap_::Constructors_::base_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        HASH_MAP,
+        "<init>",
+        DescriptorMethod(std::nullopt, {})
+    );
+}
+
+ConstantMethodref* CodeGenContext::HashMap_::Methods_::put_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        HASH_MAP,
+        "put",
+        DescriptorMethod(
+            DescriptorField(OBJECT),
+            {
+                {OBJECT},
+                {OBJECT}
+            }
+        )
+    );
+}
+
+ConstantClass* CodeGenContext::HashMap_::classConstant_impl()
+{
+    return getClass()->getOrCreateClassConstant(HASH_MAP);
 }
 
 void CodeGenContext::setContextIndexInLocals(uint16_t index)
@@ -675,91 +643,4 @@ int32_t CodeGenContext::getStartIndexForVarargInListArgs() const
         throw std::logic_error("Index of vararg start index not initialized");
     }
     return startIndexForVarargInListArgs_;
-}
-
-ConstantMethodref* CodeGenContext::LuaContext_base::Methods_base::getParentContextMethodFromContext()
-{
-    if (luaContextGetParent == nullptr)
-    {
-        luaContextGetParent = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "getParent",
-            DescriptorMethod(
-                DescriptorField(LUA_CONTEXT),
-                {}
-            )
-        );
-    }
-    return luaContextGetParent;
-}
-
-ConstantMethodref* CodeGenContext::LuaContext_base::Methods_base::getLuaValueByIdMethodFromContext()
-{
-    if (luaContextGetLuaValueById == nullptr)
-    {
-        luaContextGetLuaValueById = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "get",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {STRING}
-                }
-            )
-        );
-    }
-    return luaContextGetLuaValueById;
-}
-
-ConstantMethodref* CodeGenContext::LuaContext_base::Methods_base::getLuaValueByIdOrCreateNewMethodFromContext()
-{
-    if (luaContextGetLuaValueByIdOrCreateNew == nullptr)
-    {
-        luaContextGetLuaValueByIdOrCreateNew = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "getOrCreateGlobal",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {
-                    {STRING}
-                }
-            )
-        );
-    }
-    return luaContextGetLuaValueByIdOrCreateNew;
-}
-
-ConstantMethodref* CodeGenContext::LuaContext_base::Methods_base::setLuaValueByIdMethodFromContext()
-{
-    if (luaContextSetLuaValueById == nullptr)
-    {
-        luaContextSetLuaValueById = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "set",
-            DescriptorMethod(
-                std::nullopt,
-                {
-                    {STRING},
-                    {LUA_VALUE}
-                }
-            )
-        );
-    }
-    return luaContextSetLuaValueById;
-}
-
-ConstantMethodref* CodeGenContext::LuaContext_base::Methods_base::getDeclareLocalByIdMethodFromContext()
-{
-    if (luaContextDeclareLocalById == nullptr)
-    {
-        luaContextDeclareLocalById = getLuaContext()->getContext()->getClass()->getOrCreateMethodrefConstant(
-            LUA_CONTEXT,
-            "declareLocal",
-            DescriptorMethod(
-                DescriptorField(LUA_VALUE),
-                {{STRING}}
-            )
-        );
-    }
-    return luaContextDeclareLocalById;
 }
