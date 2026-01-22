@@ -250,13 +250,15 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             break;
         }
     case StatementNode::Type::Assignment:
-        assigment(*static_cast<const AssignmentStmtNode*>(node));
-        break;
+        {
+            assigment(*static_cast<const AssignmentStmtNode*>(node));
+            break;
+        }
     case StatementNode::Type::FunctionCall:
         {
             functionCallStmt(*static_cast<const FunctionCallStmtNode*>(node));
+            break;
         }
-        break;
     case StatementNode::Type::Branching:
         {
             auto* code = getAttributeCode();
