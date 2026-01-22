@@ -330,34 +330,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
         }
     case StatementNode::Type::Block:
         {
-            // auto* luaContextCtor = getConstructorForLuaContext();
-            // auto* code = getAttributeCode();
-            //
-            // // сохранить старый контекст
-            // *code
-            //     << code->LoadReference(0)
-            //     << code->StoreReference(1);
-            //
-            // // создать новый LuaContext(parent)
-            // *code
-            //     << code->LoadReference(0)
-            //     << code->New(getLuaContextClass())
-            //     << code->Duplicate()
-            //     << code->Swap()
-            //     << code->InvokeSpecial(getConstructorForLuaContext())
-            //     << code->StoreReference(0);
-
-            auto* castValue = static_cast<const BlockStmtNode*>(node);
-            for (auto* stmt : *castValue->getList())
-            {
-                buildBytecode(stmt);
-            }
-
-            // // восстановить контекст
-            // *code
-            //     << code->LoadReference(1)
-            //     << code->StoreReference(0);
-            //
+            buildBlock(*static_cast<const BlockStmtNode*>(node));
             break;
         }
     case StatementNode::Type::GoTo:
@@ -637,6 +610,44 @@ void ByteCodeBuilder::createHashMap()
         << code->New(getHashMapClass()) // ..., objectref(HashMap)
         << code->Duplicate() // ..., objectref, objectref
         << code->InvokeSpecial(getHashMapConstructor()); // ..., objectref
+}
+
+void ByteCodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewContext, bool needSetParentContextAfter)
+{
+    if (needCreateNewContext)
+    {
+        createChildrenContext();
+    }
+    for (auto* stmt : *block.getList())
+    {
+        buildBytecode(stmt);
+    }
+    if (needSetParentContextAfter)
+    {
+        getParentContext();
+    }
+}
+
+void ByteCodeBuilder::createChildrenContext()
+{
+    auto code = getAttributeCode();
+    const auto contextIndex = getContextIndexInLocals();
+    *code
+        << code->New(getLuaContextClass()) // ..., LuaContext
+        << code->Duplicate() // ..., LuaContext, LuaContext
+        << code->LoadReference(contextIndex) // ..., LuaContext, LuaContext, LuaContext
+        << code->InvokeSpecial(getConstructorForLuaContextWithParent()) // ..., LuaContext
+        << code->StoreReference(contextIndex); // ...
+}
+
+void ByteCodeBuilder::getParentContext()
+{
+    auto code = getAttributeCode();
+    const auto contextIndex = getContextIndexInLocals();
+    *code
+        << code->LoadReference(contextIndex) // ..., LuaContext
+        << code->InvokeVirtual(getParentContextMethodFromContext()) // ..., LuaContext
+        << code->StoreReference(contextIndex); // ...
 }
 
 void ByteCodeBuilder::functionCallExpr(const FunctionCallExprNode& node)

@@ -153,6 +153,22 @@ ConstantMethodref* CodeGenContext::getConstructorForLuaContextWithParent()
     return luaContextWithParentCtor;
 }
 
+ConstantMethodref* CodeGenContext::getParentContextMethodFromContext()
+{
+    if (luaContextGetParent == nullptr)
+    {
+        luaContextGetParent = getClass()->getOrCreateMethodrefConstant(
+            LUA_CONTEXT,
+            "getParent",
+            DescriptorMethod(
+                DescriptorField(LUA_CONTEXT),
+                {}
+            )
+        );
+    }
+    return luaContextGetParent;
+}
+
 ConstantMethodref* CodeGenContext::getAddMethodFromLuaValue()
 {
     if (luaValueAdd == nullptr)

@@ -78,6 +78,9 @@ private:
     //region Helpers
     void emitStaticCall(ConstantMethodref* methodref);
     void createHashMap();
+    void buildBlock(const BlockStmtNode& block, bool needCreateNewContext = true, bool needSetParentContextAfter = true);
+    void createChildrenContext();
+    void getParentContext();
     //endregion
 
     void functionCallExpr(const FunctionCallExprNode& node);
