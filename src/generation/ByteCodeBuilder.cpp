@@ -12,6 +12,7 @@
 #include "node/statement/DeclarationStmtNode.h"
 #include "node/statement/StatementNode.h"
 #include "node/statement/WhileLoopStmtNode.h"
+#include "node/statement/ReturnStmtNode.h"
 
 void ByteCodeBuilder::build(const BlockStmtNode& node)
 {
@@ -340,7 +341,15 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
     case StatementNode::Type::Break:
         break;
     case StatementNode::Type::Return:
-        break;
+        {
+            auto* code = getAttributeCode();
+            auto* castNode = static_cast<const ReturnStmtNode*>(node);
+
+            pushArgumentsList(*castNode->getReturnExprList()); // ..., LuaList
+
+            *code << code->ReturnReference();
+            break;
+        }
     }
 }
 
