@@ -115,7 +115,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            sum();
+            mul();
             break;
         }
     case ExpressionNode::Type::Division:
