@@ -57,6 +57,7 @@ public:
     ConstantMethodref* getConstructorForLuaContext();
     ConstantMethodref* getConstructorForLuaContextWithParent();
     ConstantMethodref* getLuaValueByIdMethodFromContext();
+    ConstantMethodref* getLuaValueByIdOrCreateNewMethodFromContext();
     ConstantMethodref* setLuaValueByIdMethodFromContext();
     ConstantMethodref* getDeclareLocalByIdMethodFromContext();
     //endregion
@@ -132,6 +133,7 @@ private:
     ConstantMethodref* luaValueLen = nullptr;
 
     ConstantMethodref* luaContextGetLuaValueById = nullptr;
+    ConstantMethodref* luaContextGetLuaValueByIdOrCreateNew = nullptr;
     ConstantMethodref* luaContextSetLuaValueById = nullptr;
     ConstantMethodref* luaContextDeclareLocalById = nullptr;
 

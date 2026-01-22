@@ -693,6 +693,24 @@ ConstantMethodref* CodeGenContext::getLuaValueByIdMethodFromContext()
     return luaContextGetLuaValueById;
 }
 
+ConstantMethodref* CodeGenContext::getLuaValueByIdOrCreateNewMethodFromContext()
+{
+    if (luaContextGetLuaValueByIdOrCreateNew == nullptr)
+    {
+        luaContextGetLuaValueByIdOrCreateNew = getClass()->getOrCreateMethodrefConstant(
+            LUA_CONTEXT,
+            "getOrCreateGlobal",
+            DescriptorMethod(
+                DescriptorField(LUA_VALUE),
+                {
+                    {STRING}
+                }
+            )
+        );
+    }
+    return luaContextGetLuaValueByIdOrCreateNew;
+}
+
 ConstantMethodref* CodeGenContext::setLuaValueByIdMethodFromContext()
 {
     if (luaContextSetLuaValueById == nullptr)
