@@ -334,7 +334,7 @@ ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getPowMethodFrom
 
 ConstantMethodref* CodeGenContext::LuaValue_base::Methods_base::getConcatMethodFromLuaValue()
 {
-    if (luaValueConcat)
+    if (luaValueConcat == nullptr)
     {
         luaValueConcat = getLuaValue()->getContext()->getClass()->getOrCreateMethodrefConstant(
             LUA_VALUE,
