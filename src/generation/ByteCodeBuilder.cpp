@@ -695,7 +695,19 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
         for (auto* exprNode : node.getNameList())
         {
             *code << code->Duplicate(); // ..., LuaList, LuaList
-            buildBytecode(exprNode); // ..., LuaList, LuaList, LuaValue
+            if (exprNode->getType() == ExpressionNode::Type::Id)
+            {
+                auto castExpr = static_cast<IdExprNode*>(exprNode);
+                *code
+                    << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
+                    << code->PushString(castExpr->getValue()) // ..., LuaList, LuaList, LuaContext, StringId
+                    << code->InvokeVirtual(getLuaValueByIdOrCreateNewMethodFromContext());
+                // ..., LuaList, LuaList, LuaValue
+            }
+            else
+            {
+                buildBytecode(exprNode); // ..., LuaList, LuaList, LuaValue
+            }
             addToLuaList(); // ..., LuaList
         }
     }
@@ -716,7 +728,6 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
         }
     }
 
-    createLuaList(); // ..., LuaList, LuaList
     pushArgumentsList(node.getValues()); // ..., LuaList, LuaList
 
     *code << code->InvokeStatic(getAssignmentMethodFromLuaValue()); // ...
