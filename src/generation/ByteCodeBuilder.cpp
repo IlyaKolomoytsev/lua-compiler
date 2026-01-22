@@ -8,8 +8,10 @@
 #include "jvm/descriptor-method.h"
 #include "node/statement/AssignmentStmtNode.h"
 #include "node/statement/BlockStmtNode.h"
+#include "node/statement/BranchingStmtNode.h"
 #include "node/statement/DeclarationStmtNode.h"
 #include "node/statement/StatementNode.h"
+#include "node/statement/WhileLoopStmtNode.h"
 
 void ByteCodeBuilder::build(const BlockStmtNode& node)
 {
