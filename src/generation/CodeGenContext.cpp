@@ -422,9 +422,9 @@ ConstantMethodref* CodeGenContext::getCallMethodFromLuaValue()
             LUA_VALUE,
             "call",
             DescriptorMethod(
-                DescriptorField(LIST),
+                DescriptorField(LUA_LIST),
                 {
-                    {LIST}
+                    {LUA_LIST}
                 }
             )
         );
@@ -478,8 +478,8 @@ ConstantMethodref* CodeGenContext::getAssignmentMethodFromLuaValue()
             DescriptorMethod(
                 std::nullopt,
                 {
-                    {LIST},
-                    {LIST}
+                    {LUA_LIST},
+                    {LUA_LIST}
                 }
             )
         );
@@ -558,7 +558,7 @@ ConstantMethodref* CodeGenContext::getGetMethodFromLuaList()
             LUA_LIST,
             "get",
             DescriptorMethod(
-                DescriptorField(OBJECT),
+                DescriptorField(LUA_VALUE),
                 {{Descriptor::Int}}
             )
         );
