@@ -311,7 +311,7 @@ ConstantMethodref* CodeGenContext::getEqualMethodFromLuaValue()
     {
         luaValueEqual = getClass()->getOrCreateMethodrefConstant(
             LUA_VALUE,
-            "equal",
+            "eq",
             DescriptorMethod(
                 DescriptorField(LUA_VALUE),
                 {
