@@ -388,7 +388,7 @@ ConstantMethodref* CodeGenContext::getBoolValueFromLuaValue()
             LUA_VALUE,
             "getBoolValueSave",
             DescriptorMethod(
-                DescriptorField(LUA_VALUE),
+                Descriptor::Boolean,
                 {}
             )
         );
