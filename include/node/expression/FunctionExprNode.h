@@ -2,16 +2,18 @@
 #define LUA_COMPILER_FUNCTION_EXPR_NODE_H
 #include "node/expression/ExpressionNode.h"
 
+class BlockStmtNode;
+
 class FunctionExprNode : public ExpressionNode
 {
 public:
-    FunctionExprNode(ExpressionNodeList* parameters, StatementNode* body) :
+    FunctionExprNode(ExpressionNodeList* parameters, BlockStmtNode* body) :
         ExpressionNode(Type::FunctionLiteral), parameters_(parameters), body_(body)
     {
     }
 
     [[nodiscard]] const ExpressionNodeList& parameters() const { return *parameters_; };
-    [[nodiscard]] StatementNode* body() const { return body_; }
+    [[nodiscard]] BlockStmtNode* body() const { return body_; }
 
     /* Overridden methods */
 
@@ -19,7 +21,7 @@ public:
 
 private:
     ExpressionNodeList* parameters_;
-    StatementNode* body_;
+    BlockStmtNode* body_;
 };
 
 #endif //LUA_COMPILER_FUNCTION_EXPR_NODE_H

@@ -43,7 +43,7 @@ namespace parser
     inline AssignmentStmtNode* FunctionDeclaration(Scope scope,
                                                    ExpressionNode* functionName,
                                                    ExpressionNodeList* parameters,
-                                                   StatementNode* body)
+                                                   BlockStmtNode* body)
     {
         auto inputValues = new ExpressionNodeList();
         auto outputValues = new ExpressionNodeList();
@@ -55,7 +55,7 @@ namespace parser
     inline AssignmentStmtNode* MethodDeclaration(ExpressionNode* tableExpr,
                                                  std::string* methodName,
                                                  ExpressionNodeList* parameters,
-                                                 StatementNode* body)
+                                                 BlockStmtNode* body)
     {
         auto functionName = new TableFieldExprNode(tableExpr, new IdExprNode(methodName));
         parameters->push_front(new IdExprNode("self"));
