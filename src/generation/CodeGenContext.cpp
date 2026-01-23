@@ -135,6 +135,17 @@ ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::table_impl()
     );
 }
 
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::anotherLuaValue_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt,
+            {{LUA_VALUE}}) // ()V
+    );
+}
+
 ConstantMethodref* CodeGenContext::LuaValue_::Methods_::add_impl()
 {
     return getClass()->getOrCreateMethodrefConstant(
@@ -487,6 +498,21 @@ ConstantMethodref* CodeGenContext::LuaContext_::Methods_::declareLocalId_impl()
         DescriptorMethod(
             DescriptorField(LUA_VALUE),
             {{STRING}}
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaContext_::Methods_::declareLocalValueById_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_CONTEXT,
+        "declareLocal",
+        DescriptorMethod(
+            std::nullopt,
+            {
+                {STRING},
+                {LUA_VALUE}
+            }
         )
     );
 }

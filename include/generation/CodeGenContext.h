@@ -1,5 +1,6 @@
 #ifndef LUA_COMPILER_CODEGEN_CONTEXT_H
 #define LUA_COMPILER_CODEGEN_CONTEXT_H
+#include "LocalsManager.h"
 #include "jvm/class.h"
 #include "jvm/attribute-code.h"
 
@@ -24,7 +25,7 @@ private:                                                \
 
 using namespace jvm;
 
-class CodeGenContext
+class CodeGenContext : public LocalsManager
 {
     struct ContextProvider
     {
@@ -62,6 +63,7 @@ public:
             METHODREF_CONSTANT_METHOD(boolean)
             METHODREF_CONSTANT_METHOD(string)
             METHODREF_CONSTANT_METHOD(table)
+            METHODREF_CONSTANT_METHOD(anotherLuaValue)
         } constructor;
 
         struct Methods_ : ContextProvider
@@ -112,6 +114,7 @@ public:
             METHODREF_CONSTANT_METHOD(getByIdOrCreateNewGlobal)
             METHODREF_CONSTANT_METHOD(setValue)
             METHODREF_CONSTANT_METHOD(declareLocalId)
+            METHODREF_CONSTANT_METHOD(declareLocalValueById)
         } method;
 
         CLASS_CONSTANT_METHOD(classConstant)

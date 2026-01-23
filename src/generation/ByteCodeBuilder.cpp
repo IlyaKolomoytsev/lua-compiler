@@ -10,6 +10,7 @@
 #include "node/statement/BlockStmtNode.h"
 #include "node/statement/BranchingStmtNode.h"
 #include "node/statement/DeclarationStmtNode.h"
+#include "node/statement/ForLoopClassicStmtNode.h"
 #include "node/statement/StatementNode.h"
 #include "node/statement/WhileLoopStmtNode.h"
 #include "node/statement/ReturnStmtNode.h"
@@ -17,21 +18,23 @@
 void ByteCodeBuilder::build(const BlockStmtNode& node)
 {
     auto* code = getAttributeCode();
-    constexpr uint16_t contextIndex = 0;
+    auto* contextIndex = registerNewLocal(Local::Size::one);
 
     // create new context
     *code
         << code->New(luaContext.classConstant())
         << code->Duplicate()
         << code->InvokeSpecial(luaContext.constructor.root())
-        << code->StoreReference(contextIndex);
-    setContextIndexInLocals(contextIndex);
+        << code->StoreReference(contextIndex->getIndex());
+    setContextIndexInLocals(contextIndex->getIndex());
 
     for (auto* stmt : *node.getList())
     {
         buildBytecode(stmt);
     }
     *code << code->ReturnVoid();
+
+    delete contextIndex;
 }
 
 void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
@@ -289,7 +292,76 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             break;
         }
     case StatementNode::Type::ForLoopClassic:
-        break;
+        {
+            auto* code = getAttributeCode();
+            auto* castNode = static_cast<const ForLoopClassicStmtNode*>(node);
+            auto range = castNode->getRange();
+
+            buildBytecode(range.start);
+            auto currentLocal = registerNewLocal(Local::Size::one);
+            *code << code->StoreReference(currentLocal->getIndex());
+
+            buildBytecode(range.finish);
+            auto finishLocal = registerNewLocal(Local::Size::one);
+            *code << code->StoreReference(finishLocal->getIndex());
+
+            auto EndLoop_L = code->CodeLabel();
+
+            // if finish < start goto end
+            *code
+                << code->LoadReference(finishLocal->getIndex())
+                << code->LoadReference(currentLocal->getIndex());
+            lessThan();
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool())
+                << code->If(Instruction::Compare::NotEqual, EndLoop_L);
+
+            buildBytecode(range.step);
+            auto stepLocal = registerNewLocal(Local::Size::one);
+            *code << code->StoreReference(stepLocal->getIndex());
+
+            auto StartLoop_L = code->CodeLabel();
+
+            *code << StartLoop_L;
+
+            // prepare block context
+            createChildrenContext();
+            *code
+                << code->LoadReference(getContextIndexInLocals()) // ..., LuaContext
+                << code->PushString(castNode->getIteratorVariableId()->getValue()) // ..., LuaContext, String
+                << code->New(luaValue.classConstant()) // ..., LuaContext, String, LuaValue
+                << code->Duplicate() // ..., LuaContext, String, LuaValue, LuaValue
+                << code->LoadReference(currentLocal->getIndex())
+                // ..., LuaContext, String, LuaValue, LuaValue, LuaValue
+                << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()) // ..., LuaContext, String, LuaValue
+                << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...
+
+            // block
+            buildBlock(*castNode->getBlock(), false);
+
+            // update loop value
+            *code
+                << code->LoadReference(currentLocal->getIndex()) // ..., LuaValue
+                << code->LoadReference(stepLocal->getIndex()); // ..., LuaValue, LuaValue
+            sum(); // ..., LuaValue
+            *code << code->StoreReference(currentLocal->getIndex()); // ...
+
+            // if current <= finish goto start
+            *code
+                << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
+                << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
+            lessThan(); // ..., LuaValue
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
+                << code->If(Instruction::Equal, StartLoop_L) // ...
+                << EndLoop_L;
+
+            // free local variables
+            delete currentLocal;
+            delete finishLocal;
+            delete stepLocal;
+            break;
+        }
     case StatementNode::Type::ForLoopIterator:
         break;
     case StatementNode::Type::WhileLoop:
