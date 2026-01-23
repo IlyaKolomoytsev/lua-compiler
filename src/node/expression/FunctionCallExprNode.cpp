@@ -1,6 +1,5 @@
 #include "node/expression/FunctionCallExprNode.h"
 
-#include "generation/ByteCodeBuilder.h"
 #include "node/DotMacros.h"
 #include "node/expression/TableFieldExprNode.h"
 

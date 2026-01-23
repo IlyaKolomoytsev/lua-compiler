@@ -3,8 +3,6 @@
 #include <sys/types.h>
 #include <ostream>
 
-class ByteCodeBuilder;
-
 
 class Node
 {

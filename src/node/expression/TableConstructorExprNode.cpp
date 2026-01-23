@@ -2,7 +2,6 @@
 
 #include <bits/locale_facets_nonio.h>
 
-#include "generation/ByteCodeBuilder.h"
 #include "node/DotMacros.h"
 
 void TableConstructorExprNode::writeNodeInfoToDot(std::ostream& os) const

@@ -1,6 +1,5 @@
 #include "node/expression/TableFieldExprNode.h"
 
-#include "generation/ByteCodeBuilder.h"
 #include "node/DotMacros.h"
 
 void TableFieldExprNode::writeNodeInfoToDot(std::ostream& os) const

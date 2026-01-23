@@ -4,7 +4,6 @@
 #include "node/Node.h"
 #include "FixedString.h"
 #include "ExpressionNode.h"
-#include "generation/ByteCodeBuilder.h"
 
 template <exprType T, fixed_string N>
 class ExpressionNodeOf : public ExpressionNode

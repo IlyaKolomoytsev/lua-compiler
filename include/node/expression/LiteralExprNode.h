@@ -3,7 +3,6 @@
 
 #include "node/expression/ExpressionNode.h"
 #include "node/DotMacros.h"
-#include "generation/ByteCodeBuilder.h"
 
 template <typename V, ExpressionNode::Type T>
 class LiteralExprNode : public ExpressionNode
