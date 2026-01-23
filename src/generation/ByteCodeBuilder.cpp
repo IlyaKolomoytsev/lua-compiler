@@ -345,7 +345,6 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
                 << code->If(Instruction::Compare::Equal, EndLoop_L);
 
 
-
             *code << StartLoop_L;
 
             // prepare block context
@@ -699,7 +698,9 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         buildBytecode(field.value);
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
 
-        *code << code->InvokeVirtual(hashMap.method.put());
+        *code
+            << code->InvokeVirtual(hashMap.method.put())
+            << code->PopOne();
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
     }
 
