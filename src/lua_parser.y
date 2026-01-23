@@ -166,9 +166,9 @@ name_list: ID { $$ = new ExpressionNodeList{ new IdExprNode($1) }; }
          ;
 
 variable: ID { $$ = new IdExprNode($1); }
-        | variable '.' ID { $$ = new TableFieldExprNode($1, new IdExprNode($3)); }
+        | variable '.' ID { $$ = new TableFieldExprNode($1, new StringExprNode($3)); }
         | variable '[' expr ']' { $$ = new TableFieldExprNode($1, $3); }
-        | function_call '.' ID { $$ = new TableFieldExprNode($1, new IdExprNode($3)); }
+        | function_call '.' ID { $$ = new TableFieldExprNode($1, new StringExprNode($3)); }
         | function_call '[' expr ']' { $$ = new TableFieldExprNode($1, $3); }
         ;
 
