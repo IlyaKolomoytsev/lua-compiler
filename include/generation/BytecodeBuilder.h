@@ -21,9 +21,8 @@ public:
         CodeGenContext(currentClass, currentMethod), classRegistry_(registry)
     {
     }
-    void build(const BlockStmtNode& node);
 
-private:
+protected:
 
     //region Build
     void buildBytecode(const ExpressionNode* node);

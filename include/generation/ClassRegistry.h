@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "BytecodeBuilder.h"
+#include "MainBytecodeBuilder.h"
 
 
 class ClassRegistry
@@ -11,13 +12,13 @@ public:
     ClassRegistry(std::filesystem::path targetDirectory);
 
     void build(BlockStmtNode* blockNode);
-    BytecodeBuilder* getBuilderForMain();
+    MainBytecodeBuilder* getBuilderForMain();
     BytecodeBuilder* createNewFunction();
 
 private:
     [[nodiscard]] std::string newFunctionClassName();
 
-    BytecodeBuilder* mainBuilder_ = nullptr;
+    MainBytecodeBuilder* mainBuilder_ = nullptr;
     size_t index_ = 0;
     std::filesystem::path targetDirectory_;
 };

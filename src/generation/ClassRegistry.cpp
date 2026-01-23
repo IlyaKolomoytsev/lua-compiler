@@ -13,7 +13,7 @@ void ClassRegistry::build(BlockStmtNode* blockNode)
     builder->getClass()->writeToProject(targetDirectory_);
 }
 
-BytecodeBuilder* ClassRegistry::getBuilderForMain()
+MainBytecodeBuilder* ClassRegistry::getBuilderForMain()
 {
     if (mainBuilder_ == nullptr)
     {
@@ -28,7 +28,7 @@ BytecodeBuilder* ClassRegistry::getBuilderForMain()
         method->addFlag(Method::ACC_PUBLIC);
         method->addFlag(Method::ACC_STATIC);
 
-        mainBuilder_ = new BytecodeBuilder(functionClass, method, this);
+        mainBuilder_ = new MainBytecodeBuilder(functionClass, method, this);
     }
     return mainBuilder_;
 }

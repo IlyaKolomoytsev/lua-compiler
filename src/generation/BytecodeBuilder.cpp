@@ -15,28 +15,6 @@
 #include "node/statement/WhileLoopStmtNode.h"
 #include "node/statement/ReturnStmtNode.h"
 
-void BytecodeBuilder::build(const BlockStmtNode& node)
-{
-    auto* code = getAttributeCode();
-    auto* contextIndex = registerNewLocal(Local::Size::one);
-
-    // create new context
-    *code
-        << code->New(luaContext.classConstant())
-        << code->Duplicate()
-        << code->InvokeSpecial(luaContext.constructor.root())
-        << code->StoreReference(contextIndex->getIndex());
-    setContextIndexInLocals(contextIndex->getIndex());
-
-    for (auto* stmt : *node.getList())
-    {
-        buildBytecode(stmt);
-    }
-    *code << code->ReturnVoid();
-
-    delete contextIndex;
-}
-
 void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
 {
     switch (node->getType())
