@@ -145,8 +145,6 @@ public:
         CLASS_CONSTANT_METHOD(classConstant)
     } luaList;
 
-    //endregion
-    //region HashMap
     struct HashMap_ : ContextProvider
     {
         explicit HashMap_(CodeGenContext* context);
@@ -167,8 +165,6 @@ public:
 
         CLASS_CONSTANT_METHOD(classConstant)
     } hashMap;
-
-    //endregion
 
     void setContextIndexInLocals(uint16_t index);
     uint16_t getContextIndexInLocals() const;
