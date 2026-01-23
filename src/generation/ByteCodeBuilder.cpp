@@ -305,7 +305,23 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             auto finishLocal = registerNewLocal(Local::Size::one);
             *code << code->StoreReference(finishLocal->getIndex());
 
+            buildBytecode(range.step);
+            auto stepLocal = registerNewLocal(Local::Size::one);
+            *code << code->StoreReference(stepLocal->getIndex());
+
+            auto StartLoop_L = code->CodeLabel();
             auto EndLoop_L = code->CodeLabel();
+            auto stepLessThanZeroPrepare = code->CodeLabel();
+            auto stepLessThanZeroContinue = code->CodeLabel();
+
+            // if step < 0 goto stepLessThanZeroPrepare
+            *code
+                << code->LoadReference(stepLocal->getIndex());
+            pushInt(0);
+            lessThan();
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool())
+                << code->If(Instruction::Compare::NotEqual, stepLessThanZeroPrepare);
 
             // if finish < start goto end
             *code
@@ -314,13 +330,21 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             lessThan();
             *code
                 << code->InvokeVirtual(luaValue.method.toBool())
-                << code->If(Instruction::Compare::NotEqual, EndLoop_L);
+                << code->If(Instruction::Compare::NotEqual, EndLoop_L)
+                << code->GoTo(StartLoop_L);
 
-            buildBytecode(range.step);
-            auto stepLocal = registerNewLocal(Local::Size::one);
-            *code << code->StoreReference(stepLocal->getIndex());
+            *code << stepLessThanZeroPrepare;
 
-            auto StartLoop_L = code->CodeLabel();
+            // if finish > start goto end
+            *code
+                << code->LoadReference(finishLocal->getIndex())
+                << code->LoadReference(currentLocal->getIndex());
+            lessThan();
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool())
+                << code->If(Instruction::Compare::Equal, EndLoop_L);
+
+
 
             *code << StartLoop_L;
 
@@ -346,6 +370,15 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             sum(); // ..., LuaValue
             *code << code->StoreReference(currentLocal->getIndex()); // ...
 
+            // if step < 0 goto stepLessThanZeroContinue
+            *code
+                << code->LoadReference(stepLocal->getIndex());
+            pushInt(0);
+            lessThan();
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool())
+                << code->If(Instruction::Compare::NotEqual, stepLessThanZeroContinue);
+
             // if current <= finish goto start
             *code
                 << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
@@ -354,7 +387,21 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
                 << code->If(Instruction::Equal, StartLoop_L) // ...
-                << EndLoop_L;
+                << code->GoTo(EndLoop_L);
+
+
+            *code << stepLessThanZeroContinue;
+
+            // if current >= finish goto start
+            *code
+                << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
+                << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
+            lessEqual(); // ..., LuaValue
+            *code
+                << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
+                << code->If(Instruction::NotEqual, StartLoop_L); // ...
+
+            *code << EndLoop_L;
 
             // free local variables
             delete currentLocal;
