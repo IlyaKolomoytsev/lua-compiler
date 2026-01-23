@@ -44,37 +44,37 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
     case ExpressionNode::Type::Integer:
         {
             auto castNode = static_cast<const IntegerExprNode*>(node);
-            pushInt(castNode->getValue());
+            emitPushInt(castNode->getValue());
             break;
         }
     case ExpressionNode::Type::Float:
         {
             auto castNode = static_cast<const FloatExprNode*>(node);
-            pushFloat(castNode->getValue());
+            emitPushFloat(castNode->getValue());
             break;
         }
     case ExpressionNode::Type::String:
         {
             auto castNode = static_cast<const StringExprNode*>(node);
-            pushString(castNode->getValue());
+            emitPushString(castNode->getValue());
             break;
         }
     case ExpressionNode::Type::Boolean:
         {
             auto castNode = static_cast<const BoolExprNode*>(node);
-            pushBool(castNode->getValue());
+            emitPushBool(castNode->getValue());
             break;
         }
     case ExpressionNode::Type::Nil:
-        pushNull();
+        emitPushNull();
         break;
     case ExpressionNode::Type::Vararg:
-        pushVararg();
+        emitLoadVararg();
         break;
     case ExpressionNode::Type::Id:
         {
             auto castNode = static_cast<const IdExprNode*>(node);
-            id(castNode->getValue());
+            emitLoadId(castNode->getValue());
             break;
         }
     case ExpressionNode::Type::TableField:
@@ -82,17 +82,17 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto castField = static_cast<const TableFieldExprNode*>(node);
             buildBytecode(castField->getTable());
             buildBytecode(castField->getKey());
-            getFieldByKey();
+            emitBinaryGetFieldByKey();
             break;
         }
     case ExpressionNode::Type::TableConstructor:
         {
             auto* castValue = static_cast<const TableConstructorExprNode*>(node);
-            tableConstructor(castValue->getTableFields());
+            emitTableConstructor(castValue->getTableFields());
             break;
         }
     case ExpressionNode::Type::FunctionCall:
-        functionCallExpr(*static_cast<const FunctionCallExprNode*>(node));
+        emitFunctionCallExpr(*static_cast<const FunctionCallExprNode*>(node));
         break;
     case ExpressionNode::Type::FunctionLiteral:
         // ToDo
@@ -102,7 +102,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            sum();
+            emitBinarySum();
             break;
         }
     case ExpressionNode::Type::Subtraction:
@@ -110,7 +110,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            sub();
+            emitBinarySub();
             break;
         }
     case ExpressionNode::Type::Multiplication:
@@ -118,7 +118,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            mul();
+            emitBinaryMul();
             break;
         }
     case ExpressionNode::Type::Division:
@@ -126,7 +126,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            div();
+            emitBinaryDiv();
             break;
         }
     case ExpressionNode::Type::Modulo:
@@ -134,7 +134,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            mod();
+            emitBinaryMod();
             break;
         }
     case ExpressionNode::Type::IntegerDivision:
@@ -142,7 +142,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            idiv();
+            emitBinaryIntDiv();
             break;
         }
     case ExpressionNode::Type::Exponentiation:
@@ -150,7 +150,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            pow();
+            emitBinaryPow();
             break;
         }
     case ExpressionNode::Type::Less:
@@ -158,7 +158,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            lessThan();
+            emitBinaryLessThan();
             break;
         }
     case ExpressionNode::Type::Greater:
@@ -166,7 +166,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            greaterThan();
+            emitBinaryGreaterThan();
             break;
         }
     case ExpressionNode::Type::Equality:
@@ -174,7 +174,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            equal();
+            emitBinaryEqual();
             break;
         }
     case ExpressionNode::Type::Unequality:
@@ -182,7 +182,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            notEqual();
+            emitBinaryNotEqual();
             break;
         }
     case ExpressionNode::Type::LessEqual:
@@ -190,7 +190,7 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            lessEqual();
+            emitBinaryLessEqual();
             break;
         }
     case ExpressionNode::Type::GreaterEqual:
@@ -198,19 +198,19 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const SummationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            greaterEqual();
+            emitBinaryGreaterEqual();
             break;
         }
     case ExpressionNode::Type::Or:
         {
             auto* castValue = static_cast<const OrExprNode*>(node);
-            buildOr(castValue->getLeft(), castValue->getRight());
+            emitBinaryOr(castValue->getLeft(), castValue->getRight());
             break;
         }
     case ExpressionNode::Type::And:
         {
             auto* castValue = static_cast<const AndExprNode*>(node);
-            buildAnd(castValue->getLeft(), castValue->getRight());
+            emitBinaryAnd(castValue->getLeft(), castValue->getRight());
             break;
         }
     case ExpressionNode::Type::Concatenation:
@@ -218,28 +218,28 @@ void ByteCodeBuilder::buildBytecode(const ExpressionNode* node)
             auto* castValue = static_cast<const ConcatenationExprNode*>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
-            concat();
+            emitBinaryConcat();
             break;
         }
     case ExpressionNode::Type::Length:
         {
             auto* castValue = static_cast<const LengthExprNode*>(node);
             buildBytecode(castValue->getOperand());
-            len();
+            emitUnaryLen();
             break;
         }
     case ExpressionNode::Type::Negation:
         {
             auto* castValue = static_cast<const NegationExprNode*>(node);
             buildBytecode(castValue->getOperand());
-            booleanNot();
+            emitUnaryBooleanNot();
             break;
         }
     case ExpressionNode::Type::UnaryMinuses:
         {
             auto* castValue = static_cast<const UnaryMinusExprNode*>(node);
             buildBytecode(castValue->getOperand());
-            unm();
+            emitUnaryUnm();
             break;
         }
     }
@@ -252,17 +252,17 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
     case StatementNode::Type::Declaration:
         {
             auto* castNode = static_cast<const DeclarationStmtNode*>(node);
-            declareIds(castNode->getNames());
+            emitDeclareLocalIds(castNode->getNames());
             break;
         }
     case StatementNode::Type::Assignment:
         {
-            assigment(*static_cast<const AssignmentStmtNode*>(node));
+            emitAssigment(*static_cast<const AssignmentStmtNode*>(node));
             break;
         }
     case StatementNode::Type::FunctionCall:
         {
-            functionCallStmt(*static_cast<const FunctionCallStmtNode*>(node));
+            emitFunctionCallStmt(*static_cast<const FunctionCallStmtNode*>(node));
             break;
         }
     case StatementNode::Type::Branching:
@@ -317,8 +317,8 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             // if step < 0 goto stepLessThanZeroPrepare
             *code
                 << code->LoadReference(stepLocal->getIndex());
-            pushInt(0);
-            lessThan();
+            emitPushInt(0);
+            emitBinaryLessThan();
             *code
                 << code->InvokeVirtual(luaValue.method.toBool())
                 << code->If(Instruction::Compare::NotEqual, stepLessThanZeroPrepare);
@@ -327,7 +327,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->LoadReference(finishLocal->getIndex())
                 << code->LoadReference(currentLocal->getIndex());
-            lessThan();
+            emitBinaryLessThan();
             *code
                 << code->InvokeVirtual(luaValue.method.toBool())
                 << code->If(Instruction::Compare::NotEqual, EndLoop_L)
@@ -339,7 +339,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->LoadReference(finishLocal->getIndex())
                 << code->LoadReference(currentLocal->getIndex());
-            lessThan();
+            emitBinaryLessThan();
             *code
                 << code->InvokeVirtual(luaValue.method.toBool())
                 << code->If(Instruction::Compare::Equal, EndLoop_L);
@@ -348,7 +348,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code << StartLoop_L;
 
             // prepare block context
-            createChildrenContext();
+            emitCreateChildrenContext();
             *code
                 << code->LoadReference(getContextIndexInLocals()) // ..., LuaContext
                 << code->PushString(castNode->getIteratorVariableId()->getValue()) // ..., LuaContext, String
@@ -366,14 +366,14 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->LoadReference(currentLocal->getIndex()) // ..., LuaValue
                 << code->LoadReference(stepLocal->getIndex()); // ..., LuaValue, LuaValue
-            sum(); // ..., LuaValue
+            emitBinarySum(); // ..., LuaValue
             *code << code->StoreReference(currentLocal->getIndex()); // ...
 
             // if step < 0 goto stepLessThanZeroContinue
             *code
                 << code->LoadReference(stepLocal->getIndex());
-            pushInt(0);
-            lessThan();
+            emitPushInt(0);
+            emitBinaryLessThan();
             *code
                 << code->InvokeVirtual(luaValue.method.toBool())
                 << code->If(Instruction::Compare::NotEqual, stepLessThanZeroContinue);
@@ -382,7 +382,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
                 << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
-            lessThan(); // ..., LuaValue
+            emitBinaryLessThan(); // ..., LuaValue
             *code
                 << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
                 << code->If(Instruction::Equal, StartLoop_L) // ...
@@ -395,7 +395,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             *code
                 << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
                 << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
-            lessEqual(); // ..., LuaValue
+            emitBinaryLessEqual(); // ..., LuaValue
             *code
                 << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
                 << code->If(Instruction::NotEqual, StartLoop_L); // ...
@@ -463,7 +463,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
             auto* code = getAttributeCode();
             auto* castNode = static_cast<const ReturnStmtNode*>(node);
 
-            pushArgumentsList(*castNode->getReturnExprList()); // ..., LuaList
+            emitLoadArgumentsToLuaList(*castNode->getReturnExprList()); // ..., LuaList
 
             *code << code->ReturnReference();
             break;
@@ -471,7 +471,7 @@ void ByteCodeBuilder::buildBytecode(const StatementNode* node)
     }
 }
 
-void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::emitBinaryAnd(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = getAttributeCode();
 
@@ -489,7 +489,7 @@ void ByteCodeBuilder::buildAnd(const ExpressionNode* left, const ExpressionNode*
     *code << L_end;
 }
 
-void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* right)
+void ByteCodeBuilder::emitBinaryOr(const ExpressionNode* left, const ExpressionNode* right)
 {
     auto* code = getAttributeCode();
 
@@ -507,7 +507,7 @@ void ByteCodeBuilder::buildOr(const ExpressionNode* left, const ExpressionNode* 
     *code << L_end;
 }
 
-void ByteCodeBuilder::pushInt(int64_t value)
+void ByteCodeBuilder::emitPushInt(int64_t value)
 {
     auto* code = getAttributeCode();
 
@@ -518,7 +518,7 @@ void ByteCodeBuilder::pushInt(int64_t value)
         << code->InvokeSpecial(luaValue.constructor.integer());
 }
 
-void ByteCodeBuilder::pushFloat(double value)
+void ByteCodeBuilder::emitPushFloat(double value)
 {
     auto* code = getAttributeCode();
     *code
@@ -528,7 +528,7 @@ void ByteCodeBuilder::pushFloat(double value)
         << code->InvokeSpecial(luaValue.constructor.floatNumber());
 }
 
-void ByteCodeBuilder::pushBool(bool value)
+void ByteCodeBuilder::emitPushBool(bool value)
 {
     auto* code = getAttributeCode();
 
@@ -539,7 +539,7 @@ void ByteCodeBuilder::pushBool(bool value)
         << code->InvokeSpecial(luaValue.constructor.boolean());
 }
 
-void ByteCodeBuilder::pushString(const std::string& value)
+void ByteCodeBuilder::emitPushString(const std::string& value)
 {
     auto* code = getAttributeCode();
 
@@ -550,7 +550,7 @@ void ByteCodeBuilder::pushString(const std::string& value)
         << code->InvokeSpecial(luaValue.constructor.string());
 }
 
-void ByteCodeBuilder::pushNull()
+void ByteCodeBuilder::emitPushNull()
 {
     auto* code = getAttributeCode();
 
@@ -560,7 +560,7 @@ void ByteCodeBuilder::pushNull()
         << code->InvokeSpecial(luaValue.constructor.nil());
 }
 
-void ByteCodeBuilder::id(const std::string& value)
+void ByteCodeBuilder::emitLoadId(const std::string& value)
 {
     auto* code = getAttributeCode();
 
@@ -570,111 +570,111 @@ void ByteCodeBuilder::id(const std::string& value)
         << code->InvokeVirtual(luaContext.method.getById());
 }
 
-void ByteCodeBuilder::sum()
+void ByteCodeBuilder::emitBinarySum()
 {
     emitStaticCall(luaValue.method.add());
 }
 
-void ByteCodeBuilder::sub()
+void ByteCodeBuilder::emitBinarySub()
 {
     emitStaticCall(luaValue.method.sub());
 }
 
-void ByteCodeBuilder::mul()
+void ByteCodeBuilder::emitBinaryMul()
 {
     emitStaticCall(luaValue.method.mul());
 }
 
-void ByteCodeBuilder::div()
+void ByteCodeBuilder::emitBinaryDiv()
 {
     emitStaticCall(luaValue.method.div());
 }
 
-void ByteCodeBuilder::idiv()
+void ByteCodeBuilder::emitBinaryIntDiv()
 {
     emitStaticCall(luaValue.method.idiv());
 }
 
-void ByteCodeBuilder::mod()
+void ByteCodeBuilder::emitBinaryMod()
 {
     emitStaticCall(luaValue.method.mod());
 }
 
-void ByteCodeBuilder::pow()
+void ByteCodeBuilder::emitBinaryPow()
 {
     emitStaticCall(luaValue.method.pow());
 }
 
-void ByteCodeBuilder::concat()
+void ByteCodeBuilder::emitBinaryConcat()
 {
     emitStaticCall(luaValue.method.concat());
 }
 
-void ByteCodeBuilder::equal()
+void ByteCodeBuilder::emitBinaryEqual()
 {
     emitStaticCall(luaValue.method.equal());
 }
 
-void ByteCodeBuilder::notEqual()
+void ByteCodeBuilder::emitBinaryNotEqual()
 {
-    equal();
-    booleanNot();
+    emitBinaryEqual();
+    emitUnaryBooleanNot();
 }
 
-void ByteCodeBuilder::lessThan()
+void ByteCodeBuilder::emitBinaryLessThan()
 {
     emitStaticCall(luaValue.method.lessThan());
 }
 
-void ByteCodeBuilder::lessEqual()
+void ByteCodeBuilder::emitBinaryLessEqual()
 {
     emitStaticCall(luaValue.method.lessEqual());
 }
 
-void ByteCodeBuilder::greaterThan()
+void ByteCodeBuilder::emitBinaryGreaterThan()
 {
     auto* code = getAttributeCode();
     *code << code->Swap();
     emitStaticCall(luaValue.method.lessThan());
 }
 
-void ByteCodeBuilder::greaterEqual()
+void ByteCodeBuilder::emitBinaryGreaterEqual()
 {
     auto* code = getAttributeCode();
     *code << code->Swap();
     emitStaticCall(luaValue.method.lessEqual());
 }
 
-void ByteCodeBuilder::getFieldByKey()
+void ByteCodeBuilder::emitBinaryGetFieldByKey()
 {
     auto* code = getAttributeCode();
     *code
         << code->InvokeVirtual(luaValue.method.fieldByKey());
 }
 
-void ByteCodeBuilder::call()
+void ByteCodeBuilder::emitCall()
 {
     auto* code = getAttributeCode();
     *code
         << code->InvokeVirtual(luaValue.method.call());
 }
 
-void ByteCodeBuilder::unm()
+void ByteCodeBuilder::emitUnaryUnm()
 {
     emitStaticCall(luaValue.method.unMinus());
 }
 
-void ByteCodeBuilder::len()
+void ByteCodeBuilder::emitUnaryLen()
 {
     emitStaticCall(luaValue.method.length());
 }
 
-void ByteCodeBuilder::booleanNot()
+void ByteCodeBuilder::emitUnaryBooleanNot()
 {
     emitStaticCall(luaValue.method.boolNot());
 }
 
-void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
+void ByteCodeBuilder::emitTableConstructor(TableFieldList* fieldList)
 {
     auto code = getAttributeCode();
     int64_t index = 0;
@@ -683,7 +683,7 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         << code->New(luaValue.classConstant()) // ..., ref(LuaValue)
         << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue)
 
-    createHashMap(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
+    emitCreateHashMap(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
     for (auto field : *fieldList)
     {
         *code << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap)
@@ -693,7 +693,7 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
         }
         else
         {
-            pushInt(++index); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
+            emitPushInt(++index); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
         }
         buildBytecode(field.value);
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
@@ -707,7 +707,7 @@ void ByteCodeBuilder::tableConstructor(TableFieldList* fieldList)
     *code << code->InvokeSpecial(luaValue.constructor.table()); // ..., ref(LuaValue)
 }
 
-void ByteCodeBuilder::pushVararg()
+void ByteCodeBuilder::emitLoadVararg()
 {
     auto code = getAttributeCode();
     *code
@@ -716,7 +716,7 @@ void ByteCodeBuilder::pushVararg()
         << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
 
-void ByteCodeBuilder::pushVarargList()
+void ByteCodeBuilder::emitLoadVarargList()
 {
     auto code = getAttributeCode();
     *code
@@ -731,7 +731,7 @@ void ByteCodeBuilder::emitStaticCall(ConstantMethodref* methodref)
     *code << code->InvokeStatic(methodref);
 }
 
-void ByteCodeBuilder::createHashMap()
+void ByteCodeBuilder::emitCreateHashMap()
 {
     auto* code = getAttributeCode();
 
@@ -745,7 +745,7 @@ void ByteCodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewC
 {
     if (needCreateNewContext)
     {
-        createChildrenContext();
+        emitCreateChildrenContext();
     }
     for (auto* stmt : *block.getList())
     {
@@ -753,11 +753,11 @@ void ByteCodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewC
     }
     if (needSetParentContextAfter)
     {
-        getParentContext();
+        emitGetParentContext();
     }
 }
 
-void ByteCodeBuilder::createChildrenContext()
+void ByteCodeBuilder::emitCreateChildrenContext()
 {
     auto code = getAttributeCode();
     const auto contextIndex = getContextIndexInLocals();
@@ -769,7 +769,7 @@ void ByteCodeBuilder::createChildrenContext()
         << code->StoreReference(contextIndex); // ...
 }
 
-void ByteCodeBuilder::getParentContext()
+void ByteCodeBuilder::emitGetParentContext()
 {
     auto code = getAttributeCode();
     const auto contextIndex = getContextIndexInLocals();
@@ -779,18 +779,18 @@ void ByteCodeBuilder::getParentContext()
         << code->StoreReference(contextIndex); // ...
 }
 
-void ByteCodeBuilder::functionCallExpr(const FunctionCallExprNode& node)
+void ByteCodeBuilder::emitFunctionCallExpr(const FunctionCallExprNode& node)
 {
     auto* code = getAttributeCode();
 
-    functionCallExprList(node);
+    emitFunctionCallExprList(node);
     *code
         << code->PushInt(0)
         << code->InvokeVirtual(luaList.method.get());
 }
 
 
-void ByteCodeBuilder::functionCallExprList(const FunctionCallExprNode& node)
+void ByteCodeBuilder::emitFunctionCallExprList(const FunctionCallExprNode& node)
 {
     auto* code = getAttributeCode();
 
@@ -801,38 +801,38 @@ void ByteCodeBuilder::functionCallExprList(const FunctionCallExprNode& node)
         buildBytecode(tableFunc->getTable()); // ..., self
         *code << code->Duplicate(); // ..., self, self
         buildBytecode(tableFunc->getKey()); // ..., self, self, key
-        getFieldByKey(); // ..., self, LuaValue
+        emitBinaryGetFieldByKey(); // ..., self, LuaValue
 
         *code << code->Swap(); // ..., LuaValue, self
-        createLuaList(); // ..., LuaValue, self, LuaList
+        emitNewLuaList(); // ..., LuaValue, self, LuaList
         *code
             << code->DuplicateBeforeOne() // ..., LuaValue, LuaList, self, LuaList
             << code->Swap(); // .., LuaValue, LuaList, LuaList, self
-        addToLuaList(); // ..., LuaValue, LuaList
+        emitAddToLuaList(); // ..., LuaValue, LuaList
     }
     else
     {
         buildBytecode(node.getFunctionExpression()); // ..., LuaValue
-        createLuaList(); // ..., LuaValue, LuaList
+        emitNewLuaList(); // ..., LuaValue, LuaList
     }
 
-    pushArgumentsList(node.getFunctionArguments(), false);
+    emitLoadArgumentsToLuaList(node.getFunctionArguments(), false);
 
-    call(); // ..., LuaList
+    emitCall(); // ..., LuaList
 }
 
-void ByteCodeBuilder::functionCallStmt(const FunctionCallStmtNode& node)
+void ByteCodeBuilder::emitFunctionCallStmt(const FunctionCallStmtNode& node)
 {
     auto* code = getAttributeCode();
     buildBytecode(node.getExpression());
     *code << code->PopOne();
 }
 
-void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
+void ByteCodeBuilder::emitAssigment(const AssignmentStmtNode& node)
 {
     auto* code = getAttributeCode();
 
-    createLuaList(); // ..., LuaList
+    emitNewLuaList(); // ..., LuaList
 
     if (node.getScope() == Scope::Global)
     {
@@ -852,7 +852,7 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
             {
                 buildBytecode(exprNode); // ..., LuaList, LuaList, LuaValue
             }
-            addToLuaList(); // ..., LuaList
+            emitAddToLuaList(); // ..., LuaList
         }
     }
     else
@@ -868,22 +868,22 @@ void ByteCodeBuilder::assigment(const AssignmentStmtNode& node)
                 << code->PushString(idExprNode->getValue()) // ..., LuaList, LuaList, LuaContext, string
                 << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaList, LuaList, LuaValue
 
-            addToLuaList(); // ..., LuaList
+            emitAddToLuaList(); // ..., LuaList
         }
     }
 
-    pushArgumentsList(node.getValues()); // ..., LuaList, LuaList
+    emitLoadArgumentsToLuaList(node.getValues()); // ..., LuaList, LuaList
 
     *code << code->InvokeStatic(luaValue.method.assigment()); // ...
 }
 
-void ByteCodeBuilder::pushArgumentsList(const ExpressionNodeList& nodes, bool createListBeforeSet)
+void ByteCodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes, bool createListBeforeSet)
 {
     auto* code = getAttributeCode();
 
     if (createListBeforeSet)
     {
-        createLuaList();
+        emitNewLuaList();
     }
     // ..., LuaList
 
@@ -897,28 +897,28 @@ void ByteCodeBuilder::pushArgumentsList(const ExpressionNodeList& nodes, bool cr
             switch ((*it)->getType())
             {
             case ExpressionNode::Type::Vararg:
-                pushVarargList(); // ..., LuaList, LuaList, LuaList
-                addAllToList();
+                emitLoadVarargList(); // ..., LuaList, LuaList, LuaList
+                emitAddAllToLuaList();
                 break;
             case ExpressionNode::Type::FunctionCall:
-                functionCallExprList(*static_cast<FunctionCallExprNode*>(*it)); // ..., LuaList, LuaList, LuaList
-                addAllToList();
+                emitFunctionCallExprList(*static_cast<FunctionCallExprNode*>(*it)); // ..., LuaList, LuaList, LuaList
+                emitAddAllToLuaList();
                 break;
             default:
                 buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
-                addToLuaList(); // ..., LuaList
+                emitAddToLuaList(); // ..., LuaList
             }
         }
         else
         {
             buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
-            addToLuaList(); // ..., LuaList
+            emitAddToLuaList(); // ..., LuaList
         }
         it = next;
     }
 }
 
-void ByteCodeBuilder::createLuaList()
+void ByteCodeBuilder::emitNewLuaList()
 {
     auto* code = getAttributeCode();
 
@@ -928,7 +928,7 @@ void ByteCodeBuilder::createLuaList()
         << code->InvokeSpecial(luaList.constructor.base()); // ..., objectref
 }
 
-void ByteCodeBuilder::addToLuaList()
+void ByteCodeBuilder::emitAddToLuaList()
 {
     auto* code = getAttributeCode();
 
@@ -937,7 +937,7 @@ void ByteCodeBuilder::addToLuaList()
         << code->PopOne(); // отбросить bool
 }
 
-void ByteCodeBuilder::addAllToList()
+void ByteCodeBuilder::emitAddAllToLuaList()
 {
     auto* code = getAttributeCode();
 
@@ -946,7 +946,7 @@ void ByteCodeBuilder::addAllToList()
         << code->PopOne();
 }
 
-void ByteCodeBuilder::declareIds(ExpressionNodeList* ids)
+void ByteCodeBuilder::emitDeclareLocalIds(ExpressionNodeList* ids)
 {
     auto* code = getAttributeCode();
     for (auto id : *ids)

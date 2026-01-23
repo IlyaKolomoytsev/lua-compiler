@@ -24,70 +24,72 @@ public:
     void build(const BlockStmtNode& node);
 
 private:
+
+    //region Build
     void buildBytecode(const ExpressionNode* node);
     void buildBytecode(const StatementNode* node);
-
-    //region Bool operation
-    void buildAnd(const ExpressionNode* left, const ExpressionNode* right);
-    void buildOr(const ExpressionNode* left, const ExpressionNode* right);
+    void buildBlock(const BlockStmtNode& block, bool needCreateNewContext = true, bool needSetParentContextAfter = true);
     //endregion
     //region Push LuaValue primitive on stack
-    void pushInt(int64_t value);
-    void pushFloat(double value);
-    void pushBool(bool value);
-    void pushString(const std::string& value);
-    void pushNull();
-
-    void id(const std::string& value);
+    void emitPushNull();
+    void emitPushInt(int64_t value);
+    void emitPushFloat(double value);
+    void emitPushBool(bool value);
+    void emitPushString(const std::string& value);
+    //endregion
+    //region Load on stack
+    void emitLoadId(const std::string& value);
+    void emitLoadVararg();
+    void emitLoadVarargList();
     //endregion
     //region Operations with two operands
-    void sum();
-    void sub();
-    void mul();
-    void div();
-    void idiv();
-    void mod();
-    void pow();
-    void concat();
-    void equal();
-    void notEqual();
-    void lessThan();
-    void lessEqual();
-    void greaterThan();
-    void greaterEqual();
-    void getFieldByKey();
-    void call();
+    void emitBinarySum();
+    void emitBinarySub();
+    void emitBinaryMul();
+    void emitBinaryDiv();
+    void emitBinaryIntDiv();
+    void emitBinaryMod();
+    void emitBinaryPow();
+    void emitBinaryConcat();
+    void emitBinaryEqual();
+    void emitBinaryNotEqual();
+    void emitBinaryLessThan();
+    void emitBinaryLessEqual();
+    void emitBinaryGreaterThan();
+    void emitBinaryGreaterEqual();
+    void emitBinaryGetFieldByKey();
+    void emitBinaryAnd(const ExpressionNode* left, const ExpressionNode* right);
+    void emitBinaryOr(const ExpressionNode* left, const ExpressionNode* right);
     //endregion
     //region Operations with one operand
-    void unm();
-    void len();
-    void booleanNot();
+    void emitUnaryUnm();
+    void emitUnaryLen();
+    void emitUnaryBooleanNot();
     //endregion
-    //region Others
-    void tableConstructor(TableFieldList* fieldList);
-    void pushVararg();
-    void pushVarargList();
+    //region LuaList
+    void emitNewLuaList();
+    void emitAddToLuaList();
+    void emitAddAllToLuaList();
+    void emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes, bool createListBeforeSet = true);
     //endregion
-
-    void createLuaList();
-    void addToLuaList();
-    void addAllToList();
-
-    void declareIds(ExpressionNodeList* ids);
-
-    //region Helpers
+    //region Context
+    void emitCreateChildrenContext();
+    void emitGetParentContext();
+    void emitAssigment(const AssignmentStmtNode& node);
+    void emitDeclareLocalIds(ExpressionNodeList* ids);
+    //endregion
+    //region Work with functions
+    void emitCall();
+    void emitFunctionCallExpr(const FunctionCallExprNode& node);
+    void emitFunctionCallExprList(const FunctionCallExprNode& node);
+    void emitFunctionCallStmt(const FunctionCallStmtNode& node);
     void emitStaticCall(ConstantMethodref* methodref);
-    void createHashMap();
-    void buildBlock(const BlockStmtNode& block, bool needCreateNewContext = true, bool needSetParentContextAfter = true);
-    void createChildrenContext();
-    void getParentContext();
+    //endregion
+    //region Tables
+    void emitTableConstructor(TableFieldList* fieldList);
+    void emitCreateHashMap();
     //endregion
 
-    void functionCallExpr(const FunctionCallExprNode& node);
-    void functionCallExprList(const FunctionCallExprNode& node);
-    void functionCallStmt(const FunctionCallStmtNode& node);
-    void assigment(const AssignmentStmtNode& node);
-    void pushArgumentsList(const ExpressionNodeList& nodes, bool createListBeforeSet = true);
     ClassRegistry* classRegistry_;
 };
 
