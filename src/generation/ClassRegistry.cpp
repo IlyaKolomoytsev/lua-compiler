@@ -13,7 +13,7 @@ void ClassRegistry::build(BlockStmtNode* blockNode)
     builder->getClass()->writeToProject(targetDirectory_);
 }
 
-ByteCodeBuilder* ClassRegistry::getBuilderForMain()
+BytecodeBuilder* ClassRegistry::getBuilderForMain()
 {
     if (mainBuilder_ == nullptr)
     {
@@ -28,12 +28,12 @@ ByteCodeBuilder* ClassRegistry::getBuilderForMain()
         method->addFlag(Method::ACC_PUBLIC);
         method->addFlag(Method::ACC_STATIC);
 
-        mainBuilder_ = new ByteCodeBuilder(functionClass, method, this);
+        mainBuilder_ = new BytecodeBuilder(functionClass, method, this);
     }
     return mainBuilder_;
 }
 
-ByteCodeBuilder* ClassRegistry::createNewFunction()
+BytecodeBuilder* ClassRegistry::createNewFunction()
 {
     auto* functionClass = new Class(newFunctionClassName(), "com/luajvm/LuaFunction");
     auto* method = functionClass->getOrCreateMethod(
@@ -45,7 +45,7 @@ ByteCodeBuilder* ClassRegistry::createNewFunction()
     );
     method->addFlag(Method::ACC_PUBLIC);
 
-    return new ByteCodeBuilder(functionClass, method, this);
+    return new BytecodeBuilder(functionClass, method, this);
 }
 
 std::string ClassRegistry::newFunctionClassName()

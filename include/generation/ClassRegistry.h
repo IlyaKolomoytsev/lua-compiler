@@ -2,7 +2,7 @@
 #define LUA_COMPILER_CLASS_REGISTRY_H
 #include <utility>
 
-#include "ByteCodeBuilder.h"
+#include "BytecodeBuilder.h"
 
 
 class ClassRegistry
@@ -11,13 +11,13 @@ public:
     ClassRegistry(std::filesystem::path targetDirectory);
 
     void build(BlockStmtNode* blockNode);
-    ByteCodeBuilder* getBuilderForMain();
-    ByteCodeBuilder* createNewFunction();
+    BytecodeBuilder* getBuilderForMain();
+    BytecodeBuilder* createNewFunction();
 
 private:
     [[nodiscard]] std::string newFunctionClassName();
 
-    ByteCodeBuilder* mainBuilder_ = nullptr;
+    BytecodeBuilder* mainBuilder_ = nullptr;
     size_t index_ = 0;
     std::filesystem::path targetDirectory_;
 };

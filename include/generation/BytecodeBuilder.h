@@ -14,10 +14,10 @@ class ClassRegistry;
 
 using namespace jvm;
 
-class ByteCodeBuilder : public CodeGenContext
+class BytecodeBuilder : public CodeGenContext
 {
 public:
-    ByteCodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry) :
+    BytecodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry) :
         CodeGenContext(currentClass, currentMethod), classRegistry_(registry)
     {
     }
