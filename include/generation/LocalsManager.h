@@ -13,6 +13,7 @@ public:
 
     Local* registerNewLocal(Local::Size type);
 
+    void freeAllLocals();
 private:
     void freeLocal(Local* local);
 

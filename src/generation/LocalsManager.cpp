@@ -8,6 +8,14 @@ Local* LocalsManager::registerNewLocal(Local::Size type)
     return new Local(newIndex, type, this);
 }
 
+void LocalsManager::freeAllLocals()
+{
+    for (auto i = 0; i < locals_.size(); i++)
+    {
+        locals_[i] = false;
+    }
+}
+
 void LocalsManager::freeLocal(Local* local)
 {
     assert(local->owner_ == this);
