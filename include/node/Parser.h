@@ -14,7 +14,7 @@ namespace parser
                                                  std::string* methodName,
                                                  ExpressionNodeList* arguments)
     {
-        auto tableField = new TableFieldExprNode(table, new IdExprNode(methodName));
+        auto tableField = new TableFieldExprNode(table, new StringExprNode(methodName));
         return new FunctionCallExprNode(tableField, arguments, true);
     }
 
