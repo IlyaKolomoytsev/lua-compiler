@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include "generation/ClassRegistry.h"
+#include "jvm/constant-class.h"
 #include "node/NodeExpressionModule.h"
 
 
@@ -73,8 +75,26 @@ void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
         emitFunctionCallExpr(*static_cast<const FunctionCallExprNode*>(node));
         break;
     case ExpressionNode::Type::FunctionLiteral:
-        // ToDo
-        break;
+        {
+            auto castNode = static_cast<const FunctionExprNode*>(node);
+            auto functionBuilder = classRegistry_->createNewFunction();
+            functionBuilder->build(*castNode->body(), castNode->parameters());
+
+            std::string newFunctionClassName = functionBuilder->getClass()->getThisClassConstant()->getName()->getString();
+            auto classConstant = getClass()->getOrCreateClassConstant(newFunctionClassName);
+
+            auto code = getAttributeCode();
+            *code
+                << code->New(luaValue.classConstant()) // ..., LuaValue
+                << code->Duplicate() // ..., LuaValue, LuaValue
+                << code->New(classConstant) // ..., LuaValue, LuaValue, Function
+                << code->Duplicate() // ..., LuaValue, LuaValue, Function, Function
+                << code->LoadReference(local.getContext()) // ..., LuaValue, LuaValue, Function, Function, context
+                << code->InvokeSpecial(customFunction.constructor.base(newFunctionClassName)) // ..., LuaValue, LuaValue, Function
+                << code->InvokeSpecial(luaValue.constructor.function()); // ..., LuaValue
+
+            break;
+        }
     case ExpressionNode::Type::Summation:
         {
             auto* castValue = static_cast<const SummationExprNode*>(node);
@@ -689,7 +709,7 @@ void BytecodeBuilder::emitLoadVararg()
 {
     auto code = getAttributeCode();
     *code
-        << code->LoadReference( local.getArgs()) // ..., ref(List of args)
+        << code->LoadReference(local.getArgs()) // ..., ref(List of args)
         << code->PushInt(local.getVararg()) // ..., ref(List of args), int
         << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
@@ -821,7 +841,7 @@ void BytecodeBuilder::emitAssigment(const AssignmentStmtNode& node)
             {
                 auto castExpr = static_cast<IdExprNode*>(exprNode);
                 *code
-                    << code->LoadReference( local.getContext()) // ..., LuaList, LuaList, LuaContext
+                    << code->LoadReference(local.getContext()) // ..., LuaList, LuaList, LuaContext
                     << code->PushString(castExpr->getValue()) // ..., LuaList, LuaList, LuaContext, StringId
                     << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal());
                 // ..., LuaList, LuaList, LuaValue

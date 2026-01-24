@@ -1,12 +1,9 @@
 #include "generation/MainBytecodeBuilder.h"
 #include "jvm/descriptor-method.h"
 
-MainBytecodeBuilder::MainBytecodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry) :
-    BytecodeBuilder(currentClass, registry)
-{
-}
-
-void MainBytecodeBuilder::build(const BlockStmtNode& node)
+MainBytecodeBuilder::MainBytecodeBuilder(Class* currentClass, ClassRegistry* registry,
+                                         const std::filesystem::path& projectDirectory) :
+    BytecodeBuilder(currentClass, registry, projectDirectory)
 {
     auto* method = getClass()->getOrCreateMethod(
         "main",
@@ -16,8 +13,13 @@ void MainBytecodeBuilder::build(const BlockStmtNode& node)
         }
     );
     method->addFlag(Method::ACC_PUBLIC);
-    updateContext(method);
+    method->addFlag(Method::ACC_STATIC);
 
+    updateContext(method);
+}
+
+void MainBytecodeBuilder::build(const BlockStmtNode& node)
+{
     auto* code = getAttributeCode();
     local.setContext(registerNewLocal(Local::Size::one));
 
@@ -35,4 +37,5 @@ void MainBytecodeBuilder::build(const BlockStmtNode& node)
     *code << code->ReturnVoid();
 
     local.clearContext();
+    getClass()->writeToProject(projectDirectory_);
 }

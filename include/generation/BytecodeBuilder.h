@@ -23,8 +23,11 @@ inline void set##name(Local* local) \
 }                                   \
 inline void clear##name()           \
 {                                   \
-    delete name##_;                 \
-    name##_ = nullptr;              \
+    if(name##_ != nullptr)          \
+    {                               \
+        delete name##_;             \
+        name##_ = nullptr;          \
+    }                               \
 }                                   \
 private:                            \
 Local* name##_ = nullptr;
@@ -36,8 +39,8 @@ using namespace jvm;
 class BytecodeBuilder : public MethodCodeGenContext
 {
 public:
-    BytecodeBuilder(Class* currentClass, ClassRegistry* registry) :
-        MethodCodeGenContext(currentClass), classRegistry_(registry)
+    BytecodeBuilder(Class* currentClass, ClassRegistry* registry, const std::filesystem::path& projectDirectory) :
+        MethodCodeGenContext(currentClass), classRegistry_(registry), projectDirectory_(projectDirectory)
     {
     }
 
@@ -116,6 +119,7 @@ protected:
     //endregion
 
     ClassRegistry* classRegistry_;
+    std::filesystem::path projectDirectory_;
 };
 
 #endif //LUA_COMPILER_BYTE_CODE_BUILDER_H

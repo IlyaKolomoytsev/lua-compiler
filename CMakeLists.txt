@@ -82,6 +82,7 @@ set(SOURCE_FILES
         src/generation/LocalsManager.cpp
         src/generation/MainBytecodeBuilder.cpp
         src/generation/MethodCodeGenContext.cpp
+        src/generation/FunctionBytecodeBuilder.cpp
 )
 
 # Add files to executable target

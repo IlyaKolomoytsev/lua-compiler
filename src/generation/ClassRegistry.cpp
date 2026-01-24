@@ -10,7 +10,6 @@ void ClassRegistry::build(BlockStmtNode* blockNode)
 {
     auto builder = getBuilderForMain();
     builder->build(*blockNode);
-    builder->getClass()->writeToProject(targetDirectory_);
 }
 
 MainBytecodeBuilder* ClassRegistry::getBuilderForMain()
@@ -18,25 +17,17 @@ MainBytecodeBuilder* ClassRegistry::getBuilderForMain()
     if (mainBuilder_ == nullptr)
     {
         auto* functionClass = new Class("Main", "java/lang/Object");
-        auto* method = functionClass->getOrCreateMethod(
-            "main",
-            {
-                std::nullopt,
-                {{"java/lang/String", 1}}
-            }
-        );
-        method->addFlag(Method::ACC_PUBLIC);
-        method->addFlag(Method::ACC_STATIC);
 
-        mainBuilder_ = new MainBytecodeBuilder(functionClass, method, this);
+        mainBuilder_ = new MainBytecodeBuilder(functionClass, this, targetDirectory_);
     }
     return mainBuilder_;
 }
 
-BytecodeBuilder* ClassRegistry::createNewFunction()
+FunctionBytecodeBuilder* ClassRegistry::createNewFunction()
 {
-    auto* functionClass = new Class(newFunctionClassName(), "com/luajvm/LuaFunction");
-    return new BytecodeBuilder(functionClass, this);
+    auto* functionClass = new Class(newFunctionClassName(), "java/lang/Object");
+    functionClass->addInterface(functionClass->getOrCreateClassConstant("java/util/function/Function"));
+    return new FunctionBytecodeBuilder(functionClass, this, targetDirectory_);
 }
 
 std::string ClassRegistry::newFunctionClassName()

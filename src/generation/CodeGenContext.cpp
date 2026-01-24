@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "jvm/constant-class.h"
 #include "jvm/descriptor-field.h"
 #include "jvm/descriptor-method.h"
 #include "jvm/method.h"
@@ -15,12 +16,14 @@
 #define STRING "java/lang/String"
 #define LIST "java/util/List"
 #define COLLECTION "java/util/Collection"
+#define FUNCTION "java/util/function/Function"
 
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
 
 CodeGenContext::CodeGenContext(Class* currentClass) :
-    luaValue(this), luaContext(this), luaList(this), hashMap(this), class_(currentClass)
+    luaValue(this), luaContext(this), luaList(this), hashMap(this), customFunction(this), object(this),
+    class_(currentClass)
 {
 }
 
@@ -128,6 +131,19 @@ ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::table_impl()
         "<init>",
         DescriptorMethod(
             std::nullopt, {DescriptorField(MAP)}
+        )
+    );
+}
+
+
+ConstantMethodref* CodeGenContext::LuaValue_::Constructors_::function_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt,
+            {{FUNCTION}}
         )
     );
 }
@@ -621,4 +637,72 @@ ConstantMethodref* CodeGenContext::HashMap_::Methods_::put_impl()
 ConstantClass* CodeGenContext::HashMap_::classConstant_impl()
 {
     return getClass()->getOrCreateClassConstant(HASH_MAP);
+}
+
+CodeGenContext::CustomFunction_::CustomFunction_(CodeGenContext* context) :
+    constructor(context), method(context), field(context)
+{
+}
+
+CodeGenContext::CustomFunction_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
+{
+}
+
+ConstantMethodref* CodeGenContext::CustomFunction_::Constructors_::base(
+    const std::string& customFunctionClassName) const
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        customFunctionClassName,
+        "<init>",
+        DescriptorMethod(
+            std::nullopt,
+            {{LUA_CONTEXT}}
+        )
+    );
+}
+
+CodeGenContext::CustomFunction_::Methods_::Methods_(CodeGenContext* context) : ContextProvider(context)
+{
+}
+
+ConstantMethodref* CodeGenContext::CustomFunction_::Methods_::apply(const std::string& customFunctionClassName) const
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        customFunctionClassName,
+        "apply",
+        DescriptorMethod(
+            DescriptorField(LUA_LIST),
+            {{LUA_LIST}}
+        )
+    );
+}
+
+CodeGenContext::CustomFunction_::Fields_::Fields_(CodeGenContext* context) : ContextProvider(context)
+{
+}
+
+ConstantFieldref* CodeGenContext::CustomFunction_::Fields_::context(const std::string& customFunctionClassName) const
+{
+    return getClass()->getOrCreateFieldrefConstant(
+        customFunctionClassName,
+        "context",
+        {LUA_CONTEXT}
+    );
+}
+
+CodeGenContext::Object_::Object_(CodeGenContext* context) : constructor(context)
+{
+}
+
+CodeGenContext::Object_::Constructors_::Constructors_(CodeGenContext* context) : ContextProvider(context)
+{
+}
+
+ConstantMethodref* CodeGenContext::Object_::Constructors_::base_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        OBJECT,
+        "<init>",
+        DescriptorMethod(std::nullopt, {})
+    );
 }

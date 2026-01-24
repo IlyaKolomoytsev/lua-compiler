@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "BytecodeBuilder.h"
+#include "FunctionBytecodeBuilder.h"
 #include "MainBytecodeBuilder.h"
 
 
@@ -13,7 +14,7 @@ public:
 
     void build(BlockStmtNode* blockNode);
     MainBytecodeBuilder* getBuilderForMain();
-    BytecodeBuilder* createNewFunction();
+    FunctionBytecodeBuilder* createNewFunction();
 
 private:
     [[nodiscard]] std::string newFunctionClassName();

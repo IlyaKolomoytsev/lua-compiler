@@ -6,7 +6,7 @@
 class MainBytecodeBuilder : public BytecodeBuilder
 {
 public:
-    MainBytecodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry);
+    MainBytecodeBuilder(Class* currentClass, ClassRegistry* registry, const std::filesystem::path& projectDirectory);
     void build(const BlockStmtNode& node);
 };
 

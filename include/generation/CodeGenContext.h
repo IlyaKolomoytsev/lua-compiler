@@ -20,7 +20,10 @@ private:                                                \
     pointerType* method##_ = nullptr ;
 
 #define METHODREF_CONSTANT_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(ConstantMethodref, method)
+#define FILEDREF_CONSTANT_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(ConstantFieldref, method)
 #define CLASS_CONSTANT_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(ConstantClass, method)
+#define CLASS_METHOD_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(Method, method)
+#define CLASS_FIELD_METHOD(method) ONE_TIME_INIT_VALUE_METHOD(Field, method)
 
 
 using namespace jvm;
@@ -59,6 +62,7 @@ public:
             METHODREF_CONSTANT_METHOD(boolean)
             METHODREF_CONSTANT_METHOD(string)
             METHODREF_CONSTANT_METHOD(table)
+            METHODREF_CONSTANT_METHOD(function)
             METHODREF_CONSTANT_METHOD(anotherLuaValue)
         } constructor;
 
@@ -162,9 +166,42 @@ public:
         CLASS_CONSTANT_METHOD(classConstant)
     } hashMap;
 
+    struct CustomFunction_
+    {
+        explicit CustomFunction_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
+        {
+            explicit Constructors_(CodeGenContext* context);
+            ConstantMethodref* base(const std::string& customFunctionClassName) const;
+        } constructor;
+
+        struct Methods_ : ContextProvider
+        {
+            explicit Methods_(CodeGenContext* context);
+            ConstantMethodref* apply(const std::string& customFunctionClassName) const;
+        } method;
+
+        struct Fields_ : ContextProvider
+        {
+            explicit Fields_(CodeGenContext* context);
+            ConstantFieldref* context(const std::string& customFunctionClassName) const;
+        } field;
+    } customFunction;
+
+    struct Object_
+    {
+        explicit Object_(CodeGenContext* context);
+
+        struct Constructors_ : ContextProvider
+        {
+            explicit Constructors_(CodeGenContext* context);
+            METHODREF_CONSTANT_METHOD(base)
+        } constructor;
+    } object;
+
 private:
     Class* class_;
-
 };
 
 #endif //LUA_COMPILER_CODEGEN_CONTEXT_H
