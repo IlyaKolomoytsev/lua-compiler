@@ -5,7 +5,7 @@ end
 circle = {
     r = 10,
     area = function(self)
-        return math.pi * self.r * self.r
+        return 3.14 * self.r * self.r
     end
 }
 
