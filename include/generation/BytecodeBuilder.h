@@ -1,6 +1,7 @@
 #ifndef LUA_COMPILER_BYTE_CODE_BUILDER_H
 #define LUA_COMPILER_BYTE_CODE_BUILDER_H
 #include "CodeGenContext.h"
+#include "MethodCodeGenContext.h"
 #include "jvm/class.h"
 #include "jvm/method.h"
 #include "node/expression/ExpressionNode.h"
@@ -9,20 +10,45 @@
 #include "node/statement/BlockStmtNode.h"
 #include "node/statement/FunctionCallStmtNode.h"
 
+#define LOCAL_FIELD(name) \
+public:                             \
+inline uint16_t get##name()         \
+{                                   \
+    assert(name##_ != nullptr);     \
+    return name##_->getIndex();     \
+}                                   \
+inline void set##name(Local* local) \
+{                                   \
+    name##_ = local;                \
+}                                   \
+inline void clear##name()           \
+{                                   \
+    delete name##_;                 \
+    name##_ = nullptr;              \
+}                                   \
+private:                            \
+Local* name##_ = nullptr;
 
 class ClassRegistry;
 
 using namespace jvm;
 
-class BytecodeBuilder : public CodeGenContext
+class BytecodeBuilder : public MethodCodeGenContext
 {
 public:
-    BytecodeBuilder(Class* currentClass, Method* currentMethod, ClassRegistry* registry) :
-        CodeGenContext(currentClass, currentMethod), classRegistry_(registry)
+    BytecodeBuilder(Class* currentClass, ClassRegistry* registry) :
+        MethodCodeGenContext(currentClass), classRegistry_(registry)
     {
     }
 
 protected:
+    struct Locals
+    {
+        LOCAL_FIELD(This)
+        LOCAL_FIELD(Args)
+        LOCAL_FIELD(Context)
+        LOCAL_FIELD(Vararg)
+    } local;
 
     //region Build
     void buildBytecode(const ExpressionNode* node);

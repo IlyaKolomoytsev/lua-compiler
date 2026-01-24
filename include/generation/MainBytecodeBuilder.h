@@ -1,7 +1,7 @@
 #ifndef LUA_COMPILER_MAIN_BYTECODE_BUILDER_H
 #define LUA_COMPILER_MAIN_BYTECODE_BUILDER_H
 #include "BytecodeBuilder.h"
-
+#include "node/statement/BlockStmtNode.h"
 
 class MainBytecodeBuilder : public BytecodeBuilder
 {

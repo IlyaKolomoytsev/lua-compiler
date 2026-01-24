@@ -36,16 +36,7 @@ MainBytecodeBuilder* ClassRegistry::getBuilderForMain()
 BytecodeBuilder* ClassRegistry::createNewFunction()
 {
     auto* functionClass = new Class(newFunctionClassName(), "com/luajvm/LuaFunction");
-    auto* method = functionClass->getOrCreateMethod(
-        "apply",
-        {
-            DescriptorField("java/util/List"),
-            {{"java/util/List"}}
-        }
-    );
-    method->addFlag(Method::ACC_PUBLIC);
-
-    return new BytecodeBuilder(functionClass, method, this);
+    return new BytecodeBuilder(functionClass, this);
 }
 
 std::string ClassRegistry::newFunctionClassName()

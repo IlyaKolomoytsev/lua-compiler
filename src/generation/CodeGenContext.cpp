@@ -19,12 +19,9 @@
 
 DescriptorField luaValueDescriptor = DescriptorField("com/luajvm/LuaValue");
 
-CodeGenContext::CodeGenContext(Class* currentClass, Method* currentMethod) : luaValue(this), luaContext(this),
-                                                                             luaList(this), hashMap(this),
-                                                                             class_(currentClass),
-                                                                             currentMethod_(currentMethod)
+CodeGenContext::CodeGenContext(Class* currentClass) :
+    luaValue(this), luaContext(this), luaList(this), hashMap(this), class_(currentClass)
 {
-    currentAttributeCode_ = currentMethod_->getCodeAttribute();
 }
 
 CodeGenContext::LuaValue_::LuaValue_(CodeGenContext* context) : ContextProvider(context), constructor(context),
@@ -624,49 +621,4 @@ ConstantMethodref* CodeGenContext::HashMap_::Methods_::put_impl()
 ConstantClass* CodeGenContext::HashMap_::classConstant_impl()
 {
     return getClass()->getOrCreateClassConstant(HASH_MAP);
-}
-
-void CodeGenContext::setContextIndexInLocals(uint16_t index)
-{
-    contextIndexInLocals_ = index;
-    contextIndexIsInitialized_ = true;
-}
-
-uint16_t CodeGenContext::getContextIndexInLocals() const
-{
-    if (!contextIndexIsInitialized_)
-    {
-        throw std::logic_error("Index of context instance not initialized");
-    }
-    return contextIndexInLocals_;
-}
-
-void CodeGenContext::setArgsIndexInLocals(uint16_t index)
-{
-    argsIndexInLocals_ = index;
-    argsIndexIsInitialized_ = true;
-}
-
-uint16_t CodeGenContext::getArgsIndexInLocals() const
-{
-    if (!argsIndexIsInitialized_)
-    {
-        throw std::logic_error("Index of args list not initialized");
-    }
-    return contextIndexInLocals_;
-}
-
-void CodeGenContext::setStartIndexForVarargInListArgs(int32_t index)
-{
-    startIndexForVarargInListArgs_ = index;
-    startIndexForVarargIsInitialized_ = true;
-}
-
-int32_t CodeGenContext::getStartIndexForVarargInListArgs() const
-{
-    if (!startIndexForVarargIsInitialized_)
-    {
-        throw std::logic_error("Index of vararg start index not initialized");
-    }
-    return startIndexForVarargInListArgs_;
 }

@@ -25,7 +25,7 @@ private:                                                \
 
 using namespace jvm;
 
-class CodeGenContext : public LocalsManager
+class CodeGenContext
 {
     struct ContextProvider
     {
@@ -35,19 +35,15 @@ class CodeGenContext : public LocalsManager
         }
 
         [[nodiscard]] Class* getClass() const { return context_->getClass(); }
-        [[nodiscard]] Method* getMethod() const { return context_->getMethod(); }
-        [[nodiscard]] AttributeCode* getAttributeCode() const { return context_->getAttributeCode(); }
 
     private:
         CodeGenContext* context_;
     };
 
 public:
-    CodeGenContext(Class* currentClass, Method* currentMethod);
+    CodeGenContext(Class* currentClass);
 
     [[nodiscard]] Class* getClass() const { return class_; }
-    [[nodiscard]] Method* getMethod() const { return currentMethod_; }
-    [[nodiscard]] AttributeCode* getAttributeCode() const { return currentAttributeCode_; }
 
     struct LuaValue_ : ContextProvider
     {
@@ -166,26 +162,9 @@ public:
         CLASS_CONSTANT_METHOD(classConstant)
     } hashMap;
 
-    void setContextIndexInLocals(uint16_t index);
-    uint16_t getContextIndexInLocals() const;
-
-    void setArgsIndexInLocals(uint16_t index);
-    uint16_t getArgsIndexInLocals() const;
-
-    void setStartIndexForVarargInListArgs(int32_t index);
-    int32_t getStartIndexForVarargInListArgs() const;
-
 private:
     Class* class_;
-    Method* currentMethod_ = nullptr;
-    AttributeCode* currentAttributeCode_ = nullptr;
 
-    uint16_t contextIndexInLocals_ = 0;
-    bool contextIndexIsInitialized_ = false;
-    uint16_t argsIndexInLocals_ = 0;
-    bool argsIndexIsInitialized_ = false;
-    int32_t startIndexForVarargInListArgs_ = 0;
-    bool startIndexForVarargIsInitialized_ = false;
 };
 
 #endif //LUA_COMPILER_CODEGEN_CONTEXT_H

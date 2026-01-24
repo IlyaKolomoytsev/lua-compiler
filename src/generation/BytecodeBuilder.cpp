@@ -328,7 +328,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             // prepare block context
             emitCreateChildrenContext();
             *code
-                << code->LoadReference(getContextIndexInLocals()) // ..., LuaContext
+                << code->LoadReference(local.getContext()) // ..., LuaContext
                 << code->PushString(castNode->getIteratorVariableId()->getValue()) // ..., LuaContext, String
                 << code->New(luaValue.classConstant()) // ..., LuaContext, String, LuaValue
                 << code->Duplicate() // ..., LuaContext, String, LuaValue, LuaValue
@@ -543,7 +543,7 @@ void BytecodeBuilder::emitLoadId(const std::string& value)
     auto* code = getAttributeCode();
 
     *code
-        << code->LoadReference(getContextIndexInLocals())
+        << code->LoadReference(local.getContext())
         << code->PushString(value)
         << code->InvokeVirtual(luaContext.method.getById());
 }
@@ -689,8 +689,8 @@ void BytecodeBuilder::emitLoadVararg()
 {
     auto code = getAttributeCode();
     *code
-        << code->LoadReference(getArgsIndexInLocals()) // ..., ref(List of args)
-        << code->PushInt(getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
+        << code->LoadReference( local.getArgs()) // ..., ref(List of args)
+        << code->PushInt(local.getVararg()) // ..., ref(List of args), int
         << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
 
@@ -698,8 +698,8 @@ void BytecodeBuilder::emitLoadVarargList()
 {
     auto code = getAttributeCode();
     *code
-        << code->LoadReference(getArgsIndexInLocals()) // ..., ref(List of args)
-        << code->PushInt(getStartIndexForVarargInListArgs()) // ..., ref(List of args), int
+        << code->LoadReference(local.getArgs()) // ..., ref(List of args)
+        << code->PushInt(local.getVararg()) // ..., ref(List of args), int
         << code->InvokeVirtual(luaList.method.subList()); // ..., ref(List of vararg)
 }
 
@@ -738,7 +738,7 @@ void BytecodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewC
 void BytecodeBuilder::emitCreateChildrenContext()
 {
     auto code = getAttributeCode();
-    const auto contextIndex = getContextIndexInLocals();
+    const auto contextIndex = local.getContext();
     *code
         << code->New(luaContext.classConstant()) // ..., LuaContext
         << code->Duplicate() // ..., LuaContext, LuaContext
@@ -750,7 +750,7 @@ void BytecodeBuilder::emitCreateChildrenContext()
 void BytecodeBuilder::emitGetParentContext()
 {
     auto code = getAttributeCode();
-    const auto contextIndex = getContextIndexInLocals();
+    const auto contextIndex = local.getContext();
     *code
         << code->LoadReference(contextIndex) // ..., LuaContext
         << code->InvokeVirtual(luaContext.method.getParent()) // ..., LuaContext
@@ -821,7 +821,7 @@ void BytecodeBuilder::emitAssigment(const AssignmentStmtNode& node)
             {
                 auto castExpr = static_cast<IdExprNode*>(exprNode);
                 *code
-                    << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
+                    << code->LoadReference( local.getContext()) // ..., LuaList, LuaList, LuaContext
                     << code->PushString(castExpr->getValue()) // ..., LuaList, LuaList, LuaContext, StringId
                     << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal());
                 // ..., LuaList, LuaList, LuaValue
@@ -842,7 +842,7 @@ void BytecodeBuilder::emitAssigment(const AssignmentStmtNode& node)
             assert(exprNode->getType() == ExpressionNode::Type::Id);
             auto* idExprNode = static_cast<IdExprNode*>(exprNode);
             *code
-                << code->LoadReference(getContextIndexInLocals()) // ..., LuaList, LuaList, LuaContext
+                << code->LoadReference(local.getContext()) // ..., LuaList, LuaList, LuaContext
                 << code->PushString(idExprNode->getValue()) // ..., LuaList, LuaList, LuaContext, string
                 << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaList, LuaList, LuaValue
 
@@ -929,7 +929,7 @@ void BytecodeBuilder::emitDeclareLocalIds(ExpressionNodeList* ids)
     auto* code = getAttributeCode();
     for (auto id : *ids)
     {
-        *code << code->LoadReference(getContextIndexInLocals());
+        *code << code->LoadReference(local.getContext());
         buildBytecode(id);
         *code << code->InvokeVirtual(luaContext.method.declareLocalId());
     }
