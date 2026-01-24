@@ -24,3 +24,13 @@ function fill(x, y)
 end
 
 fill(3, 3)
+
+for y = 1, #field do
+    print(
+            field[y][1],
+            field[y][2],
+            field[y][3],
+            field[y][4],
+            field[y][5]
+    )
+end
