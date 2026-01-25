@@ -13,6 +13,7 @@
 #include "node/statement/BranchingStmtNode.h"
 #include "node/statement/DeclarationStmtNode.h"
 #include "node/statement/ForLoopClassicStmtNode.h"
+#include "node/statement/ForLoopIteratorStmtNode.h"
 #include "node/statement/StatementNode.h"
 #include "node/statement/WhileLoopStmtNode.h"
 #include "node/statement/ReturnStmtNode.h"
@@ -409,7 +410,114 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             break;
         }
     case StatementNode::Type::ForLoopIterator:
-        break;
+        {
+            auto castNode = static_cast<const ForLoopIteratorStmtNode*>(node);
+            auto* code = getAttributeCode();
+            auto* fLocal = registerNewLocal(Local::Size::one);
+            auto* sLocal = registerNewLocal(Local::Size::one);
+            auto* varLocal = registerNewLocal(Local::Size::one);
+
+            // create new context
+            emitCreateChildrenContext();
+
+            // initialize local variables: f, s, var
+            {
+                auto explistLocal = registerNewLocal(Local::Size::one);
+                emitLoadArgumentsToLuaList(*castNode->getIterator()); // ..., LuaList
+                *code << code->StoreReference(explistLocal->getIndex()); // ...
+                int index = 0;
+                for (const auto* loopVariable : {fLocal, sLocal, varLocal})
+                {
+                    *code
+                        << code->LoadReference(explistLocal->getIndex()) // ..., LuaList
+                        << code->PushInt(index++) // ..., LuaList, int
+                        << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue
+                        << code->StoreReference(loopVariable->getIndex()); // ...
+                    /*
+                     *code
+                        << code->New(luaValue.classConstant()) // ..., LuaValue
+                        << code->Duplicate() // ..., LuaValue, LuaValue
+                        << code->InvokeSpecial(luaValue.constructor.nil()) // ..., LuaValue
+                        << code->StoreReference(loopVariable->getIndex()); // ...
+                    */
+                }
+                delete explistLocal;
+            }
+
+            auto L_startLoop = getAttributeCode()->CodeLabel();
+            auto L_endLoop = getAttributeCode()->CodeLabel();
+
+            // add loop variables to parameters list
+            *code << L_startLoop;
+            emitNewLuaList(); // ..., LuaList
+            for (const auto* parameter : {sLocal, varLocal})
+            {
+                *code
+                    << code->Duplicate() // ..., LuaList, LuaList
+                    << code->LoadReference(parameter->getIndex()); // ..., LuaList, LuaList, LuaValue
+                emitAddToLuaList(); // ..., LuaList
+            }
+
+            // call function with args: f(s, var)
+            *code
+                << code->LoadReference(fLocal->getIndex()) // ..., LuaList, LuaValue
+                << code->Swap() // ..., LuaValue, LuaList
+                << code->InvokeVirtual(luaValue.method.call()); // ..., LuaList
+
+            // declare local values to new context
+            {
+                auto resultListLocal = registerNewLocal(Local::Size::one);
+                *code << code->StoreReference(resultListLocal->getIndex()); // ...
+                int index = 0;
+                Local* firstElementLocal = nullptr;
+                for (auto* expr : *castNode->getNameList())
+                {
+                    assert(expr->getType() == ExpressionNode::Type::Id);
+                    auto idExpr = static_cast<IdExprNode*>(expr);
+                    *code
+                        << code->LoadReference(local.getContext()) // ..., LuaContext,
+                        << code->PushString(idExpr->getValue()) // ..., LuaContext, string
+                        << code->LoadReference(resultListLocal->getIndex()) // ..., LuaContext, string, LuaList
+                        << code->PushInt(index) // ..., LuaContext, string, LuaList, int
+                        << code->InvokeVirtual(luaList.method.get()); // ..., LuaContext, string, LuaValue
+
+                    // store in locals only first value
+                    if (index == 0)
+                    {
+                        firstElementLocal = registerNewLocal(Local::Size::one);
+                        *code
+                            << code->Duplicate() // ..., LuaContext, string, LuaValue, LuaValue
+                            << code->StoreReference(firstElementLocal->getIndex()); // ..., LuaContext, string, LuaValue
+                    }
+
+                    // declare value in context
+                    *code << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...,
+
+                    if (index == 0)
+                    {
+                        // check finish loop condition: idExpr_1 == nil
+                        *code
+                            << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue
+                            << code->InvokeVirtual(luaValue.method.isNil()) // ..., bool
+                            << code->If(Instruction::NotEqual, L_endLoop); // ...
+                        *code
+                            << code->LoadReference(varLocal->getIndex()) // ..., LuaValue
+                            << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue, LuaValue
+                            << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
+                        delete firstElementLocal;
+                    }
+                    index++;
+                }
+                delete resultListLocal;
+            }
+
+            buildBlock(*castNode->getBlock(), false, false);
+            *code << code->GoTo(L_startLoop);
+            *code << L_endLoop;
+            // returns to parent context
+            emitGetParentContext();
+            break;
+        }
     case StatementNode::Type::WhileLoop:
         {
             auto* code = getAttributeCode();

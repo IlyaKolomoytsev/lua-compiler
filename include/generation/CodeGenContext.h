@@ -90,6 +90,7 @@ public:
             METHODREF_CONSTANT_METHOD(length)
             METHODREF_CONSTANT_METHOD(assigment)
             METHODREF_CONSTANT_METHOD(setAnotherLuaValue)
+            METHODREF_CONSTANT_METHOD(isNil)
         } method;
 
         CLASS_CONSTANT_METHOD(classConstant)

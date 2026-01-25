@@ -450,6 +450,15 @@ ConstantMethodref* CodeGenContext::LuaValue_::Methods_::setAnotherLuaValue_impl(
     );
 }
 
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::isNil_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "isNil",
+        DescriptorMethod(Descriptor::Boolean, {})
+    );
+}
+
 ConstantClass* CodeGenContext::LuaValue_::classConstant_impl()
 {
     return getClass()->getOrCreateClassConstant(LUA_VALUE);
