@@ -1,5 +1,7 @@
 #ifndef LUA_COMPILER_BYTE_CODE_BUILDER_H
 #define LUA_COMPILER_BYTE_CODE_BUILDER_H
+#include <stack>
+
 #include "CodeGenContext.h"
 #include "MethodCodeGenContext.h"
 #include "jvm/class.h"
@@ -50,7 +52,7 @@ protected:
         LOCAL_FIELD(Args)
         LOCAL_FIELD(Context)
     } local;
-    int32_t varargIndexInArguments = -1;
+    int32_t varargIndexInArguments_ = -1;
 
     //region Build
     void buildBytecode(const ExpressionNode* node);

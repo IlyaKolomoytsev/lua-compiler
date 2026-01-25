@@ -78,7 +78,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
         else if (type == ExpressionNode::Type::Vararg)
         {
             // only one argument can be vararg
-            varargIndexInArguments = index;
+            varargIndexInArguments_ = index;
         }
         index++;
     }
@@ -97,7 +97,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
     local.clearArgs();
     local.clearContext();
     // reset vararg
-    varargIndexInArguments = -1;
+    varargIndexInArguments_ = -1;
 }
 
 void FunctionBytecodeBuilder::buildBridgeApply()
