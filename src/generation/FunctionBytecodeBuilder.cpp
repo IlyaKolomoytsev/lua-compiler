@@ -44,7 +44,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
 
     // declare locals by function signature
     auto thisLocal = registerNewLocal(Local::Size::one);
-    auto argsLocal = registerNewLocal(Local::Size::one);
+    local.setArgs(registerNewLocal(Local::Size::one));
 
     /* move context from field to locals */
     // get context field from class
@@ -60,7 +60,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
     *code << code->StoreReference(local.getContext());
 
     /* move arguments to context */
-    size_t index = 0;
+    int32_t index = 0;
     for (auto* argument : arguments)
     {
         auto type = argument->getType();
@@ -70,7 +70,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
             *code
                 << code->LoadReference(local.getContext()) // ..., context
                 << code->PushString(argumentName) // ..., context, string
-                << code->LoadReference(argsLocal->getIndex()) // ..., context, string, args
+                << code->LoadReference(local.getArgs()) // ..., context, string, args
                 << code->PushInt(index) // ..., context, string, args, int
                 << code->InvokeVirtual(luaList.method.get()) // ..., context, string, value
                 << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...
@@ -78,7 +78,7 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
         else if (type == ExpressionNode::Type::Vararg)
         {
             // only one argument can be vararg
-            local.setVararg(registerNewLocal(Local::Size::one));
+            varargIndexInArguments = index;
         }
         index++;
     }
@@ -94,9 +94,10 @@ void FunctionBytecodeBuilder::buildApply(const BlockStmtNode& node, const Expres
         << code->ReturnReference(); // ...
 
     // free locals
-    delete argsLocal;
+    local.clearArgs();
     local.clearContext();
-    local.clearVararg();
+    // reset vararg
+    varargIndexInArguments = -1;
 }
 
 void FunctionBytecodeBuilder::buildBridgeApply()

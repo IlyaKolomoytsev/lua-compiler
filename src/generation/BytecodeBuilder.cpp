@@ -712,7 +712,7 @@ void BytecodeBuilder::emitLoadVararg()
     auto code = getAttributeCode();
     *code
         << code->LoadReference(local.getArgs()) // ..., ref(List of args)
-        << code->PushInt(local.getVararg()) // ..., ref(List of args), int
+        << code->PushInt(varargIndexInArguments) // ..., ref(List of args), int
         << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
 
@@ -721,7 +721,7 @@ void BytecodeBuilder::emitLoadVarargList()
     auto code = getAttributeCode();
     *code
         << code->LoadReference(local.getArgs()) // ..., ref(List of args)
-        << code->PushInt(local.getVararg()) // ..., ref(List of args), int
+        << code->PushInt(varargIndexInArguments) // ..., ref(List of args), int
         << code->InvokeVirtual(luaList.method.subList()); // ..., ref(List of vararg)
 }
 

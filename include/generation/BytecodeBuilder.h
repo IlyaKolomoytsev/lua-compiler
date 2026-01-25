@@ -47,11 +47,10 @@ public:
 protected:
     struct Locals
     {
-        LOCAL_FIELD(This)
         LOCAL_FIELD(Args)
         LOCAL_FIELD(Context)
-        LOCAL_FIELD(Vararg)
     } local;
+    int32_t varargIndexInArguments = -1;
 
     //region Build
     void buildBytecode(const ExpressionNode* node);
