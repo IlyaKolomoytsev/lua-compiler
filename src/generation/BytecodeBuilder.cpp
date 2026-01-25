@@ -80,7 +80,8 @@ void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
             auto functionBuilder = classRegistry_->createNewFunction();
             functionBuilder->build(*castNode->body(), castNode->parameters());
 
-            std::string newFunctionClassName = functionBuilder->getClass()->getThisClassConstant()->getName()->getString();
+            std::string newFunctionClassName = functionBuilder->getClass()->getThisClassConstant()->getName()->
+                                                                getString();
             auto classConstant = getClass()->getOrCreateClassConstant(newFunctionClassName);
 
             auto code = getAttributeCode();
@@ -90,7 +91,8 @@ void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
                 << code->New(classConstant) // ..., LuaValue, LuaValue, Function
                 << code->Duplicate() // ..., LuaValue, LuaValue, Function, Function
                 << code->LoadReference(local.getContext()) // ..., LuaValue, LuaValue, Function, Function, context
-                << code->InvokeSpecial(customFunction.constructor.base(newFunctionClassName)) // ..., LuaValue, LuaValue, Function
+                << code->InvokeSpecial(customFunction.constructor.base(newFunctionClassName))
+                // ..., LuaValue, LuaValue, Function
                 << code->InvokeSpecial(luaValue.constructor.function()); // ..., LuaValue
 
             break;
@@ -830,49 +832,48 @@ void BytecodeBuilder::emitAssigment(const AssignmentStmtNode& node)
 {
     auto* code = getAttributeCode();
 
-    emitNewLuaList(); // ..., LuaList
+    auto valuesLocal = registerNewLocal(Local::Size::one);
+    emitLoadArgumentsToLuaList(node.getValues()); // ..., LuaList
+    *code << code->StoreReference(valuesLocal->getIndex()); // ...
 
-    if (node.getScope() == Scope::Global)
+    int32_t index = 0;
+    for (auto* val : node.getNameList())
     {
-        for (auto* exprNode : node.getNameList())
+        if (val->getType() == ExpressionNode::Type::Id)
         {
-            *code << code->Duplicate(); // ..., LuaList, LuaList
-            if (exprNode->getType() == ExpressionNode::Type::Id)
+            auto idExpr = static_cast<IdExprNode*>(val);
+            *code
+                << code->LoadReference(local.getContext()) // ..., LuaContext
+                << code->PushString(idExpr->getValue()); // ..., LuaContext, string
+            if (node.getScope() == Scope::Global)
             {
-                auto castExpr = static_cast<IdExprNode*>(exprNode);
-                *code
-                    << code->LoadReference(local.getContext()) // ..., LuaList, LuaList, LuaContext
-                    << code->PushString(castExpr->getValue()) // ..., LuaList, LuaList, LuaContext, StringId
-                    << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal());
-                // ..., LuaList, LuaList, LuaValue
+                *code << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal()); // ..., LuaValue
             }
             else
             {
-                buildBytecode(exprNode); // ..., LuaList, LuaList, LuaValue
+                *code << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaValue
             }
-            emitAddToLuaList(); // ..., LuaList
-        }
-    }
-    else
-    {
-        for (auto* exprNode : node.getNameList())
-        {
-            *code << code->Duplicate(); // ..., LuaList, LuaList
-
-            assert(exprNode->getType() == ExpressionNode::Type::Id);
-            auto* idExprNode = static_cast<IdExprNode*>(exprNode);
             *code
-                << code->LoadReference(local.getContext()) // ..., LuaList, LuaList, LuaContext
-                << code->PushString(idExprNode->getValue()) // ..., LuaList, LuaList, LuaContext, string
-                << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaList, LuaList, LuaValue
-
-            emitAddToLuaList(); // ..., LuaList
+                << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaList
+                << code->PushInt(index) // ..., LuaValue, LuaList, int
+                << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue
+                << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
         }
+        else
+        {
+            assert(val->getType() == ExpressionNode::Type::TableField);
+            auto tableFieldExpr = static_cast<TableFieldExprNode*>(val);
+            buildBytecode(tableFieldExpr->getTable()); // ..., LuaValue
+            buildBytecode(tableFieldExpr->getKey()); // ..., LuaValue, LuaValue
+            *code
+                << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaValue, LuaList
+                << code->PushInt(index) // ..., LuaValue, LuaValue, LuaList, int
+                << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue, LuaValue
+                << code->InvokeVirtual(luaValue.method.newIndex()); // ...
+        }
+        index++;
     }
-
-    emitLoadArgumentsToLuaList(node.getValues()); // ..., LuaList, LuaList
-
-    *code << code->InvokeStatic(luaValue.method.assigment()); // ...
+    delete valuesLocal;
 }
 
 void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes, bool createListBeforeSet)
@@ -902,6 +903,14 @@ void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes
                 emitFunctionCallExprList(*static_cast<FunctionCallExprNode*>(*it)); // ..., LuaList, LuaList, LuaList
                 emitAddAllToLuaList();
                 break;
+            case ExpressionNode::Type::Id:
+                *code
+                    << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
+                    << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
+                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue, LuaValue, LuaValue
+                *code << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()); // ..., LuaList, LuaList, LuaValue
+                emitAddToLuaList(); // ..., LuaList
+                break;
             default:
                 buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
                 emitAddToLuaList(); // ..., LuaList
@@ -909,8 +918,20 @@ void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes
         }
         else
         {
-            buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
-            emitAddToLuaList(); // ..., LuaList
+            if ((*it)->getType() == ExpressionNode::Type::Id)
+            {
+                *code
+                    << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
+                    << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
+                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue, LuaValue, LuaValue
+                *code << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()); // ..., LuaList, LuaList, LuaValue
+                emitAddToLuaList(); // ..., LuaList
+            }
+            else
+            {
+                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
+                emitAddToLuaList(); // ..., LuaList
+            }
         }
         it = next;
     }

@@ -84,10 +84,12 @@ public:
             METHODREF_CONSTANT_METHOD(boolNot)
             METHODREF_CONSTANT_METHOD(toBool)
             METHODREF_CONSTANT_METHOD(index)
+            METHODREF_CONSTANT_METHOD(newIndex)
             METHODREF_CONSTANT_METHOD(call)
             METHODREF_CONSTANT_METHOD(unMinus)
             METHODREF_CONSTANT_METHOD(length)
             METHODREF_CONSTANT_METHOD(assigment)
+            METHODREF_CONSTANT_METHOD(setAnotherLuaValue)
         } method;
 
         CLASS_CONSTANT_METHOD(classConstant)

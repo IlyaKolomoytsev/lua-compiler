@@ -364,6 +364,21 @@ ConstantMethodref* CodeGenContext::LuaValue_::Methods_::index_impl()
     );
 }
 
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::newIndex_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "newIndex",
+        DescriptorMethod(
+            std::nullopt,
+            {
+                {LUA_VALUE},
+                {LUA_VALUE}
+            }
+        )
+    );
+}
+
 ConstantMethodref* CodeGenContext::LuaValue_::Methods_::call_impl()
 {
     return getClass()->getOrCreateMethodrefConstant(
@@ -416,6 +431,20 @@ ConstantMethodref* CodeGenContext::LuaValue_::Methods_::assigment_impl()
             {
                 {LUA_LIST},
                 {LUA_LIST}
+            }
+        )
+    );
+}
+
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::setAnotherLuaValue_impl()
+{
+    return getClass()->getOrCreateMethodrefConstant(
+        LUA_VALUE,
+        "setValue",
+        DescriptorMethod(
+            std::nullopt,
+            {
+                {LUA_VALUE}
             }
         )
     );
