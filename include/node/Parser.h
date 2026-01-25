@@ -57,7 +57,7 @@ namespace parser
                                                  ExpressionNodeList* parameters,
                                                  BlockStmtNode* body)
     {
-        auto functionName = new TableFieldExprNode(tableExpr, new IdExprNode(methodName));
+        auto functionName = new TableFieldExprNode(tableExpr, new StringExprNode(methodName));
         parameters->push_front(new IdExprNode("self"));
         return FunctionDeclaration(Scope::Global, functionName, parameters, body);
     }
