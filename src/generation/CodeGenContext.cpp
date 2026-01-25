@@ -350,7 +350,7 @@ ConstantMethodref* CodeGenContext::LuaValue_::Methods_::toBool_impl()
     );
 }
 
-ConstantMethodref* CodeGenContext::LuaValue_::Methods_::fieldByKey_impl()
+ConstantMethodref* CodeGenContext::LuaValue_::Methods_::index_impl()
 {
     return getClass()->getOrCreateMethodrefConstant(
         LUA_VALUE,

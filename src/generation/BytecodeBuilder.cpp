@@ -647,7 +647,7 @@ void BytecodeBuilder::emitBinaryGetFieldByKey()
 {
     auto* code = getAttributeCode();
     *code
-        << code->InvokeVirtual(luaValue.method.fieldByKey());
+        << code->InvokeVirtual(luaValue.method.index());
 }
 
 void BytecodeBuilder::emitCall()

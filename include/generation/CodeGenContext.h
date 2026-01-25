@@ -83,7 +83,7 @@ public:
             METHODREF_CONSTANT_METHOD(lessEqual)
             METHODREF_CONSTANT_METHOD(boolNot)
             METHODREF_CONSTANT_METHOD(toBool)
-            METHODREF_CONSTANT_METHOD(fieldByKey)
+            METHODREF_CONSTANT_METHOD(index)
             METHODREF_CONSTANT_METHOD(call)
             METHODREF_CONSTANT_METHOD(unMinus)
             METHODREF_CONSTANT_METHOD(length)
