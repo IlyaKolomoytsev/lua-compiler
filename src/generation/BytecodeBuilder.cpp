@@ -312,6 +312,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
 
             auto StartLoop_L = code->CodeLabel();
             auto EndLoop_L = code->CodeLabel();
+            loopEndLabels_.push(EndLoop_L);
             auto stepLessThanZeroPrepare = code->CodeLabel();
             auto stepLessThanZeroContinue = code->CodeLabel();
 
@@ -402,6 +403,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
                 << code->If(Instruction::NotEqual, StartLoop_L); // ...
 
             *code << EndLoop_L;
+            loopEndLabels_.pop();
 
             // free local variables
             delete currentLocal;
@@ -446,6 +448,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
 
             auto L_startLoop = getAttributeCode()->CodeLabel();
             auto L_endLoop = getAttributeCode()->CodeLabel();
+            loopEndLabels_.push(L_endLoop);
 
             // add loop variables to parameters list
             *code << L_startLoop;
@@ -514,6 +517,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             buildBlock(*castNode->getBlock(), false, false);
             *code << code->GoTo(L_startLoop);
             *code << L_endLoop;
+            loopEndLabels_.pop();
             // returns to parent context
             emitGetParentContext();
             break;
@@ -524,6 +528,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
             auto* L_cond = code->CodeLabel();
             auto* L_end = code->CodeLabel();
+            loopEndLabels_.push(L_end);
 
             *code << L_cond;
             buildBytecode(castNode->getCondition()); // ..., LuaValue
@@ -535,6 +540,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             *code << code->GoTo(L_cond);
 
             *code << L_end;
+            loopEndLabels_.pop();
             break;
         }
     case StatementNode::Type::RepeatLoop:
@@ -543,6 +549,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
             auto* L_body = code->CodeLabel();
             auto* L_end = code->CodeLabel();
+            loopEndLabels_.push(L_end);
 
             *code << L_body;
             buildBytecode(castNode->getBlock());
@@ -553,6 +560,7 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
                 << code->If(Instruction::Compare::Equal, L_body); // if 0 -> L_body
 
             *code << L_end;
+            loopEndLabels_.pop();
             break;
         }
     case StatementNode::Type::Block:
@@ -565,7 +573,15 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
     case StatementNode::Type::Label:
         break;
     case StatementNode::Type::Break:
-        break;
+        {
+            auto* code = getAttributeCode();
+            if (loopEndLabels_.empty())
+            {
+                throw std::runtime_error("break outside loop");
+            }
+            *code << code->GoTo(loopEndLabels_.top());
+            break;
+        }
     case StatementNode::Type::Return:
         {
             auto* code = getAttributeCode();

@@ -53,6 +53,7 @@ protected:
         LOCAL_FIELD(Context)
     } local;
     int32_t varargIndexInArguments_ = -1;
+    std::stack<Label*> loopEndLabels_{};
 
     //region Build
     void buildBytecode(const ExpressionNode* node);
