@@ -1,140 +1,55 @@
-print("=== BRANCHING TESTS START ===")
-
--- A) Простое if / else
-print("\n-- A) simple if/else")
-
-if true then
-    print("A1: OK (true branch)")
-else
-    print("A1: FAIL")
+local function hi(a, s)
+    local str = "func_print: " .. s
+    print(str)
+    return a
 end
 
-if false then
-    print("A2: FAIL")
-else
-    print("A2: OK (false branch)")
+-- читаем число
+local line = io.read("*l")
+local number = tonumber(line)
+
+-- не ввели число
+if number == nil then
+    print "input string is not number"
+    return
 end
 
-
--- B) Lua truthiness
-print("\n-- B) truthiness")
-
-if nil then
-    print("B1: FAIL (nil is false)")
-else
-    print("B1: OK (nil)")
+if number > 10 and hi(true, "number > 10 && hi(true)") then
+    print("branch_print: number > 10 && hi(true)")
+    print("")
 end
 
-if false then
-    print("B2: FAIL (false is false)")
-else
-    print("B2: OK (false)")
+if number > 5 and hi(true, "number > 5 && hi(true)") then
+    print("branch_print: number > 5 && hi(true)")
+    print("")
 end
 
-if 0 then
-    print("B3: OK (0 is truthy)")
-else
-    print("B3: FAIL")
+if number > 10 or hi(true, "number > 10 || hi(true)") then
+    print("branch_print: number > 10 || hi(true)")
+    print("")
 end
 
-if "" then
-    print("B4: OK (empty string is truthy)")
-else
-    print("B4: FAIL")
+if number > 5 or hi(true, "number > 5 || hi(true)") then
+    print("branch_print: number > 5 || hi(true)")
+    print("")
 end
 
-
--- C) elseif chain
-print("\n-- C) elseif chain")
-
-local x = 2
-if x == 1 then
-    print("C: FAIL (x == 1)")
-elseif x == 2 then
-    print("C: OK (x == 2)")
-elseif x == 3 then
-    print("C: FAIL (x == 3)")
-else
-    print("C: FAIL (else)")
+if number > 10 and hi(false, "number > 10 && hi(false)") then
+    print("branch_print: number > 10 && hi(false)")
+    print("")
 end
 
-
--- D) only one branch must execute
-print("\n-- D) only one branch")
-
-local y = 1
-if y == 1 then
-    print("D1: OK")
-elseif y == 1 then
-    print("D2: FAIL (elseif should not run)")
-else
-    print("D3: FAIL")
+if number > 5 and hi(false, "number > 5 && hi(false)") then
+    print("branch_print: number > 5 && hi(false)")
+    print("")
 end
 
-
--- E) nested if
-print("\n-- E) nested if")
-
-local z = 1
-if z == 1 then
-    if false then
-        print("E1: FAIL")
-    else
-        print("E2: OK (nested else)")
-    end
-else
-    print("E3: FAIL")
+if number > 10 or hi(false, "number > 10 || hi(false)") then
+    print("branch_print: number > 10 || hi(false)")
+    print("")
 end
 
-
--- F) logical operators
-print("\n-- F) logical operators")
-
-if true and true then
-    print("F1: OK (true and true)")
-else
-    print("F1: FAIL")
+if number > 5 or hi(false, "number > 5 || hi(false)") then
+    print("branch_print: number > 5 || hi(false)")
+    print("")
 end
-
-if true and false then
-    print("F2: FAIL")
-else
-    print("F2: OK (true and false)")
-end
-
-if false or true then
-    print("F3: OK (false or true)")
-else
-    print("F3: FAIL")
-end
-
-if false or false then
-    print("F4: FAIL")
-else
-    print("F4: OK (false or false)")
-end
-
-
--- G) not operator
-print("\n-- G) not operator")
-
-if not true then
-    print("G1: FAIL")
-else
-    print("G1: OK (not true)")
-end
-
-if not false then
-    print("G2: OK (not false)")
-else
-    print("G2: FAIL")
-end
-
-if not nil then
-    print("G3: OK (not nil)")
-else
-    print("G3: FAIL")
-end
-
-
-print("\n=== BRANCHING TESTS END ===")

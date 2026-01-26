@@ -9,10 +9,18 @@ function bubbleSort(arr)
     end
 end
 
-local a = {5, 1, 4, 2, 8}
+local a = {}
+print "input size"
+local size = io.read()
+for i = 1, tonumber(size) do
+    print("input value with index", i)
+    local val = io.read()
+    a[i] = tonumber(val);
+end
 
 bubbleSort(a)
 
+print "\nsorted array:"
 for i = 1, #a do
     print(a[i])
 end
