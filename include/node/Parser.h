@@ -28,7 +28,7 @@ namespace parser
     }
 
     inline BranchingStmtNode* IfElseifChainElse(ExpressionNode* condition, BlockStmtNode* successBlock,
-                                                    BranchingStmtNode* elseifChain, BlockStmtNode* elseBlock)
+                                                BranchingStmtNode* elseifChain, BlockStmtNode* elseBlock)
     {
         elseifChain->appendElseToDeepestIf(elseBlock);
         return new BranchingStmtNode(condition, successBlock, elseifChain);
@@ -47,6 +47,14 @@ namespace parser
     {
         auto inputValues = new ExpressionNodeList();
         auto outputValues = new ExpressionNodeList();
+        if (functionName->getType() == ExpressionNode::Type::TableField)
+        {
+            auto tableField = static_cast<TableFieldExprNode*>(functionName);
+            if (tableField->getKey()->getType() == ExpressionNode::Type::Id)
+            {
+                tableField->setKey(new StringExprNode(static_cast<IdExprNode*>(tableField->getKey())->getValue()));
+            }
+        }
         inputValues->push_back(functionName);
         outputValues->push_back(new FunctionExprNode(parameters, body));
         return new AssignmentStmtNode(scope, inputValues, outputValues);

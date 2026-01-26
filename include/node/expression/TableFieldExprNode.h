@@ -12,6 +12,7 @@ public:
 
     [[nodiscard]] ExpressionNode* getTable() const { return table_; }
     [[nodiscard]] ExpressionNode* getKey() const { return key_; }
+    void setKey(ExpressionNode* key) { key_ = key; }
 
     /* Overridden methods */
 
