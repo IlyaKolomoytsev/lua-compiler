@@ -44,6 +44,8 @@ class CodeGenContext
     };
 
 public:
+    virtual ~CodeGenContext() = default;
+
     CodeGenContext(Class* currentClass);
 
     [[nodiscard]] Class* getClass() const { return class_; }

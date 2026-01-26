@@ -59,6 +59,7 @@ protected:
     void buildBytecode(const ExpressionNode* node);
     void buildBytecode(const StatementNode* node);
     void buildBlock(const BlockStmtNode& block, bool needCreateNewContext = true, bool needSetParentContextAfter = true);
+    virtual void buildReturn(const StatementNode* node) = 0;
     //endregion
     //region Push LuaValue primitive on stack
     void emitPushNull();

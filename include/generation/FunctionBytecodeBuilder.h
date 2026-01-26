@@ -27,6 +27,10 @@ private:
     Method* bridgeApplyMethod();
     Field* contextField();
 
+protected:
+    void buildReturn(const StatementNode *node) override;
+
+private:
     const std::string className_;
 };
 

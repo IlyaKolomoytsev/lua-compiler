@@ -8,6 +8,9 @@ class MainBytecodeBuilder : public BytecodeBuilder
 public:
     MainBytecodeBuilder(Class* currentClass, ClassRegistry* registry, const std::filesystem::path& projectDirectory);
     void build(const BlockStmtNode& node);
+
+protected:
+    void buildReturn(const StatementNode *node) override;
 };
 
 

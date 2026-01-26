@@ -39,3 +39,8 @@ void MainBytecodeBuilder::build(const BlockStmtNode& node)
     local.clearContext();
     getClass()->writeToProject(projectDirectory_);
 }
+
+void MainBytecodeBuilder::buildReturn(const StatementNode *node) {
+    auto* code = getAttributeCode();
+    *code << code->ReturnVoid();
+}

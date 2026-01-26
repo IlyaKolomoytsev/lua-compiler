@@ -4,6 +4,9 @@
 #include "jvm/descriptor-method.h"
 #include "jvm/field.h"
 #include "node/NodeExpressionModule.h"
+#include "node/statement/ReturnStmtNode.h"
+
+class ReturnStmtNode;
 
 FunctionBytecodeBuilder::FunctionBytecodeBuilder(Class* currentClass, ClassRegistry* registry,
                                                  const std::filesystem::path& projectDirectory) :
@@ -176,4 +179,13 @@ Field* FunctionBytecodeBuilder::contextField()
         "context",
         {"com/luajvm/LuaContext"}
     );
+}
+
+void FunctionBytecodeBuilder::buildReturn(const StatementNode *node) {
+    auto* code = getAttributeCode();
+    auto* castNode = static_cast<const ReturnStmtNode*>(node);
+
+    emitLoadArgumentsToLuaList(*castNode->getReturnExprList()); // ..., LuaList
+
+    *code << code->ReturnReference();
 }

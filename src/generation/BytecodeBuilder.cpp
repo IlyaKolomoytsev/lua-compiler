@@ -18,227 +18,198 @@
 #include "node/statement/WhileLoopStmtNode.h"
 #include "node/statement/ReturnStmtNode.h"
 
-void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
-{
-    switch (node->getType())
-    {
-    case ExpressionNode::Type::Integer:
-        {
-            auto castNode = static_cast<const IntegerExprNode*>(node);
+void BytecodeBuilder::buildBytecode(const ExpressionNode *node) {
+    switch (node->getType()) {
+        case ExpressionNode::Type::Integer: {
+            auto castNode = static_cast<const IntegerExprNode *>(node);
             emitPushInt(castNode->getValue());
             break;
         }
-    case ExpressionNode::Type::Float:
-        {
-            auto castNode = static_cast<const FloatExprNode*>(node);
+        case ExpressionNode::Type::Float: {
+            auto castNode = static_cast<const FloatExprNode *>(node);
             emitPushFloat(castNode->getValue());
             break;
         }
-    case ExpressionNode::Type::String:
-        {
-            auto castNode = static_cast<const StringExprNode*>(node);
+        case ExpressionNode::Type::String: {
+            auto castNode = static_cast<const StringExprNode *>(node);
             emitPushString(castNode->getValue());
             break;
         }
-    case ExpressionNode::Type::Boolean:
-        {
-            auto castNode = static_cast<const BoolExprNode*>(node);
+        case ExpressionNode::Type::Boolean: {
+            auto castNode = static_cast<const BoolExprNode *>(node);
             emitPushBool(castNode->getValue());
             break;
         }
-    case ExpressionNode::Type::Nil:
-        emitPushNull();
-        break;
-    case ExpressionNode::Type::Vararg:
-        emitLoadVararg();
-        break;
-    case ExpressionNode::Type::Id:
-        {
-            auto castNode = static_cast<const IdExprNode*>(node);
+        case ExpressionNode::Type::Nil:
+            emitPushNull();
+            break;
+        case ExpressionNode::Type::Vararg:
+            emitLoadVararg();
+            break;
+        case ExpressionNode::Type::Id: {
+            auto castNode = static_cast<const IdExprNode *>(node);
             emitLoadId(castNode->getValue());
             break;
         }
-    case ExpressionNode::Type::TableField:
-        {
-            auto castField = static_cast<const TableFieldExprNode*>(node);
+        case ExpressionNode::Type::TableField: {
+            auto castField = static_cast<const TableFieldExprNode *>(node);
             buildBytecode(castField->getTable());
             buildBytecode(castField->getKey());
             emitBinaryGetFieldByKey();
             break;
         }
-    case ExpressionNode::Type::TableConstructor:
-        {
-            auto* castValue = static_cast<const TableConstructorExprNode*>(node);
+        case ExpressionNode::Type::TableConstructor: {
+            auto *castValue = static_cast<const TableConstructorExprNode *>(node);
             emitTableConstructor(castValue->getTableFields());
             break;
         }
-    case ExpressionNode::Type::FunctionCall:
-        emitFunctionCallExpr(*static_cast<const FunctionCallExprNode*>(node));
-        break;
-    case ExpressionNode::Type::FunctionLiteral:
-        {
-            auto castNode = static_cast<const FunctionExprNode*>(node);
+        case ExpressionNode::Type::FunctionCall:
+            emitFunctionCallExpr(*static_cast<const FunctionCallExprNode *>(node));
+            break;
+        case ExpressionNode::Type::FunctionLiteral: {
+            auto castNode = static_cast<const FunctionExprNode *>(node);
             auto functionBuilder = classRegistry_->createNewFunction();
             functionBuilder->build(*castNode->body(), castNode->parameters());
 
             std::string newFunctionClassName = functionBuilder->getClass()->getThisClassConstant()->getName()->
-                                                                getString();
+                    getString();
             auto classConstant = getClass()->getOrCreateClassConstant(newFunctionClassName);
 
             auto code = getAttributeCode();
             *code
-                << code->New(luaValue.classConstant()) // ..., LuaValue
-                << code->Duplicate() // ..., LuaValue, LuaValue
-                << code->New(classConstant) // ..., LuaValue, LuaValue, Function
-                << code->Duplicate() // ..., LuaValue, LuaValue, Function, Function
-                << code->LoadReference(local.getContext()) // ..., LuaValue, LuaValue, Function, Function, context
-                << code->InvokeSpecial(customFunction.constructor.base(newFunctionClassName))
-                // ..., LuaValue, LuaValue, Function
-                << code->InvokeSpecial(luaValue.constructor.function()); // ..., LuaValue
+                    << code->New(luaValue.classConstant()) // ..., LuaValue
+                    << code->Duplicate() // ..., LuaValue, LuaValue
+                    << code->New(classConstant) // ..., LuaValue, LuaValue, Function
+                    << code->Duplicate() // ..., LuaValue, LuaValue, Function, Function
+                    << code->LoadReference(local.getContext()) // ..., LuaValue, LuaValue, Function, Function, context
+                    << code->InvokeSpecial(customFunction.constructor.base(newFunctionClassName))
+                    // ..., LuaValue, LuaValue, Function
+                    << code->InvokeSpecial(luaValue.constructor.function()); // ..., LuaValue
 
             break;
         }
-    case ExpressionNode::Type::Summation:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Summation: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinarySum();
             break;
         }
-    case ExpressionNode::Type::Subtraction:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Subtraction: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinarySub();
             break;
         }
-    case ExpressionNode::Type::Multiplication:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Multiplication: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryMul();
             break;
         }
-    case ExpressionNode::Type::Division:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Division: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryDiv();
             break;
         }
-    case ExpressionNode::Type::Modulo:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Modulo: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryMod();
             break;
         }
-    case ExpressionNode::Type::IntegerDivision:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::IntegerDivision: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryIntDiv();
             break;
         }
-    case ExpressionNode::Type::Exponentiation:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Exponentiation: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryPow();
             break;
         }
-    case ExpressionNode::Type::Less:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Less: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryLessThan();
             break;
         }
-    case ExpressionNode::Type::Greater:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Greater: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryGreaterThan();
             break;
         }
-    case ExpressionNode::Type::Equality:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Equality: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryEqual();
             break;
         }
-    case ExpressionNode::Type::Unequality:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::Unequality: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryNotEqual();
             break;
         }
-    case ExpressionNode::Type::LessEqual:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::LessEqual: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryLessEqual();
             break;
         }
-    case ExpressionNode::Type::GreaterEqual:
-        {
-            auto* castValue = static_cast<const SummationExprNode*>(node);
+        case ExpressionNode::Type::GreaterEqual: {
+            auto *castValue = static_cast<const SummationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryGreaterEqual();
             break;
         }
-    case ExpressionNode::Type::Or:
-        {
-            auto* castValue = static_cast<const OrExprNode*>(node);
+        case ExpressionNode::Type::Or: {
+            auto *castValue = static_cast<const OrExprNode *>(node);
             emitBinaryOr(castValue->getLeft(), castValue->getRight());
             break;
         }
-    case ExpressionNode::Type::And:
-        {
-            auto* castValue = static_cast<const AndExprNode*>(node);
+        case ExpressionNode::Type::And: {
+            auto *castValue = static_cast<const AndExprNode *>(node);
             emitBinaryAnd(castValue->getLeft(), castValue->getRight());
             break;
         }
-    case ExpressionNode::Type::Concatenation:
-        {
-            auto* castValue = static_cast<const ConcatenationExprNode*>(node);
+        case ExpressionNode::Type::Concatenation: {
+            auto *castValue = static_cast<const ConcatenationExprNode *>(node);
             buildBytecode(castValue->getLeft());
             buildBytecode(castValue->getRight());
             emitBinaryConcat();
             break;
         }
-    case ExpressionNode::Type::Length:
-        {
-            auto* castValue = static_cast<const LengthExprNode*>(node);
+        case ExpressionNode::Type::Length: {
+            auto *castValue = static_cast<const LengthExprNode *>(node);
             buildBytecode(castValue->getOperand());
             emitUnaryLen();
             break;
         }
-    case ExpressionNode::Type::Negation:
-        {
-            auto* castValue = static_cast<const NegationExprNode*>(node);
+        case ExpressionNode::Type::Negation: {
+            auto *castValue = static_cast<const NegationExprNode *>(node);
             buildBytecode(castValue->getOperand());
             emitUnaryBooleanNot();
             break;
         }
-    case ExpressionNode::Type::UnaryMinuses:
-        {
-            auto* castValue = static_cast<const UnaryMinusExprNode*>(node);
+        case ExpressionNode::Type::UnaryMinuses: {
+            auto *castValue = static_cast<const UnaryMinusExprNode *>(node);
             buildBytecode(castValue->getOperand());
             emitUnaryUnm();
             break;
@@ -246,45 +217,38 @@ void BytecodeBuilder::buildBytecode(const ExpressionNode* node)
     }
 }
 
-void BytecodeBuilder::buildBytecode(const StatementNode* node)
-{
-    switch (node->getType())
-    {
-    case StatementNode::Type::Declaration:
-        {
-            auto* castNode = static_cast<const DeclarationStmtNode*>(node);
+void BytecodeBuilder::buildBytecode(const StatementNode *node) {
+    switch (node->getType()) {
+        case StatementNode::Type::Declaration: {
+            auto *castNode = static_cast<const DeclarationStmtNode *>(node);
             emitDeclareLocalIds(castNode->getNames());
             break;
         }
-    case StatementNode::Type::Assignment:
-        {
-            emitAssigment(*static_cast<const AssignmentStmtNode*>(node));
+        case StatementNode::Type::Assignment: {
+            emitAssigment(*static_cast<const AssignmentStmtNode *>(node));
             break;
         }
-    case StatementNode::Type::FunctionCall:
-        {
-            emitFunctionCallStmt(*static_cast<const FunctionCallStmtNode*>(node));
+        case StatementNode::Type::FunctionCall: {
+            emitFunctionCallStmt(*static_cast<const FunctionCallStmtNode *>(node));
             break;
         }
-    case StatementNode::Type::Branching:
-        {
-            auto* code = getAttributeCode();
-            auto* castNode = static_cast<const BranchingStmtNode*>(node);
-            auto* L_else = code->CodeLabel();
-            auto* L_end = code->CodeLabel();
+        case StatementNode::Type::Branching: {
+            auto *code = getAttributeCode();
+            auto *castNode = static_cast<const BranchingStmtNode *>(node);
+            auto *L_else = code->CodeLabel();
+            auto *L_end = code->CodeLabel();
 
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
-                << code->If(Instruction::Compare::Equal, L_else); // if 0 -> L_else
+                    << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
+                    << code->If(Instruction::Compare::Equal, L_else); // if 0 -> L_else
 
             buildBytecode(castNode->getSuccessBlock());
             *code << code->GoTo(L_end);
 
             *code << L_else;
-            auto* fail = castNode->getFailureBlock();
-            if (fail != nullptr)
-            {
+            auto *fail = castNode->getFailureBlock();
+            if (fail != nullptr) {
                 buildBytecode(fail);
             }
 
@@ -292,10 +256,9 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
 
             break;
         }
-    case StatementNode::Type::ForLoopClassic:
-        {
-            auto* code = getAttributeCode();
-            auto* castNode = static_cast<const ForLoopClassicStmtNode*>(node);
+        case StatementNode::Type::ForLoopClassic: {
+            auto *code = getAttributeCode();
+            auto *castNode = static_cast<const ForLoopClassicStmtNode *>(node);
             auto range = castNode->getRange();
 
             buildBytecode(range.start);
@@ -318,33 +281,33 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
 
             // if step < 0 goto stepLessThanZeroPrepare
             *code
-                << code->LoadReference(stepLocal->getIndex());
+                    << code->LoadReference(stepLocal->getIndex());
             emitPushInt(0);
             emitBinaryLessThan();
             *code
-                << code->InvokeVirtual(luaValue.method.toBool())
-                << code->If(Instruction::Compare::NotEqual, stepLessThanZeroPrepare);
+                    << code->InvokeVirtual(luaValue.method.toBool())
+                    << code->If(Instruction::Compare::NotEqual, stepLessThanZeroPrepare);
 
             // if finish < start goto end
             *code
-                << code->LoadReference(finishLocal->getIndex())
-                << code->LoadReference(currentLocal->getIndex());
+                    << code->LoadReference(finishLocal->getIndex())
+                    << code->LoadReference(currentLocal->getIndex());
             emitBinaryLessThan();
             *code
-                << code->InvokeVirtual(luaValue.method.toBool())
-                << code->If(Instruction::Compare::NotEqual, EndLoop_L)
-                << code->GoTo(StartLoop_L);
+                    << code->InvokeVirtual(luaValue.method.toBool())
+                    << code->If(Instruction::Compare::NotEqual, EndLoop_L)
+                    << code->GoTo(StartLoop_L);
 
             *code << stepLessThanZeroPrepare;
 
             // if finish > start goto end
             *code
-                << code->LoadReference(finishLocal->getIndex())
-                << code->LoadReference(currentLocal->getIndex());
+                    << code->LoadReference(finishLocal->getIndex())
+                    << code->LoadReference(currentLocal->getIndex());
             emitBinaryLessThan();
             *code
-                << code->InvokeVirtual(luaValue.method.toBool())
-                << code->If(Instruction::Compare::Equal, EndLoop_L);
+                    << code->InvokeVirtual(luaValue.method.toBool())
+                    << code->If(Instruction::Compare::Equal, EndLoop_L);
 
 
             *code << StartLoop_L;
@@ -352,55 +315,55 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             // prepare block context
             emitCreateChildrenContext();
             *code
-                << code->LoadReference(local.getContext()) // ..., LuaContext
-                << code->PushString(castNode->getIteratorVariableId()->getValue()) // ..., LuaContext, String
-                << code->New(luaValue.classConstant()) // ..., LuaContext, String, LuaValue
-                << code->Duplicate() // ..., LuaContext, String, LuaValue, LuaValue
-                << code->LoadReference(currentLocal->getIndex())
-                // ..., LuaContext, String, LuaValue, LuaValue, LuaValue
-                << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()) // ..., LuaContext, String, LuaValue
-                << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...
+                    << code->LoadReference(local.getContext()) // ..., LuaContext
+                    << code->PushString(castNode->getIteratorVariableId()->getValue()) // ..., LuaContext, String
+                    << code->New(luaValue.classConstant()) // ..., LuaContext, String, LuaValue
+                    << code->Duplicate() // ..., LuaContext, String, LuaValue, LuaValue
+                    << code->LoadReference(currentLocal->getIndex())
+                    // ..., LuaContext, String, LuaValue, LuaValue, LuaValue
+                    << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()) // ..., LuaContext, String, LuaValue
+                    << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...
 
             // block
             buildBlock(*castNode->getBlock(), false);
 
             // update loop value
             *code
-                << code->LoadReference(currentLocal->getIndex()) // ..., LuaValue
-                << code->LoadReference(stepLocal->getIndex()); // ..., LuaValue, LuaValue
+                    << code->LoadReference(currentLocal->getIndex()) // ..., LuaValue
+                    << code->LoadReference(stepLocal->getIndex()); // ..., LuaValue, LuaValue
             emitBinarySum(); // ..., LuaValue
             *code << code->StoreReference(currentLocal->getIndex()); // ...
 
             // if step < 0 goto stepLessThanZeroContinue
             *code
-                << code->LoadReference(stepLocal->getIndex());
+                    << code->LoadReference(stepLocal->getIndex());
             emitPushInt(0);
             emitBinaryLessThan();
             *code
-                << code->InvokeVirtual(luaValue.method.toBool())
-                << code->If(Instruction::Compare::NotEqual, stepLessThanZeroContinue);
+                    << code->InvokeVirtual(luaValue.method.toBool())
+                    << code->If(Instruction::Compare::NotEqual, stepLessThanZeroContinue);
 
             // if current <= finish goto start
             *code
-                << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
-                << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
+                    << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
+                    << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
             emitBinaryLessThan(); // ..., LuaValue
             *code
-                << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
-                << code->If(Instruction::Equal, StartLoop_L) // ...
-                << code->GoTo(EndLoop_L);
+                    << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
+                    << code->If(Instruction::Equal, StartLoop_L) // ...
+                    << code->GoTo(EndLoop_L);
 
 
             *code << stepLessThanZeroContinue;
 
             // if current >= finish goto start
             *code
-                << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
-                << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
+                    << code->LoadReference(finishLocal->getIndex()) // ..., LuaValue
+                    << code->LoadReference(currentLocal->getIndex()); // ..., LuaValue, LuaValue
             emitBinaryLessEqual(); // ..., LuaValue
             *code
-                << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
-                << code->If(Instruction::NotEqual, StartLoop_L); // ...
+                    << code->InvokeVirtual(luaValue.method.toBool()) // ..., boolean
+                    << code->If(Instruction::NotEqual, StartLoop_L); // ...
 
             *code << EndLoop_L;
             loopEndLabels_.pop();
@@ -411,13 +374,12 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             delete stepLocal;
             break;
         }
-    case StatementNode::Type::ForLoopIterator:
-        {
-            auto castNode = static_cast<const ForLoopIteratorStmtNode*>(node);
-            auto* code = getAttributeCode();
-            auto* fLocal = registerNewLocal(Local::Size::one);
-            auto* sLocal = registerNewLocal(Local::Size::one);
-            auto* varLocal = registerNewLocal(Local::Size::one);
+        case StatementNode::Type::ForLoopIterator: {
+            auto castNode = static_cast<const ForLoopIteratorStmtNode *>(node);
+            auto *code = getAttributeCode();
+            auto *fLocal = registerNewLocal(Local::Size::one);
+            auto *sLocal = registerNewLocal(Local::Size::one);
+            auto *varLocal = registerNewLocal(Local::Size::one);
 
             // create new context
             emitCreateChildrenContext();
@@ -428,13 +390,12 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
                 emitLoadArgumentsToLuaList(*castNode->getIterator()); // ..., LuaList
                 *code << code->StoreReference(explistLocal->getIndex()); // ...
                 int index = 0;
-                for (const auto* loopVariable : {fLocal, sLocal, varLocal})
-                {
+                for (const auto *loopVariable: {fLocal, sLocal, varLocal}) {
                     *code
-                        << code->LoadReference(explistLocal->getIndex()) // ..., LuaList
-                        << code->PushInt(index++) // ..., LuaList, int
-                        << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue
-                        << code->StoreReference(loopVariable->getIndex()); // ...
+                            << code->LoadReference(explistLocal->getIndex()) // ..., LuaList
+                            << code->PushInt(index++) // ..., LuaList, int
+                            << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue
+                            << code->StoreReference(loopVariable->getIndex()); // ...
                     /*
                      *code
                         << code->New(luaValue.classConstant()) // ..., LuaValue
@@ -453,60 +414,57 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             // add loop variables to parameters list
             *code << L_startLoop;
             emitNewLuaList(); // ..., LuaList
-            for (const auto* parameter : {sLocal, varLocal})
-            {
+            for (const auto *parameter: {sLocal, varLocal}) {
                 *code
-                    << code->Duplicate() // ..., LuaList, LuaList
-                    << code->LoadReference(parameter->getIndex()); // ..., LuaList, LuaList, LuaValue
+                        << code->Duplicate() // ..., LuaList, LuaList
+                        << code->LoadReference(parameter->getIndex()); // ..., LuaList, LuaList, LuaValue
                 emitAddToLuaList(); // ..., LuaList
             }
 
             // call function with args: f(s, var)
             *code
-                << code->LoadReference(fLocal->getIndex()) // ..., LuaList, LuaValue
-                << code->Swap() // ..., LuaValue, LuaList
-                << code->InvokeVirtual(luaValue.method.call()); // ..., LuaList
+                    << code->LoadReference(fLocal->getIndex()) // ..., LuaList, LuaValue
+                    << code->Swap() // ..., LuaValue, LuaList
+                    << code->InvokeVirtual(luaValue.method.call()); // ..., LuaList
 
             // declare local values to new context
             {
                 auto resultListLocal = registerNewLocal(Local::Size::one);
                 *code << code->StoreReference(resultListLocal->getIndex()); // ...
                 int index = 0;
-                Local* firstElementLocal = nullptr;
-                for (auto* expr : *castNode->getNameList())
-                {
+                Local *firstElementLocal = nullptr;
+                for (auto *expr: *castNode->getNameList()) {
                     assert(expr->getType() == ExpressionNode::Type::Id);
-                    auto idExpr = static_cast<IdExprNode*>(expr);
+                    auto idExpr = static_cast<IdExprNode *>(expr);
                     *code
-                        << code->LoadReference(local.getContext()) // ..., LuaContext,
-                        << code->PushString(idExpr->getValue()) // ..., LuaContext, string
-                        << code->LoadReference(resultListLocal->getIndex()) // ..., LuaContext, string, LuaList
-                        << code->PushInt(index) // ..., LuaContext, string, LuaList, int
-                        << code->InvokeVirtual(luaList.method.get()); // ..., LuaContext, string, LuaValue
+                            << code->LoadReference(local.getContext()) // ..., LuaContext,
+                            << code->PushString(idExpr->getValue()) // ..., LuaContext, string
+                            << code->LoadReference(resultListLocal->getIndex()) // ..., LuaContext, string, LuaList
+                            << code->PushInt(index) // ..., LuaContext, string, LuaList, int
+                            << code->InvokeVirtual(luaList.method.get()); // ..., LuaContext, string, LuaValue
 
                     // store in locals only first value
-                    if (index == 0)
-                    {
+                    if (index == 0) {
                         firstElementLocal = registerNewLocal(Local::Size::one);
                         *code
-                            << code->Duplicate() // ..., LuaContext, string, LuaValue, LuaValue
-                            << code->StoreReference(firstElementLocal->getIndex()); // ..., LuaContext, string, LuaValue
+                                << code->Duplicate() // ..., LuaContext, string, LuaValue, LuaValue
+                                << code->StoreReference(firstElementLocal->getIndex());
+                        // ..., LuaContext, string, LuaValue
                     }
 
                     // declare value in context
                     *code << code->InvokeVirtual(luaContext.method.declareLocalValueById()); // ...,
 
-                    if (index == 0)
-                    {
+                    if (index == 0) {
                         // check finish loop condition: idExpr_1 == nil
                         *code
-                            << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue
-                            << code->InvokeVirtual(luaValue.method.isNil()) // ..., bool
-                            << code->If(Instruction::NotEqual, L_endLoop); // ...
+                                << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue
+                                << code->InvokeVirtual(luaValue.method.isNil()) // ..., bool
+                                << code->If(Instruction::NotEqual, L_endLoop); // ...
                         *code
-                            << code->LoadReference(varLocal->getIndex()) // ..., LuaValue
-                            << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue, LuaValue
-                            << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
+                                << code->LoadReference(varLocal->getIndex()) // ..., LuaValue
+                                << code->LoadReference(firstElementLocal->getIndex()) // ..., LuaValue, LuaValue
+                                << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
                         delete firstElementLocal;
                     }
                     index++;
@@ -522,19 +480,18 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             emitGetParentContext();
             break;
         }
-    case StatementNode::Type::WhileLoop:
-        {
-            auto* code = getAttributeCode();
-            auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
-            auto* L_cond = code->CodeLabel();
-            auto* L_end = code->CodeLabel();
+        case StatementNode::Type::WhileLoop: {
+            auto *code = getAttributeCode();
+            auto *castNode = static_cast<const WhileLoopStmtNode *>(node);
+            auto *L_cond = code->CodeLabel();
+            auto *L_end = code->CodeLabel();
             loopEndLabels_.push(L_end);
 
             *code << L_cond;
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
-                << code->If(Instruction::Compare::Equal, L_end); // if 0 -> L_end
+                    << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
+                    << code->If(Instruction::Compare::Equal, L_end); // if 0 -> L_end
 
             buildBytecode(castNode->getBlock());
             *code << code->GoTo(L_cond);
@@ -543,12 +500,11 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
             loopEndLabels_.pop();
             break;
         }
-    case StatementNode::Type::RepeatLoop:
-        {
-            auto* code = getAttributeCode();
-            auto* castNode = static_cast<const WhileLoopStmtNode*>(node);
-            auto* L_body = code->CodeLabel();
-            auto* L_end = code->CodeLabel();
+        case StatementNode::Type::RepeatLoop: {
+            auto *code = getAttributeCode();
+            auto *castNode = static_cast<const WhileLoopStmtNode *>(node);
+            auto *L_body = code->CodeLabel();
+            auto *L_end = code->CodeLabel();
             loopEndLabels_.push(L_end);
 
             *code << L_body;
@@ -556,50 +512,40 @@ void BytecodeBuilder::buildBytecode(const StatementNode* node)
 
             buildBytecode(castNode->getCondition()); // ..., LuaValue
             *code
-                << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
-                << code->If(Instruction::Compare::Equal, L_body); // if 0 -> L_body
+                    << code->InvokeVirtual(luaValue.method.toBool()) // ..., bool
+                    << code->If(Instruction::Compare::Equal, L_body); // if 0 -> L_body
 
             *code << L_end;
             loopEndLabels_.pop();
             break;
         }
-    case StatementNode::Type::Block:
-        {
-            buildBlock(*static_cast<const BlockStmtNode*>(node));
+        case StatementNode::Type::Block: {
+            buildBlock(*static_cast<const BlockStmtNode *>(node));
             break;
         }
-    case StatementNode::Type::GoTo:
-        break;
-    case StatementNode::Type::Label:
-        break;
-    case StatementNode::Type::Break:
-        {
-            auto* code = getAttributeCode();
-            if (loopEndLabels_.empty())
-            {
+        case StatementNode::Type::GoTo:
+            break;
+        case StatementNode::Type::Label:
+            break;
+        case StatementNode::Type::Break: {
+            auto *code = getAttributeCode();
+            if (loopEndLabels_.empty()) {
                 throw std::runtime_error("break outside loop");
             }
             *code << code->GoTo(loopEndLabels_.top());
             break;
         }
-    case StatementNode::Type::Return:
-        {
-            auto* code = getAttributeCode();
-            auto* castNode = static_cast<const ReturnStmtNode*>(node);
-
-            emitLoadArgumentsToLuaList(*castNode->getReturnExprList()); // ..., LuaList
-
-            *code << code->ReturnReference();
+        case StatementNode::Type::Return: {
+            buildReturn(node);
             break;
         }
     }
 }
 
-void BytecodeBuilder::emitBinaryAnd(const ExpressionNode* left, const ExpressionNode* right)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitBinaryAnd(const ExpressionNode *left, const ExpressionNode *right) {
+    auto *code = getAttributeCode();
 
-    auto* L_end = code->CodeLabel();
+    auto *L_end = code->CodeLabel();
 
     buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
@@ -613,11 +559,10 @@ void BytecodeBuilder::emitBinaryAnd(const ExpressionNode* left, const Expression
     *code << L_end;
 }
 
-void BytecodeBuilder::emitBinaryOr(const ExpressionNode* left, const ExpressionNode* right)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitBinaryOr(const ExpressionNode *left, const ExpressionNode *right) {
+    auto *code = getAttributeCode();
 
-    auto* L_end = code->CodeLabel();
+    auto *L_end = code->CodeLabel();
 
     buildBytecode(left); // ..., left
     *code << code->Duplicate(); // ..., left, left
@@ -631,297 +576,255 @@ void BytecodeBuilder::emitBinaryOr(const ExpressionNode* left, const ExpressionN
     *code << L_end;
 }
 
-void BytecodeBuilder::emitPushInt(int64_t value)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitPushInt(int64_t value) {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(luaValue.classConstant())
-        << code->Duplicate()
-        << code->PushLong(value)
-        << code->InvokeSpecial(luaValue.constructor.integer());
+            << code->New(luaValue.classConstant())
+            << code->Duplicate()
+            << code->PushLong(value)
+            << code->InvokeSpecial(luaValue.constructor.integer());
 }
 
-void BytecodeBuilder::emitPushFloat(double value)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitPushFloat(double value) {
+    auto *code = getAttributeCode();
     *code
-        << code->New(luaValue.classConstant())
-        << code->Duplicate()
-        << code->PushDouble(value)
-        << code->InvokeSpecial(luaValue.constructor.floatNumber());
+            << code->New(luaValue.classConstant())
+            << code->Duplicate()
+            << code->PushDouble(value)
+            << code->InvokeSpecial(luaValue.constructor.floatNumber());
 }
 
-void BytecodeBuilder::emitPushBool(bool value)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitPushBool(bool value) {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(luaValue.classConstant())
-        << code->Duplicate()
-        << code->PushInt(value)
-        << code->InvokeSpecial(luaValue.constructor.boolean());
+            << code->New(luaValue.classConstant())
+            << code->Duplicate()
+            << code->PushInt(value)
+            << code->InvokeSpecial(luaValue.constructor.boolean());
 }
 
-void BytecodeBuilder::emitPushString(const std::string& value)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitPushString(const std::string &value) {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(luaValue.classConstant())
-        << code->Duplicate()
-        << code->PushString(value)
-        << code->InvokeSpecial(luaValue.constructor.string());
+            << code->New(luaValue.classConstant())
+            << code->Duplicate()
+            << code->PushString(value)
+            << code->InvokeSpecial(luaValue.constructor.string());
 }
 
-void BytecodeBuilder::emitPushNull()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitPushNull() {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(luaValue.classConstant())
-        << code->Duplicate()
-        << code->InvokeSpecial(luaValue.constructor.nil());
+            << code->New(luaValue.classConstant())
+            << code->Duplicate()
+            << code->InvokeSpecial(luaValue.constructor.nil());
 }
 
-void BytecodeBuilder::emitLoadId(const std::string& value)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitLoadId(const std::string &value) {
+    auto *code = getAttributeCode();
 
     *code
-        << code->LoadReference(local.getContext())
-        << code->PushString(value)
-        << code->InvokeVirtual(luaContext.method.getById());
+            << code->LoadReference(local.getContext())
+            << code->PushString(value)
+            << code->InvokeVirtual(luaContext.method.getById());
 }
 
-void BytecodeBuilder::emitBinarySum()
-{
+void BytecodeBuilder::emitBinarySum() {
     emitStaticCall(luaValue.method.add());
 }
 
-void BytecodeBuilder::emitBinarySub()
-{
+void BytecodeBuilder::emitBinarySub() {
     emitStaticCall(luaValue.method.sub());
 }
 
-void BytecodeBuilder::emitBinaryMul()
-{
+void BytecodeBuilder::emitBinaryMul() {
     emitStaticCall(luaValue.method.mul());
 }
 
-void BytecodeBuilder::emitBinaryDiv()
-{
+void BytecodeBuilder::emitBinaryDiv() {
     emitStaticCall(luaValue.method.div());
 }
 
-void BytecodeBuilder::emitBinaryIntDiv()
-{
+void BytecodeBuilder::emitBinaryIntDiv() {
     emitStaticCall(luaValue.method.idiv());
 }
 
-void BytecodeBuilder::emitBinaryMod()
-{
+void BytecodeBuilder::emitBinaryMod() {
     emitStaticCall(luaValue.method.mod());
 }
 
-void BytecodeBuilder::emitBinaryPow()
-{
+void BytecodeBuilder::emitBinaryPow() {
     emitStaticCall(luaValue.method.pow());
 }
 
-void BytecodeBuilder::emitBinaryConcat()
-{
+void BytecodeBuilder::emitBinaryConcat() {
     emitStaticCall(luaValue.method.concat());
 }
 
-void BytecodeBuilder::emitBinaryEqual()
-{
+void BytecodeBuilder::emitBinaryEqual() {
     emitStaticCall(luaValue.method.equal());
 }
 
-void BytecodeBuilder::emitBinaryNotEqual()
-{
+void BytecodeBuilder::emitBinaryNotEqual() {
     emitBinaryEqual();
     emitUnaryBooleanNot();
 }
 
-void BytecodeBuilder::emitBinaryLessThan()
-{
+void BytecodeBuilder::emitBinaryLessThan() {
     emitStaticCall(luaValue.method.lessThan());
 }
 
-void BytecodeBuilder::emitBinaryLessEqual()
-{
+void BytecodeBuilder::emitBinaryLessEqual() {
     emitStaticCall(luaValue.method.lessEqual());
 }
 
-void BytecodeBuilder::emitBinaryGreaterThan()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitBinaryGreaterThan() {
+    auto *code = getAttributeCode();
     *code << code->Swap();
     emitStaticCall(luaValue.method.lessThan());
 }
 
-void BytecodeBuilder::emitBinaryGreaterEqual()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitBinaryGreaterEqual() {
+    auto *code = getAttributeCode();
     *code << code->Swap();
     emitStaticCall(luaValue.method.lessEqual());
 }
 
-void BytecodeBuilder::emitBinaryGetFieldByKey()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitBinaryGetFieldByKey() {
+    auto *code = getAttributeCode();
     *code
-        << code->InvokeVirtual(luaValue.method.index());
+            << code->InvokeVirtual(luaValue.method.index());
 }
 
-void BytecodeBuilder::emitCall()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitCall() {
+    auto *code = getAttributeCode();
     *code
-        << code->InvokeVirtual(luaValue.method.call());
+            << code->InvokeVirtual(luaValue.method.call());
 }
 
-void BytecodeBuilder::emitUnaryUnm()
-{
+void BytecodeBuilder::emitUnaryUnm() {
     emitStaticCall(luaValue.method.unMinus());
 }
 
-void BytecodeBuilder::emitUnaryLen()
-{
+void BytecodeBuilder::emitUnaryLen() {
     emitStaticCall(luaValue.method.length());
 }
 
-void BytecodeBuilder::emitUnaryBooleanNot()
-{
+void BytecodeBuilder::emitUnaryBooleanNot() {
     emitStaticCall(luaValue.method.boolNot());
 }
 
-void BytecodeBuilder::emitTableConstructor(TableFieldList* fieldList)
-{
+void BytecodeBuilder::emitTableConstructor(TableFieldList *fieldList) {
     auto code = getAttributeCode();
     int64_t index = 0;
 
     *code
-        << code->New(luaValue.classConstant()) // ..., ref(LuaValue)
-        << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue)
+            << code->New(luaValue.classConstant()) // ..., ref(LuaValue)
+            << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue)
 
     emitCreateHashMap(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
-    for (auto field : *fieldList)
-    {
+    for (auto field: *fieldList) {
         *code << code->Duplicate(); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap)
-        if (field.name != nullptr)
-        {
+        if (field.name != nullptr) {
             buildBytecode(field.name); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
-        }
-        else
-        {
+        } else {
             emitPushInt(++index); // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue)
         }
         buildBytecode(field.value);
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap), ref(HashMap), ref(LuaValue), ref(LuaValue)
 
         *code
-            << code->InvokeVirtual(hashMap.method.put())
-            << code->PopOne();
+                << code->InvokeVirtual(hashMap.method.put())
+                << code->PopOne();
         // ..., ref(LuaValue), ref(LuaValue), ref(HashMap)
     }
 
     *code << code->InvokeSpecial(luaValue.constructor.table()); // ..., ref(LuaValue)
 }
 
-void BytecodeBuilder::emitLoadVararg()
-{
+void BytecodeBuilder::emitLoadVararg() {
     auto code = getAttributeCode();
     *code
-        << code->LoadReference(local.getArgs()) // ..., ref(List of args)
-        << code->PushInt(varargIndexInArguments_) // ..., ref(List of args), int
-        << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
+            << code->LoadReference(local.getArgs()) // ..., ref(List of args)
+            << code->PushInt(varargIndexInArguments_) // ..., ref(List of args), int
+            << code->InvokeVirtual(luaList.method.get()); // ..., ref(LuaValue)
 }
 
-void BytecodeBuilder::emitLoadVarargList()
-{
+void BytecodeBuilder::emitLoadVarargList() {
     auto code = getAttributeCode();
     *code
-        << code->LoadReference(local.getArgs()) // ..., ref(List of args)
-        << code->PushInt(varargIndexInArguments_) // ..., ref(List of args), int
-        << code->InvokeVirtual(luaList.method.subList()); // ..., ref(List of vararg)
+            << code->LoadReference(local.getArgs()) // ..., ref(List of args)
+            << code->PushInt(varargIndexInArguments_) // ..., ref(List of args), int
+            << code->InvokeVirtual(luaList.method.subList()); // ..., ref(List of vararg)
 }
 
-void BytecodeBuilder::emitStaticCall(ConstantMethodref* methodref)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitStaticCall(ConstantMethodref *methodref) {
+    auto *code = getAttributeCode();
     *code << code->InvokeStatic(methodref);
 }
 
-void BytecodeBuilder::emitCreateHashMap()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitCreateHashMap() {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(hashMap.classConstant()) // ..., objectref(HashMap)
-        << code->Duplicate() // ..., objectref, objectref
-        << code->InvokeSpecial(hashMap.constructor.base()); // ..., objectref
+            << code->New(hashMap.classConstant()) // ..., objectref(HashMap)
+            << code->Duplicate() // ..., objectref, objectref
+            << code->InvokeSpecial(hashMap.constructor.base()); // ..., objectref
 }
 
-void BytecodeBuilder::buildBlock(const BlockStmtNode& block, bool needCreateNewContext, bool needSetParentContextAfter)
-{
-    if (needCreateNewContext)
-    {
+void BytecodeBuilder::buildBlock(const BlockStmtNode &block, bool needCreateNewContext,
+                                 bool needSetParentContextAfter) {
+    if (needCreateNewContext) {
         emitCreateChildrenContext();
     }
-    for (auto* stmt : *block.getList())
-    {
+    for (auto *stmt: *block.getList()) {
         buildBytecode(stmt);
     }
-    if (needSetParentContextAfter)
-    {
+    if (needSetParentContextAfter) {
         emitGetParentContext();
     }
 }
 
-void BytecodeBuilder::emitCreateChildrenContext()
-{
+void BytecodeBuilder::emitCreateChildrenContext() {
     auto code = getAttributeCode();
     const auto contextIndex = local.getContext();
     *code
-        << code->New(luaContext.classConstant()) // ..., LuaContext
-        << code->Duplicate() // ..., LuaContext, LuaContext
-        << code->LoadReference(contextIndex) // ..., LuaContext, LuaContext, LuaContext
-        << code->InvokeSpecial(luaContext.constructor.withParent()) // ..., LuaContext
-        << code->StoreReference(contextIndex); // ...
+            << code->New(luaContext.classConstant()) // ..., LuaContext
+            << code->Duplicate() // ..., LuaContext, LuaContext
+            << code->LoadReference(contextIndex) // ..., LuaContext, LuaContext, LuaContext
+            << code->InvokeSpecial(luaContext.constructor.withParent()) // ..., LuaContext
+            << code->StoreReference(contextIndex); // ...
 }
 
-void BytecodeBuilder::emitGetParentContext()
-{
+void BytecodeBuilder::emitGetParentContext() {
     auto code = getAttributeCode();
     const auto contextIndex = local.getContext();
     *code
-        << code->LoadReference(contextIndex) // ..., LuaContext
-        << code->InvokeVirtual(luaContext.method.getParent()) // ..., LuaContext
-        << code->StoreReference(contextIndex); // ...
+            << code->LoadReference(contextIndex) // ..., LuaContext
+            << code->InvokeVirtual(luaContext.method.getParent()) // ..., LuaContext
+            << code->StoreReference(contextIndex); // ...
 }
 
-void BytecodeBuilder::emitFunctionCallExpr(const FunctionCallExprNode& node)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitFunctionCallExpr(const FunctionCallExprNode &node) {
+    auto *code = getAttributeCode();
 
     emitFunctionCallExprList(node);
     *code
-        << code->PushInt(0)
-        << code->InvokeVirtual(luaList.method.get());
+            << code->PushInt(0)
+            << code->InvokeVirtual(luaList.method.get());
 }
 
 
-void BytecodeBuilder::emitFunctionCallExprList(const FunctionCallExprNode& node)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitFunctionCallExprList(const FunctionCallExprNode &node) {
+    auto *code = getAttributeCode();
 
-    if (node.getWithSelf())
-    {
+    if (node.getWithSelf()) {
         // The function is a table method, i.e. the self parameter exists only for TableField, so the static_cast is used.
-        auto tableFunc = static_cast<TableFieldExprNode*>(node.getFunctionExpression());
+        auto tableFunc = static_cast<TableFieldExprNode *>(node.getFunctionExpression());
         buildBytecode(tableFunc->getTable()); // ..., self
         *code << code->Duplicate(); // ..., self, self
         buildBytecode(tableFunc->getKey()); // ..., self, self, key
@@ -930,12 +833,10 @@ void BytecodeBuilder::emitFunctionCallExprList(const FunctionCallExprNode& node)
         *code << code->Swap(); // ..., LuaValue, self
         emitNewLuaList(); // ..., LuaValue, self, LuaList
         *code
-            << code->DuplicateBeforeOne() // ..., LuaValue, LuaList, self, LuaList
-            << code->Swap(); // .., LuaValue, LuaList, LuaList, self
+                << code->DuplicateBeforeOne() // ..., LuaValue, LuaList, self, LuaList
+                << code->Swap(); // .., LuaValue, LuaList, LuaList, self
         emitAddToLuaList(); // ..., LuaValue, LuaList
-    }
-    else
-    {
+    } else {
         buildBytecode(node.getFunctionExpression()); // ..., LuaValue
         emitNewLuaList(); // ..., LuaValue, LuaList
     }
@@ -945,114 +846,97 @@ void BytecodeBuilder::emitFunctionCallExprList(const FunctionCallExprNode& node)
     emitCall(); // ..., LuaList
 }
 
-void BytecodeBuilder::emitFunctionCallStmt(const FunctionCallStmtNode& node)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitFunctionCallStmt(const FunctionCallStmtNode &node) {
+    auto *code = getAttributeCode();
     buildBytecode(node.getExpression());
     *code << code->PopOne();
 }
 
-void BytecodeBuilder::emitAssigment(const AssignmentStmtNode& node)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitAssigment(const AssignmentStmtNode &node) {
+    auto *code = getAttributeCode();
 
     auto valuesLocal = registerNewLocal(Local::Size::one);
     emitLoadArgumentsToLuaList(node.getValues()); // ..., LuaList
     *code << code->StoreReference(valuesLocal->getIndex()); // ...
 
     int32_t index = 0;
-    for (auto* val : node.getNameList())
-    {
-        if (val->getType() == ExpressionNode::Type::Id)
-        {
-            auto idExpr = static_cast<IdExprNode*>(val);
+    for (auto *val: node.getNameList()) {
+        if (val->getType() == ExpressionNode::Type::Id) {
+            auto idExpr = static_cast<IdExprNode *>(val);
             *code
-                << code->LoadReference(local.getContext()) // ..., LuaContext
-                << code->PushString(idExpr->getValue()); // ..., LuaContext, string
-            if (node.getScope() == Scope::Global)
-            {
+                    << code->LoadReference(local.getContext()) // ..., LuaContext
+                    << code->PushString(idExpr->getValue()); // ..., LuaContext, string
+            if (node.getScope() == Scope::Global) {
                 *code << code->InvokeVirtual(luaContext.method.getByIdOrCreateNewGlobal()); // ..., LuaValue
-            }
-            else
-            {
+            } else {
                 *code << code->InvokeVirtual(luaContext.method.declareLocalId()); // ..., LuaValue
             }
             *code
-                << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaList
-                << code->PushInt(index) // ..., LuaValue, LuaList, int
-                << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue
-                << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
-        }
-        else
-        {
+                    << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaList
+                    << code->PushInt(index) // ..., LuaValue, LuaList, int
+                    << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue
+                    << code->InvokeVirtual(luaValue.method.setAnotherLuaValue()); // ...
+        } else {
             assert(val->getType() == ExpressionNode::Type::TableField);
-            auto tableFieldExpr = static_cast<TableFieldExprNode*>(val);
+            auto tableFieldExpr = static_cast<TableFieldExprNode *>(val);
             buildBytecode(tableFieldExpr->getTable()); // ..., LuaValue
             buildBytecode(tableFieldExpr->getKey()); // ..., LuaValue, LuaValue
             *code
-                << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaValue, LuaList
-                << code->PushInt(index) // ..., LuaValue, LuaValue, LuaList, int
-                << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue, LuaValue
-                << code->InvokeVirtual(luaValue.method.newIndex()); // ...
+                    << code->LoadReference(valuesLocal->getIndex()) // ..., LuaValue, LuaValue, LuaList
+                    << code->PushInt(index) // ..., LuaValue, LuaValue, LuaList, int
+                    << code->InvokeVirtual(luaList.method.get()) // ..., LuaValue, LuaValue, LuaValue
+                    << code->InvokeVirtual(luaValue.method.newIndex()); // ...
         }
         index++;
     }
     delete valuesLocal;
 }
 
-void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes, bool createListBeforeSet)
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList &nodes, bool createListBeforeSet) {
+    auto *code = getAttributeCode();
 
-    if (createListBeforeSet)
-    {
+    if (createListBeforeSet) {
         emitNewLuaList();
     }
     // ..., LuaList
 
     auto it = nodes.begin();
-    while (it != nodes.end())
-    {
+    while (it != nodes.end()) {
         *code << code->Duplicate(); // ..., LuaList, LuaList
         auto next = std::next(it);
-        if (next == nodes.end())
-        {
-            switch ((*it)->getType())
-            {
-            case ExpressionNode::Type::Vararg:
-                emitLoadVarargList(); // ..., LuaList, LuaList, LuaList
-                emitAddAllToLuaList();
-                break;
-            case ExpressionNode::Type::FunctionCall:
-                emitFunctionCallExprList(*static_cast<FunctionCallExprNode*>(*it)); // ..., LuaList, LuaList, LuaList
-                emitAddAllToLuaList();
-                break;
-            case ExpressionNode::Type::Id:
+        if (next == nodes.end()) {
+            switch ((*it)->getType()) {
+                case ExpressionNode::Type::Vararg:
+                    emitLoadVarargList(); // ..., LuaList, LuaList, LuaList
+                    emitAddAllToLuaList();
+                    break;
+                case ExpressionNode::Type::FunctionCall:
+                    emitFunctionCallExprList(*static_cast<FunctionCallExprNode *>(*it));
+                    // ..., LuaList, LuaList, LuaList
+                    emitAddAllToLuaList();
+                    break;
+                case ExpressionNode::Type::Id:
+                    *code
+                            << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
+                            << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
+                    buildBytecode(*it); // ..., LuaList, LuaList, LuaValue, LuaValue, LuaValue
+                    *code << code->InvokeSpecial(luaValue.constructor.anotherLuaValue());
+                    // ..., LuaList, LuaList, LuaValue
+                    emitAddToLuaList(); // ..., LuaList
+                    break;
+                default:
+                    buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
+                    emitAddToLuaList(); // ..., LuaList
+            }
+        } else {
+            if ((*it)->getType() == ExpressionNode::Type::Id) {
                 *code
-                    << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
-                    << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
+                        << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
+                        << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
                 buildBytecode(*it); // ..., LuaList, LuaList, LuaValue, LuaValue, LuaValue
                 *code << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()); // ..., LuaList, LuaList, LuaValue
                 emitAddToLuaList(); // ..., LuaList
-                break;
-            default:
-                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
-                emitAddToLuaList(); // ..., LuaList
-            }
-        }
-        else
-        {
-            if ((*it)->getType() == ExpressionNode::Type::Id)
-            {
-                *code
-                    << code->New(luaValue.classConstant()) // ..., LuaList, LuaList, LuaValue
-                    << code->Duplicate(); // ..., LuaList, LuaList, LuaValue, LuaValue
-                buildBytecode(*it); // ..., LuaList, LuaList, LuaValue, LuaValue, LuaValue
-                *code << code->InvokeSpecial(luaValue.constructor.anotherLuaValue()); // ..., LuaList, LuaList, LuaValue
-                emitAddToLuaList(); // ..., LuaList
-            }
-            else
-            {
+            } else {
                 buildBytecode(*it); // ..., LuaList, LuaList, LuaValue
                 emitAddToLuaList(); // ..., LuaList
             }
@@ -1061,39 +945,34 @@ void BytecodeBuilder::emitLoadArgumentsToLuaList(const ExpressionNodeList& nodes
     }
 }
 
-void BytecodeBuilder::emitNewLuaList()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitNewLuaList() {
+    auto *code = getAttributeCode();
 
     *code
-        << code->New(luaList.classConstant()) // ..., objectref(LuaList)
-        << code->Duplicate() // ..., objectref, objectref
-        << code->InvokeSpecial(luaList.constructor.base()); // ..., objectref
+            << code->New(luaList.classConstant()) // ..., objectref(LuaList)
+            << code->Duplicate() // ..., objectref, objectref
+            << code->InvokeSpecial(luaList.constructor.base()); // ..., objectref
 }
 
-void BytecodeBuilder::emitAddToLuaList()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitAddToLuaList() {
+    auto *code = getAttributeCode();
 
     *code
-        << code->InvokeVirtual(luaList.method.add())
-        << code->PopOne(); // отбросить bool
+            << code->InvokeVirtual(luaList.method.add())
+            << code->PopOne(); // отбросить bool
 }
 
-void BytecodeBuilder::emitAddAllToLuaList()
-{
-    auto* code = getAttributeCode();
+void BytecodeBuilder::emitAddAllToLuaList() {
+    auto *code = getAttributeCode();
 
     *code
-        << code->InvokeVirtual(luaList.method.addAll())
-        << code->PopOne();
+            << code->InvokeVirtual(luaList.method.addAll())
+            << code->PopOne();
 }
 
-void BytecodeBuilder::emitDeclareLocalIds(ExpressionNodeList* ids)
-{
-    auto* code = getAttributeCode();
-    for (auto id : *ids)
-    {
+void BytecodeBuilder::emitDeclareLocalIds(ExpressionNodeList *ids) {
+    auto *code = getAttributeCode();
+    for (auto id: *ids) {
         *code << code->LoadReference(local.getContext());
         buildBytecode(id);
         *code << code->InvokeVirtual(luaContext.method.declareLocalId());
